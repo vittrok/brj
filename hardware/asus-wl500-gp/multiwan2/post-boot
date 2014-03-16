@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# disable multicast on ogo & volia
+#ifconfig vlan1 -multicast
+#ifconfig vlan2 -multicast
+
+# bogus route
+#ip route replace unreachable 10.0.0.0/8
+#ip route replace unreachable 172.16.0.0/12
+#ip route replace unreachable 192.168.0.0/16
+
+# multicast & broadcast
+#ip route replace unreachable 224.0.0.0/24 
+#ip route replace unreachable 255.255.255.255
+
+# start services                       
+crond -l 1                       
+
+# start multi-wan
+/usr/local/sbin/init_wan.sh
+
+exit 0

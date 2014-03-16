@@ -1,0 +1,48 @@
+#!/bin/sh
+
+[ -z "$1" ] && echo "Error: should be called from pppd" && exit 1
+[ -z "$6" ] && echo "Error: set WAN interface name in 'ipparam' options" && exit 1
+
+LOG="/usr/bin/logger -t ppp-$6"
+
+proto=`nvram get $6_protocol`
+
+IPT_MTU="-p tcp --syn -j TCPMSS --clamp-mss-to-pmtu"                                                                                
+
+if [ "$proto" = "pppoe" ]; then
+	pppoe_mss=$(expr `nvram get $6_pppoe_mtu` - 40)
+	IPT_MSS="-p tcp --tcp-flags SYN,RST SYN -m tcpmss --mss $(expr $pppoe_mss + 1): -j TCPMSS --set-mss $pppoe_mss"
+fi
+       
+$LOG "stopped"
+$LOG "delete masquerade and route to dev $1"
+
+iptables -D INPUT -i $1 ! -d $4 -j DROP
+#iptables -t nat -D POSTROUTING -o $1 ! -s $4 -j MASQUERADE
+iptables -t nat -D POSTROUTING -o $1 ! -s $4 -j SNAT --to-source $4
+iptables -t nat -D PREROUTING -d $4 -j VSERVER                                                       
+
+case "$proto" in
+	pppoe)
+		iptables -D FORWARD -i $1 $IPT_MSS
+		iptables -D FORWARD -o $1 $IPT_MSS
+		;;
+	pptp)
+		iptables -D FORWARD -i $1 $IPT_MTU
+		iptables -D FORWARD -o $1 $IPT_MTU
+		;;
+esac
+		
+
+if [ ! -z `nvram get $6_testip_1` ]; then
+	ip route replace `nvram get $6_testip_1` via 127.0.0.1
+	ip route replace `nvram get $6_testip_2` via 127.0.0.1
+fi
+
+nvram set $6_ipaddr_t=
+nvram set $6_pppdev_t=
+nvram set $6_gateway_t=
+
+$LOG "$proto connection down"
+
+exit 0

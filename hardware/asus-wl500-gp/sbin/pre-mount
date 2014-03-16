@@ -1,0 +1,6 @@
+#!/bin/sh
+
+# Swap on
+swapon /dev/scsi/host0/bus0/target0/lun0/part2
+
+#e2fsck -f -D -C 0 -p /dev/discs/disc0/part1 2>&1 | logger -t e2fsck

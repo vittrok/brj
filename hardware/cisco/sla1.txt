@@ -1,0 +1,109 @@
+ip cef
+ip name-server 192.168.100.2
+ip sla monitor 1
+ type echo protocol ipIcmpEcho 212.49.XXX.XX1 source-interface FastEthernet0/0.100
+ timeout 1000
+ threshold 40
+ frequency 3
+ip sla monitor schedule 1 life forever start-time now
+ip sla monitor 2
+ type echo protocol ipIcmpEcho 195.64.YYY.YY2 source-interface FastEthernet0/0.200
+ timeout 1000
+ threshold 40
+ frequency 3
+ip sla monitor schedule 2 life forever start-time now
+!
+track 100 rtr 1 reachability
+!
+track 200 rtr 2 reachability
+! 
+interface FastEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+ no cdp enable
+!
+interface FastEthernet0/0.1
+ description Local-Net
+ encapsulation dot1Q 1
+ ip address 192.168.10.1 255.255.255.0
+ ip access-group 100 in
+ ip helper-address 192.168.10.2
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip nat inside
+ ip virtual-reassembly
+ ip policy route-map forced-proxy
+ no cdp enable
+!
+interface FastEthernet0/0.2
+ description Proxy-web-dhcp
+ encapsulation dot1Q 2
+ ip address 192.168.100.1 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly
+ no cdp enable
+!
+interface FastEthernet0/0.100
+ description ISP0
+ encapsulation dot1Q 100
+ ip address 212.49.XXX.XX2 255.255.255.224
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip nat outside
+ ip virtual-reassembly
+ ip policy route-map ISP0
+ no keepalive
+ no cdp enable
+!
+interface FastEthernet0/0.200
+ description ISP1
+ encapsulation dot1Q 200
+ ip address 195.64.YYY.YY2 255.255.255.252
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip nat outside
+ ip virtual-reassembly
+ ip policy route-map ISP1
+ no keepalive
+ no cdp enable
+!
+interface FastEthernet0/0.999
+ encapsulation dot1Q 999 native
+ no cdp enable
+!
+ip route 0.0.0.0 0.0.0.0 212.49.XXX.XX1 track 100
+ip route 0.0.0.0 0.0.0.0 195.64.YYY.YY1 track 200
+!
+ip dns server
+!
+no ip http server
+no ip http secure-server
+ip nat translation timeout 30
+ip nat inside source route-map ISP0 interface FastEthernet0/0.100 overload
+ip nat inside source route-map ISP1 interface FastEthernet0/0.200 overload
+!
+logging trap debugging
+access-list 1 permit any
+access-list 100 permit ip 192.168.10.0 0.0.0.255 any
+access-list 101 deny   tcp host 192.168.10.2 any eq www
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 any eq www
+no cdp run
+!
+route-map forced-proxy permit 10
+ match ip address 101
+ set ip next-hop 192.168.100.2
+!
+route-map ISP0 permit 10
+ match interface FastEthernet0/0.100
+!
+route-map ISP1 permit 10
+ match interface FastEthernet0/0.200
+!
+control-plane
+!
+end
+

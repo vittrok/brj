@@ -1,0 +1,108 @@
+#!/bin/sh
+IPTABLES="/usr/sbin/iptables"
+
+#DD-WRT firewall rules #BEGIN
+
+#apply simple forward rules
+
+for RULE in $(nvram get forward_spec)
+do
+   FROM=`echo $RULE | cut -d '>' -f 1`
+   TO=`echo $RULE | cut -d '>' -f 2`
+   STATE=`echo $FROM | cut -d ':' -f 2`
+   PROTO=`echo $FROM | cut -d ':' -f 3`
+   SPORT=`echo $FROM | cut -d ':' -f 4`
+   DEST=`echo $TO | cut -d ':' -f 1`
+   DPORT=`echo $TO | cut -d ':' -f 2`
+
+   if [ "$STATE" = "on" ]; then
+      if [ "$PROTO" = "both" ]; then
+        #udp
+        #iptables -A FORWARD -d $(nvram get wan2_ipaddr) -p udp --dport $SPORT -j ACCEPT
+        iptables -A PREROUTING -t nat -p udp -d $(nvram get wan2_ipaddr) --dport $SPORT -j DNAT --to $DEST:$DPORT
+        #tcp
+        #iptables -A FORWARD -d $(nvram get wan2_ipaddr) -p tcp --dport $SPORT -j ACCEPT
+        iptables -A PREROUTING -t nat -p tcp -d $(nvram get wan2_ipaddr) --dport $SPORT -j DNAT --to $DEST:$DPORT
+      else
+        #iptables -A FORWARD -d $(nvram get wan2_ipaddr) -p $PROTO --dport $SPORT -j ACCEPT
+        iptables -A PREROUTING -t nat -p $PROTO -d $(nvram get wan2_ipaddr) --dport $SPORT -j DNAT --to $DEST:$DPORT
+      fi
+   fi
+done
+
+#apply range forward rules
+for RULE in $(nvram get forward_port)
+do
+  FROM=`echo $RULE | cut -d '>' -f 1`
+  TO=`echo $RULE | cut -d '>' -f 2`
+  STATE=`echo $FROM | cut -d ':' -f 2`
+  PROTO=`echo $FROM | cut -d ':' -f 3`
+  SPORT=`echo $FROM | cut -d ':' -f 4`
+  EPORT=`echo $FROM | cut -d ':' -f 5`
+
+  if [ "$STATE" = "on" ]; then
+    if [ "$PROTO" = "both" ]; then
+      #udp
+      #iptables -A FORWARD -d $(nvram get wan2_ipaddr) -p udp --dport $SPORT:$EPORT -j ACCEPT
+      iptables -A PREROUTING -t nat -p udp -d $(nvram get wan2_ipaddr) --dport $SPORT:$EPORT -j DNAT --to $TO
+      #tcp
+      #iptables -A FORWARD -d $(nvram get wan2_ipaddr) -p tcp --dport $SPORT:$EPORT -j ACCEPT
+      iptables -A PREROUTING -t nat -p tcp -d $(nvram get wan2_ipaddr) --dport $SPORT:$EPORT -j DNAT --to $TO
+    else
+      #iptables -A FORWARD -d $(nvram get wan2_ipaddr) -p $PROTO --dport $SPORT:$EPORT -j ACCEPT
+      iptables -A PREROUTING -t nat -p $PROTO -d $(nvram get wan2_ipaddr) --dport $SPORT:$EPORT -j DNAT --to $TO
+    fi
+  fi
+done
+
+iptables -A PREROUTING -t nat -p icmp -d $(nvram get wan2_ipaddr) -j DNAT --to $(nvram get lan_ipaddr)
+
+if [ $(nvram get remote_management) -eq 1 ]; then
+        iptables -A PREROUTING -t nat -p tcp -d $(nvram get wan2_ipaddr) --dport $(nvram get http_wanport) -j DNAT --to $(nvram get lan_ipaddr):$(nvram get http_lanport)
+fi
+
+if [ $(nvram get dmz_enable) -eq 1 ]; then
+        DMZ_IP=$(nvram get lan_ipaddr | sed -r 's/[0-9]+$//')$(nvram get dmz_ipaddr)
+        iptables -A PREROUTING -t nat -d $(nvram get wan2_ipaddr) -j DNAT --to $DMZ_IP
+fi
+
+iptables -A PREROUTING -t nat --dest $(nvram get wan2_ipaddr) -j TRIGGER --trigger-type dnat
+iptables -A FORWARD -i $(nvram get wan2_ifname) -o $(nvram get lan_ifname) -j TRIGGER --trigger-type in
+
+#iptables -A PREROUTING -t mangle -i $(nvram get wan2_ifname) -j IMQ --todev 0
+#iptables -A PREROUTING -t mangle -i $(nvram get wan2_ifname) -j SVQOS_IN
+#iptables -A POSTROUTING -t mangle -o $(nvram get wan2_ifname) -j SVQOS_OUT
+
+#DD-WRT END
+
+$IPTABLES -F POSTROUTING -t nat
+$IPTABLES -t mangle -N ETH1
+$IPTABLES -t mangle -F ETH1
+#$IPTABLES -t mangle -A ETH1 -p tcp -j LOG --log-prefix " MANGLE_TCP_ETH1 "
+#$IPTABLES -t mangle -A ETH1 -p icmp -j LOG --log-prefix " MANGLE_ICMP_ETH1 "
+$IPTABLES -t mangle -A ETH1 -j MARK --set-mark 0x100
+$IPTABLES -t mangle -N ETH2
+$IPTABLES -t mangle -F ETH2
+#$IPTABLES -t mangle -A ETH2 -p tcp -j LOG --log-prefix " MANGLE_TCP_ETH2 "
+#$IPTABLES -t mangle -A ETH2 -p icmp -j LOG --log-prefix " MANGLE_ICMP_ETH2 "
+$IPTABLES -t mangle -A ETH2 -j MARK --set-mark 0x200
+$IPTABLES -t nat -N SPOOF_ETH1
+$IPTABLES -t nat -F SPOOF_ETH1
+#$IPTABLES -t nat -A SPOOF_ETH1 -j LOG --log-prefix " SPOOF_ETH1 "
+$IPTABLES -t nat -A SPOOF_ETH1 -j SNAT --to $(nvram get wan_ipaddr)
+$IPTABLES -t nat -N SPOOF_ETH2
+$IPTABLES -t nat -F SPOOF_ETH2
+#$IPTABLES -t nat -A SPOOF_ETH2 -j LOG --log-prefix " SPOOF_ETH2 "
+$IPTABLES -t nat -A SPOOF_ETH2 -j SNAT --to $(nvram get wan2_ipaddr)
+$IPTABLES -A INPUT -p icmp -s 192.168.1.0/24 -d 192.168.1.1 -j ACCEPT
+$IPTABLES -t mangle -A OUTPUT -o ! br0 -m random --average 50 -j ETH1
+$IPTABLES -t mangle -A PREROUTING -i br0 -m random --average 50 -j ETH1
+$IPTABLES -t mangle -A OUTPUT -o ! br0 -m random --average 50 -j ETH2
+$IPTABLES -t mangle -A PREROUTING -i br0 -m random --average 50 -j ETH2
+$IPTABLES -t nat -A POSTROUTING -o $(nvram get wan_ifname) -j SPOOF_ETH1
+$IPTABLES -t nat -A POSTROUTING -o $(nvram get wan2_ifname) -j SPOOF_ETH2
+
+RP_PATH=/proc/sys/net/ipv4/conf
+for IFACE in `ls $RP_PATH`; do
+    echo 0 > $RP_PATH/$IFACE/rp_filter
+done

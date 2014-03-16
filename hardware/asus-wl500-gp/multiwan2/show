@@ -1,0 +1,29 @@
+#!/bin/sh
+
+case "$1" in
+    nat)
+    	iptables -L -v -n -t nat
+        ;;
+    fw)
+        iptables -L -v -n
+        ;;
+    conn)
+        cat /proc/net/ip_conntrack  | grep ESTABLISHE
+        ;;
+    log)
+    	cat /tmp/syslog.log
+    	;;
+    ro|route)
+    	netstat -rn
+    	echo "primary default route"
+    	ip route show table primary
+    	echo "voip default route"
+    	ip route show table voip
+    	;;
+    run)
+    	nvram show
+    	;;
+    *)
+        echo oops!
+        ;;
+esac

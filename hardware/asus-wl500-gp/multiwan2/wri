@@ -1,0 +1,3 @@
+#!/bin/sh
+flashfs save && flashfs commit
+nvram commit

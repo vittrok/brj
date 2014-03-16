@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# bogus route
+ip route replace 10.0.0.0/8 dev lo
+ip route replace 172.16.0.0/12 dev lo
+ip route replace 192.168.0.0/16 dev lo
+
+# launch multi-wan
+/usr/local/sbin/init_wan.sh
+
+# services
+dropbear -p 34022
+fakeidentd gaaronk
+
+/usr/sbin/crond -l 1

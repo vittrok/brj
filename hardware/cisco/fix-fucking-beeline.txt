@@ -1,0 +1,9 @@
+interface Dialer0
+ ip address negotiated
+ ip mtu 1492
+ ip adjust-mss 1452
+ encapsulation ppp
+ dialer pool 5
+ dialer-group 1
+ no cdp enable
+

@@ -1,0 +1,6 @@
+32 2 * * * /usr/sbin/rtc -s
+30 2 2 * * /usr/sbin/rtc -c
+59 1 * * * /usr/sbin/daylight &
+#20 * * * * /ffp/brj/nod32/bin/update.sh
+#10 * * * * /ffp/brj/price/grab.sh
+#10 1 * * * /ffp/brj/price/price-send.sh

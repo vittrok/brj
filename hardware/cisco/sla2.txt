@@ -1,0 +1,38 @@
+ip sla 1
+ icmp-echo 194.87.x.x source-interface GigabitEthernet0/1.21
+ timeout 1000
+ threshold 800
+ frequency 5
+ip sla schedule 1 life forever start-time now
+ 
+ip sla 2
+ icmp-echo 81.211.y.y source-interface GigabitEthernet0/1.21
+ timeout 1000
+ threshold 800
+ frequency 5
+ip sla schedule 2 life forever start-time now
+ 
+track 1 rtr 1 reachability
+ delay down 11
+!
+track 2 rtr 2 reachability
+ delay down 11
+!
+ 
+track 123 list boolean or
+ object 1
+ object 2
+ delay down 11
+ 
+ip local policy route-map icmp.tst
+ 
+ip route 0.0.0.0 0.0.0.0 194.186.defaultgateway1 track 123
+ip route 0.0.0.0 0.0.0.0 195.144.defaultgateway2 254
+ 
+route-map icmp.tst permit 10
+ match ip address icmp.tst
+ set ip next-hop 194.186.defaultgateway1
+ 
+ip access-list extended icmp.tst
+ permit icmp any host 194.87.x.x echo
+ permit icmp any host 81.211.y.y echo

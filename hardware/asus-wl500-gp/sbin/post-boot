@@ -1,0 +1,47 @@
+#!/bin/sh
+
+# setup hostname
+hostname gate.c3.local
+
+# Delete default route, it's sux
+#ip route delete 0.0.0.0 dev vlan1
+#route delete default
+# Add vzletka.net static routes, not for pptp
+#route add -net 10.0.0.0     netmask 255.192.0.0   gw 10.17.64.1 dev vlan1
+#route add -net 89.105.128.0 netmask 255.255.252.0 gw 10.17.64.1 dev vlan1
+
+# Fix some buggu progs
+chmod 777 /tmp
+
+# Fix for Midnight Commander
+echo "export TERMINFO=/opt/share/terminfo" >> /etc/profile
+echo "export TERM=xterm" >> /etc/profile
+echo "alias mc=\"mc -a -c\"" >> /etc/profile
+
+# remove trash
+rmmod audio
+rmmod soundcore
+rmmod printer
+rmmod wl
+
+# Add DNS server and fix dnsmasq
+echo "nameserver 89.105.128.72" >  /etc/resolv.conf
+echo "nameserver 89.105.128.73" >> /etc/resolv.conf
+echo "nameserver 89.105.128.74" >> /etc/resolv.conf
+# OpenDNS
+echo "nameserver 208.67.222.222"  >> /etc/resolv.conf
+echo "nameserver 208.67.220.220"  >> /etc/resolv.conf
+
+# rerun dnsmasq and got my dns - roxx
+touch /tmp/dnsmasq.log
+killall dnsmasq
+killall dnsmasq
+sleep 5
+
+rm /etc/hosts
+rm /etc/dnsmasq.conf
+ln -s /usr/local/etc/hosts /etc/hosts
+ln -s /usr/local/etc/dnsmasq.conf /etc/dnsmasq.conf
+
+/usr/sbin/dnsmasq -C /usr/local/etc/dnsmasq.conf > /dev/null 2>&1
+

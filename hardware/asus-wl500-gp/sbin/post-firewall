@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Change masq 2 snat
+
+iptables -t nat -nvL POSTROUTING | grep MASQUERADE | awk '{
+    "ifconfig "$7" | grep Mask" | getline ip;
+     split(ip,ip,":"); split(ip[2],ip," ");
+     split($8,src,"!");
+     if (src[1]=="") {src="! -s "src[2]} else {src="-s "src[1]};
+     if ($9=="0.0.0.0/0") {dst=""} else {dst="-d "$9};
+     system("iptables -t nat -A POSTROUTING -o "$7" "src" "dst" -j SNAT --to-source "ip[1]);
+     system("iptables -t nat -D POSTROUTING -o "$7" "src" "dst" -j MASQUERADE");
+  }'

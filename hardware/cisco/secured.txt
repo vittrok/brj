@@ -1,0 +1,32 @@
+vtp mode off
+ip dhcp snooping vlan 116-117,150-151,200
+ip arp proxy disable
+ip arp gratuitous none
+service password-encryption
+ip ssh time-out 60
+ip ssh authentication-retries 4
+ip ssh version 2
+interface Vlan100
+ip address 192.168.0.100 255.255.255.0
+no ip redirects
+no ip unreachables
+no ip proxy-arp
+interface FastEthernet0/3
+switchport access vlan 100
+switchport mode access
+switchport port-security maximum 2
+switchport port-security
+switchport port-security aging time 10
+switchport port-security violation restrict
+switchport port-security aging type inactivity
+spanning-tree portfast
+spanning-tree bpduguard enable
+no ip http server
+ip access-list standard Mngt_Access
+permit 172.16.0.0 0.0.0.255 log
+deny any
+line vty 0 4
+access-class Mngt_Access in
+login local
+transport input ssh
+

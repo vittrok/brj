@@ -1,0 +1,9 @@
+#!/ffp/bin/sh
+
+PATH=/ffp/sbin:/ffp/bin
+
+adjtimex -t 9965
+
+# Russia/Krasnoyarsk
+echo "KRAT-7KRAST,M3.5.0,M10.5.0/3" > /etc/TZ
+

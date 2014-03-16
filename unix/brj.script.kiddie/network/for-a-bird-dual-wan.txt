@@ -1,0 +1,286 @@
+make -C /usr/ports/net/quagga/ install clean
+echo 'quagga_enable="YES"' >> /etc/rc.conf
+echo 'quagga_daemons="zebra"' >> /etc/rc.conf
+echo 'ip route 0.0.0.0/0 em0 20' >> /usr/local/etc/quagga/zebra.conf
+echo 'ip route 0.0.0.0/0 em1 10' >> /usr/local/etc/quagga/zebra.conf
+service quagga start
+
+ route 0.0.0.0/0 multipath
+                    via 10.10.10.1 weight 7
+                    via 172.17.5.1 weight 3;
+
+при этом, предполагается, что через 10.10.10.1 будет уходить 70%, через 172.17.5.1 — 30%, но, как было уже сказано — будет это работать как попало.
+
+ext_if1="ip канала 1"
+ext_if2="ip канала 2" 
+ext_gw1="Шлюз канала 1"
+ext_gw2="Шлюз канала 2"
+#{Тут какую сеть на какой канал, либо текущий рабочий канал для всех сетей}
+#Этих через канал 2
+nat on $ext_if1 from 192.168.3.0/24 to !<no_nat> -> $ext_if2
+nat on $ext_if1 from 192.168.4.0/24 to !<no_nat> -> $ext_if2
+#Остальных через канал 1
+nat on $ext_if1 from 192.168.0.0/16 to !<no_nat> -> $ext_if1
+
+pass out on $ext_if1 route-to ($ext_if2 $ext_gw2) from $ext_if2 to !<no_nat>
+pass out on $ext_if2 route-to ($ext_if1 $ext_gw1) from $ext_if1 to !<no_nat>
+
+equal cost multipath
+
+#!/bin/sh
+PATH=/etc:/bin:/sbin:/usr/bin:/usr/sbin
+
+GW1=Шлюз первого аплинка
+GW2=Шлюз второго аплинка
+tester=0;
+itest1=`/sbin/ping -c 3 $GW1 | grep "64 bytes" | wc -l`;
+itest2=`/sbin/ping -c 3 $GW2 | grep "64 bytes" | wc -l`;
+
+if [ ! -f "/tmp/countGW.tmp" ]
+then
+echo 3 > /tmp/countGW.tmp
+fi
+
+oldtest=`cat /tmp/countGW.tmp`
+
+if (test $itest1 -gt "0")
+    then
+    let tester=tester+1
+    fi
+
+if (test $itest2 -gt "0")
+        then
+    let tester=tester+2
+        fi
+
+if [ $oldtest = $tester ]; then
+exit;
+#echo "Canali ne izmenilis"
+else
+    if  [ $oldtest = 3 ]; then
+    cp /etc/pf.conf /etc/pf.conf3
+    fi
+
+        if  [ $tester = 3 ]; then
+        cp /etc/pf.conf3 /etc/pf.conf
+    /sbin/route change default $GW1
+        fi
+
+        if  [ $tester = 2 ]; then
+        cp /etc/pf.conf2 /etc/pf.conf
+    /sbin/route change default $GW2
+        fi
+
+        if  [ $tester = 1 ]; then
+        cp /etc/pf.conf1 /etc/pf.conf
+    /sbin/route change default $GW1
+        fi
+
+/etc/rc.d/pf restart
+    
+fi
+
+nat on $ext_if1 from $lan_if:network to $ext_if1 -> {$ext_if1, $ext_if2}
+nat on $ext_if2 from $lan_if:network to $ext_if2 -> {$ext_if1, $ext_if2}
+
+pass out on $ext_if1 from $lan_if:network to any nat-to {$ext_if1, $ext_if2}
+pass out on $ext_if2 from $lan_if:network to any nat-to {$ext_if1, $ext_if2}
+
+pass in on $ext_if1 reply-to ($ext_if1 $ext_gateway1) from any to $ext_if1
+pass in on $ext_if2 reply-to ($ext_if2 $ext_gateway2) from any to $ext_if2
+
+www.openbsd.org/faq/pf/pools.html
+
+ ip r | grep -E "(default|nexthop)"
+default  proto bird
+        nexthop via 10.10.10.1  dev eth0 weight 1 dead
+        nexthop via 172.17.5.1  dev eth2 weight 1
+  	
+
+Код /etc/network/if-down.d/iprules:
+#!/bin/bash
+
+ISP1_NETWORKS="10.0.5.0/24 175.5.25.0/27"
+ISP2_NETWORKS="194.22.253.23/27 5.9.0.0/16"
+
+if [ "${LOGICAL}" = "eth0" ]; then
+    for NET in ${ISP1_NETWORKS}; do
+        ip ru d from ${NET}  table ISP1  2>/dev/null 1>/dev/null
+    done
+fi
+
+if [ "${LOGICAL}" = "eth2" ]; then
+    for NET in ${ISP2_NETWORKS}; do
+        ip ru d from ${NET}  table ISP2  2>/dev/null 1>/dev/null
+    done
+fi
+
+Код /etc/network/if-up.d/iprules:
+#!/bin/bash
+
+ISP1_NETWORKS="10.0.5.0/24 175.5.25.0/27"
+ISP2_NETWORKS="194.22.253.23/27 5.9.0.0/16"
+
+if [ "${LOGICAL}" = "eth0" ]; then
+    for NET in ${ISP1_NETWORKS}; do
+        ip ru a from ${NET}  table ISP1  2>/dev/null 1>/dev/null
+    done
+fi
+
+if [ "${LOGICAL}" = "eth2" ]; then
+    for NET in ${ISP2_NETWORKS}; do
+        ip ru a from ${NET}  table ISP2  2>/dev/null 1>/dev/null
+    done
+fi
+
+Добавляем таблицы в /etc/iproute2/rt_tables:
+# cat << EOF >>/etc/iproute2/rt_tables
+
+10       ISP1
+11       ISP2
+EOF
+
+# mkdir /etc/bird/static_route.d/
+# cat << EOF >/etc/bird/static_route.d/ISP1_LAN.conf
+    route 10.0.5.0/24  via 10.10.10.1;
+    route 175.5.25.0/27 via 10.10.10.1;   # сеть взята "с потолка", подразумевается, что это сеть белых IP провайдера ISP1
+EOF
+# cat << EOF >/etc/bird/static_route.d/ISP2_LAN.conf
+    route 194.22.253.23/27  via 172.17.5.1;    # сеть взята "с потолка", подразумевается, что это сеть белых IP провайдера ISP2
+    route 5.9.0.0/16 via 172.17.5.1;   # сеть взята "с потолка", подразумевается, что это сеть белых IP провайдера ISP2
+EOF
+
+bird.conf
+
+Затем открываем его на редактирование:
+# 
+# Logging
+#
+# Уровни логгирования.
+# all эквивалентно { debug, trace, info, remote, warning, error, auth, fatal, bug }
+# Например, мы хотим получить 2 отдельных файла с разными уровнями (в этом случае, две нижеследующие строчки следует раскомментировать):
+#        log "/var/log/bird/debug.log" { debug };
+#        log "/var/log/bird/warning.log" { warning };
+log "/var/log/bird/bird.log" all;
+
+# Router ID:
+# Тут пишем IP-адрес вашей сетевой карты, которая смотрит в вашу домашнюю (не провайдера!) локалку.
+router id 192.168.254.254;
+
+#
+# Debugging
+#
+# Уровни дебага:
+# all | off | { states, routes, filters, interfaces, events, packets }
+debug protocols { routes, interfaces };
+
+#
+# Protocols
+# 
+# Сетевые устройства, которые будут мониториться на предмет смены маршрутов (в мойм случае - это eth0 и eth2)
+protocol direct {
+        interface "eth0", "eth2";
+}
+
+#
+# Tables
+#
+# Названия таблиц маршрутизации
+# Описываем провайдеров ISP1 и ISP2:
+table ISP_ISP1;
+table ISP_ISP2;
+# Таблица "другие":
+table other;
+# Таблица "master" - основная таблица маршрутизации (main). Внимание, указывать main нельзя!
+table master;
+
+#
+# Protocol 'static'
+#
+
+protocol static {
+        table ISP_ISP1;
+        description "Home internet ISP1";
+        check link on;
+        preference 100;
+        route 0.0.0.0/0 via 10.10.10.1;
+}
+
+protocol static {
+        table ISP_ISP2;
+        description "Home internet ISP2";
+        check link on;
+        preference 150;
+        route 0.0.0.0/0 via 172.17.5.1;
+}
+
+protocol static {
+        table other;
+        description "Other custom static routes";
+        preference 200;
+        # Включение всех конфигов (если есть в наличие) в /etc/bird/static_route.d/
+        include "/etc/bird/static_route.d/*.conf";
+}
+
+protocol static {
+        table master;
+        description "Common Table";
+        # Это главная таблица, сюда вписываются все default-маршруты
+        route 0.0.0.0/0 multipath
+                    via 10.10.10.1
+                    via 172.17.5.1;
+}
+
+#
+# Protocol 'kernel'
+#
+# Обратите внимание на комментарий в 'debug all'. Советую раскомментировать только на момент запуска или дебага.
+# Оставлять дебаг с 'all' не советую. В противном случае, ваш лог-файл вырастет в сотни мегабайт, а то и больше.
+# 
+# Опция 'persist' - не дает bird убирать маршруты, созданные им, после выключения (или нештатного "падения") bird.
+# Опция 'learn' - указывает, что bird будет "изучать" все маршруты, которые были добавлены внешними средствами
+# в таблицу 10/11/254 (далее мы разберем, что такое 10, 11, 254).
+#
+protocol kernel {
+        table ISP_ISP1;
+        persist;
+        learn;
+        scan time 20;
+        kernel table 10;
+        export all;
+#       debug all;
+}
+
+protocol kernel {
+        table ISP_ISP2;
+        persist;
+        learn;
+        scan time 20;
+        kernel table 11;
+        export all;
+#       debug all;
+}
+
+protocol kernel {
+        table master;
+        persist;
+        learn;
+        scan time 20;
+        kernel table 254;
+        export all;
+#       debug all;
+}
+
+#
+# Protocol 'pipe.
+#
+# Главная таблица (default).
+# Тут мы указываем, что в главную таблицу master будут импортироваться все маршруты, указанные в статических протоколах, описанных в ISP_ISP1, ISP_ISP2 и other.
+protocol pipe {
+        table master;
+        peer table ISP_ISP1;
+        peer table ISP_ISP2;
+        peer table other;
+        import all;
+#       debug all;
+}

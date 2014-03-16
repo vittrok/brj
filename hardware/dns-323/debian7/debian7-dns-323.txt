@@ -1,0 +1,62 @@
+an.
+
+http://ftp.nl.debian.org/debian/dists/stable/main/installer-armel/current/images/orion5x/network-console/d-link/dns-323/netboot.img
+
+If your original firmware is configured to use DHCP (the default configuration from D-Link and Conceptronic), Debian installer will try to acquire an IP address with DHCP. You can use the MAC address listed at the bottom of your device to tell your DHCP server to give out a specific IP address to your machine.
+If you configured a static address in your original firmware, this configuration will be used. However, if your network configuration was incomplete (e.g. IP address or DNS were missing), the installer will use DHCP instead.
+If DHCP is used but your DHCP server does not respond, the installer will use the fallback address 192.168.0.32. This is the default IP address used by the D-Link firmware, but please note that it is different to the default IP address from the Conceptronic firmware. If you are unsure what the address of your device is, unplug the Ethernet cable, start the machine again, wait until Debian installer is ready for SSH and then plug the cable back in and connect to this fallback address.
+
+после того как зашили
+
+ssh 192.168.1.33
+ 
+u: installer
+p: install
+http://www.debian.org/releases/stable/armel/
+
+
+вентиляторы
+
+After a reboot, you can control the fan this way:
+
+echo   0 > /sys/class/hwmon/hwmon?/device/pwm1  # turn it off
+echo 255 > /sys/class/hwmon/hwmon?/device/pwm1  # turn it to full speed
+
+Разираемсо с вентиляторами
+
+apt-get install fancontrol lm-sensors
+sensors-detect
+pwmconfig
+fancontrol &
+watch sensors
+
+прикручиваем свистулю
+
+Tp-Link (TL-WN722N) driver for Debian7
+
+apt-get install wireless-tools
+apt-get install wpasupplicant
+apt-get install firmware-atheros
+cd /lib/firmware
+wget http://wireless.kernel.org/download/htc_fw/1.3/htc_9271.fw
+# for Tp-Link (TL-WN722N) driver for Debian7
+wget ftp://ftp.mirrorservice.org/sites/raspbmc.com/downloads/bin/lib/wifi/rt73.bin
+# for dlink dwa-110
+modinfo ath9k
+apt-get install ifmetric
+ 
+vi /etc/network/interfaces
+ 
+allow-hotplug wlan1
+iface wlan1 inet static
+<------>address 192.168.1.44
+<------>netmask 255.255.255.0
+<------>network 192.168.1.0
+<------>broadcast 192.168.1.255
+<------>gateway 192.168.1.1
+<------>dns-nameservers 192.168.1.1
+<------>wpa-ssid "ololo"
+<------>wpa-psk "jigurda"
+ 
+/etc/init.d/networking restart
+

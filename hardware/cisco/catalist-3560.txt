@@ -1,0 +1,69 @@
+Catalyst 3560
+
+Switch> enable
+Switch# configure terminal
+Switch(config)# enable password my-secret-password
+Switch(config)# line vty 0 15
+Switch(config-line)#password my-telnet-password
+Switch(config-line)# login
+Switch(config)# exit
+Switch(config)# service password-encryption
+Switch(config)# hostname c3560G
+c3560G(config)# interface vlan 1
+c3560G(config-if)# ip address 192.168.1.2 255.255.255.0
+c3560G(config-if)# exit
+c3560G(config)# no ip domain-lookup
+c3560G(config)# ip domain-name my-domain.ru
+c3560G(config)# ip name-server 192.168.1.15
+c3560G(config)# ntp server 192.168.1.1 version 2 source vlan 1
+c3560G(config)# ntp clock-period 36029056
+c3560G(config)# ntp max-associations 1
+c3560G(config)# exit
+c3560G# clock set 20:00:50 23 Aug 2008
+c3560G# configure terminal
+c3560G(config)# clock timezone KRSK 7
+c3560G(config)# clock summer-time KRSK recurring last Sun Mar 3:00 last Sun Oct 3:00
+c3560G(config)# service timestamps log datetime localtime
+c3560G(config)# interface range gi 0/1 – 28
+c3560G(config-if-range)# description not_used
+c3560G(config-if-range)# shutdown
+c3560G(config-if-range)# no cdp enable
+c3560G(config-if-range)# switchport nonegotiate
+c3560G(config-if-range)# switchport mode access
+c3560G(config-if-range)# exit
+c3560G(config)# vlan 999
+c3560G(config-vlan)# name unused_ports
+c3560G(config-vlan)# shutdown
+c3560G(config-vlan)# exit
+c3560G(config)# interface range gi 0/1 – 28
+c3560G(config-if-range)# description not_used
+c3560G(config-if-range)# shutdown
+c3560G(config-if-range)# no cdp enable
+c3560G(config-if-range)# switchport nonegotiate
+c3560G(config-if-range)# switchport access vlan 999
+c3560G(config-if-range)# switchport mode access
+c3560G(config-if-range)# exit
+c3560G(config)# no ip http server
+c3560G(config)# ip default-gateway 192.168.1.1
+c3560G(config)# ip routing
+c3560G(config)# ip classless
+c3560G(config)# ip subnet-zero
+c3560G(config)# ip route 0.0.0.0 0.0.0.0 192.168.1.1
+c3560G(config)# ip access-list standard TELNET
+c3560G(config-std-nacl)# permit 192.168.1.1
+c3560G(config-std-nacl)# permit 192.168.1.15
+c3560G(config-std-nacl)# exit
+c3560G(config)# line vty 0 15
+c3560G(config-line)# access-class TELNET in
+c3560G(config-line)# exec-timeout 5 0
+c3560G(config-line)# exit
+c3560G(config)# snmp-server community private RO
+c3560G(config)# snmp-server trap-source Vlan1
+c3560G(config)# snmp-server source-interface informs Vlan1
+c3560G(config)# snmp-server location SWITCH-LOCATION
+c3560G(config)# snmp-server contact my-email@my-domain.ru
+c3560G(config)# snmp-server host 192.168.1.1 RO-MY-COMPANY-NAME
+c3560G(config)# exit
+c3560G# copy running-config startup-config
+c3560G# wri
+

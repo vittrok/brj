@@ -1,0 +1,157 @@
+ervice nagle
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime
+service timestamps log datetime localtime
+service password-encryption
+service sequence-numbers
+no service dhcp
+hostname sw1.msk8
+logging buffered 262144 debugging
+logging rate-limit 10 except warnings
+logging console critical
+aaa new-model
+aaa authentication login default group tacacs+ enable
+aaa authorization exec default group tacacs+ if-authenticated
+aaa accounting send stop-record authentication failure
+aaa accounting exec default start-stop group tacacs+
+aaa accounting system default start-stop group tacacs+
+enable secret good_password
+clock timezone MSK 3
+clock summer-time MSD recurring last Sun Mar 2:00 last Sun Oct 2:00
+errdisable recovery cause security-violation
+errdisable recovery interval 120
+ip subnet-zero
+no ip source-route
+ip icmp rate-limit unreachable 1000
+ip icmp rate-limit unreachable DF 1000
+ip tcp selective-ack
+ip tcp timestamp
+ip tcp path-mtu-discovery
+ip domain-list example.ru
+ip domain-list msk8.example.ru
+ip domain-name example.ru
+ip name-server 192.168.144.68
+ip name-server 192.168.146.6
+spanning-tree mode pvst
+spanning-tree portfast bpdufilter default
+no spanning-tree optimize bpdu transmission
+spanning-tree extend system-id
+interface FastEthernet0/1
+   description -- to gw1.msk8
+   switchport mode trunk
+   switchport nonegotiate
+   load-interval 60
+   spanning-tree portfast trunk
+ 
+interface FastEthernet0/2
+   description -- to sw2.msk8
+   switchport mode trunk
+   switchport nonegotiate
+   load-interval 60
+ 
+interface FastEthernet0/3
+   description ““--”” 1111 Firmname, office 303
+   switchport access vlan 100
+   switchport mode access
+   switchport nonegotiate
+   switchport port-security
+   load-interval 60
+   no cdp enable
+   spanning-tree portfast
+ 
+interface FastEthernet0/4
+   description -- 2222 Firm2name, room 302
+   switchport access vlan 14
+   switchport mode access
+   switchport nonegotiate
+   load-interval 60
+   no cdp enable
+   spanning-tree portfast
+ 
+interface FastEthernet0/5
+   switchport access vlan 1001
+   switchport mode access
+   switchport nonegotiate
+   load-interval 60
+   spanning-tree portfast
+ 
+interface Vlan1
+   description -- management interface
+   ip address 192.168.144.51 255.255.255.248
+   no ip redirects
+   no ip proxy-arp
+   no ip route-cache
+ 
+ip default-gateway 192.168.144.49
+no ip http server
+ 
+ip access-list extended vty-access
+   remark -- hosts permitted to access the router
+   permit tcp 192.168.144.0 0.0.0.255 any
+   permit tcp 192.168.146.0 0.0.0.7 any
+   deny tcp any any range 0 65535 log-input
+   deny ip any any log-input
+ 
+logging 192.168.144.67
+ 
+access-list 2 remark -- ntp hosts to which the router can synchronize
+access-list 2 permit 192.168.144.80
+access-list 2 permit 192.168.144.68
+access-list 2 deny any log
+ 
+access-list 4 remark -- tftp servers to/from which config download/upload is permitted
+access-list 4 permit 192.168.144.67
+access-list 4 deny any
+ 
+access-list 5 remark -- hosts permitted to read snmp MIBs on the switch
+access-list 5 permit 192.168.144.34
+access-list 5 permit 192.168.144.64 0.0.0.7
+access-list 5 deny any log
+ 
+access-list 6 remark -- hosts permitted to write snmp MIBs on the switch
+access-list 6 permit 192.168.144.67
+access-list 6 deny any log
+ 
+snmp-server community XXXXX RO 5
+snmp-server community XXXXX RW 6
+snmp-server location Dmitrovka 98, 2 floor
+snmp-server contact noc@example.ru
+snmp-server tftp-server-list 4
+ 
+alias exec acl show access-lists
+alias exec sm show mac-address-table
+alias exec srb sh run | b
+alias exec uptime show version | i uptime
+alias exec cpu show proces cpu | inc CPU
+alias exec d debug
+alias exec nd undebug all
+alias exec sd show debug
+alias exec mn terminal monitor
+alias exec nm terminal no monitor
+alias exec sl show log
+alias exec cl clear log
+alias exec ct configure terminal
+alias exec sr show running-config
+ 
+line con 0
+history size 256
+transport preferred none
+escape-character 3
+line vty 0 15
+access-class vty-access in
+exec-timeout 300 0
+history size 256
+transport preferred none
+transport input telnet
+transport output telnet
+escape-character 3
+ 
+ntp authentication-key 1 md5 xxxxxx xx
+ntp authenticate
+ntp trusted-key 1
+ntp access-group peer 2
+ntp server 192.168.144.80 key 1
+ntp server 192.168.144.68 key 1
+

@@ -1,0 +1,76 @@
+#!/bin/sh'
+GPIO_OUT=/dev/gpio/out
+GPIO_OUTEN=/dev/gpio/outen
+OUTEN=$'"'"'\77'"'" >> /usr/local/sbin/ledctl
+echo -e -n "$OUTEN\0\0\0" > $GPIO_OUTEN
+LED_WLAN=1
+LED_WLAN_INVERTED=0
+LED_STATUS=2
+LED_STATUS_INVERTED=0
+LED_RED=8
+LED_RED_INVERTED=1
+LED_BLUE=16
+LED_BLUE_INVERTED=1
+LED_PRINT=32
+LED_PRINT_INVERTED=0
+RETSTATE=
+getstate() {
+    RETSTATE=$(printf "%d" "'"'"'`head /dev/gpio/out -c4`")
+}
+getstate
+INIT_STATE=$RETSTATE
+INVERTED=0
+case $1 in
+    wlan)
+        BITMASK=$LED_WLAN
+        INVERTED=$LED_WLAN_INVERTED
+    ;;
+    status)
+        BITMASK=$LED_STATUS
+        INVERTED=$LED_STATUS_INVERTED
+    ;;
+    print)
+        BITMASK=$LED_PRINT
+        INVERTED=$LED_PRINT_INVERTED
+    ;;
+    red)
+        BITMASK=$LED_RED
+        INVERTED=$LED_RED_INVERTED
+    ;;
+  blue)
+        BITMASK=$LED_BLUE
+        INVERTED=$LED_BLUE_INVERTED
+    ;;
+    *)
+        exit 1
+    ;;
+esac
+if [[ $2 == '"'"'toggle'"'"' ]]
+then
+    FINAL_STATE=$(($INIT_STATE^$BITMASK))
+else
+    FINAL_STATE=$(($INIT_STATE|$BITMASK))
+fi
+case $2 in
+    on)
+        if [[ $INVERTED == 1 ]]
+        then
+            FINAL_STATE=$(($FINAL_STATE^$BITMASK))
+        fi
+    ;;
+    off)
+        if [[ $INVERTED != 1 ]]
+    then
+            FINAL_STATE=$(($FINAL_STATE^$BITMASK))
+        fi
+    ;;
+    toggle)
+    ;;
+    *)
+        exit 1
+    ;;
+esac
+FINAL_STATE_OCT=$(printf "%o" $FINAL_STATE)
+echo -e -n "\\$FINAL_STATE_OCT\0\0\0" > $GPIO_OUT
+exit 0
+

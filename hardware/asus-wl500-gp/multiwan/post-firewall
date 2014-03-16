@@ -1,0 +1,24 @@
+#!/bin/sh
+
+lanaddr=`nvram get lan_ipaddr`
+lanmask=`nvram get lan_netmask`
+lan_net=`ipcalc -s -n $lanaddr $lanmask | awk '{print(substr($1,9))}'`/$lanmask
+
+# input policy
+iptables -P INPUT DROP
+iptables -D INPUT -j DROP
+
+# forward policy
+iptables -P FORWARD DROP
+
+# public services
+iptables -D INPUT -p tcp -j ACCEPT --dport 21
+iptables -A INPUT -p tcp --dport 113 -j ACCEPT
+iptables -A INPUT -p tcp --dport 34022 -j ACCEPT
+
+# local lan
+iptables -A FORWARD -i br0 -s $lan_net -j ACCEPT
+
+# logging
+#iptables -A INPUT -j logdrop
+#iptables -A FORWARD -j logdrop

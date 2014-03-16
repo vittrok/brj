@@ -1,0 +1,35 @@
+#!/bin/sh
+
+echo "Flushing rules" >> /var/log/messages
+
+ip rule flush
+
+echo "Rebuilding rules and tables" >> /var/log/messages
+
+ip rule add lookup main prio 32766
+ip rule add lookup default prio 32767
+
+ip rule add from $(nvram get wan_ipaddr) table 100 prio 100 
+ip rule add fwmark 0x100 table 100 prio 101
+
+ip rule add from $(nvram get wan2_ipaddr) table 200 prio 200 
+ip rule add fwmark 0x200 table 200 prio 201
+
+ip route flush table 100 
+ip route flush table 200
+
+for TABLE in 100 200 
+do 
+   ip route | grep link | while read ROUTE 
+   do 
+     ip route add table $TABLE to $ROUTE 
+   done 
+done
+
+ip route add table 100 default via $(nvram get wan_gateway) 
+ip route add table 200 default via $(nvram get wan2_gateway)
+echo "Deleting default route" >> /var/log/messages
+ip route delete default
+echo "Adding in equalized route" >> /var/log/messages
+ip route add default scope global equalize nexthop via $(nvram get wan_gateway) dev  $(nvram get wan_ifname) nexthop via $(nvram get wan2_gateway) dev $(nvram get wan2_ifname)
+echo "routes.firewall completed" >> /var/log/messages

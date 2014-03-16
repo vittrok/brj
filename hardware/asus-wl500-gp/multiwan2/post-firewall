@@ -1,0 +1,37 @@
+#!/bin/sh
+
+export `ipcalc -s -n -p $(nvram get lan_ipaddr) $(nvram get lan_netmask)`
+
+# input policy
+iptables -P INPUT DROP
+iptables -D INPUT -j DROP
+
+# forward policy
+iptables -P FORWARD DROP
+iptables -D FORWARD -i br0 -j ACCEPT
+
+# DDoS
+if [ "`nvram get fw_dos_x`" != "0" ]; then
+    iptables -A INPUT -i ppp+ -m state --state NEW -j SECURITY
+    iptables -A INPUT -i vlan+ -m state --state NEW -j SECURITY
+    iptables -D FORWARD -m conntrack --ctstate DNAT -j ACCEPT
+    iptables -A FORWARD -i ppp+ -m state --state NEW -j SECURITY
+    iptables -A FORWARD -i vlan+ -m state --state NEW -j SECURITY
+    iptables -A FORWARD -m conntrack --ctstate DNAT -j ACCEPT
+fi
+
+# local lan
+iptables -A FORWARD -i br0 -s $NETWORK/$PREFIX -j ACCEPT
+
+# public services
+# add or remowe what your want
+#iptables -D INPUT -p tcp -j ACCEPT --dport 21
+#iptables -A INPUT -p tcp --dport 113 -j ACCEPT
+
+# port-forward
+# add what your want
+#iptables -t nat -A VSERVER -p tcp -m tcp --dport 4663 -j DNAT --to-destination 1.1.1.1:4663
+
+# logging
+#iptables -A INPUT -j logdrop
+#iptables -A FORWARD -j logdrop

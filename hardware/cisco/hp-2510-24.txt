@@ -1,0 +1,36 @@
+; J9019B Configuration Editor; Created on release #Q.11.57
+
+hostname "brj-2510-24"
+snmp-server contact "Roman Y. Bogdanov"
+time timezone 8
+sntp server 10.24.0.1
+timesync sntp
+sntp unicast
+logging 10.24.0.1
+snmp-server community "public" Unrestricted
+vlan 1
+   name "DEFAULT_VLAN"
+   no ip address
+   no untagged 1-26
+   exit
+vlan 24
+   name "bzz"
+   untagged 24
+   no ip address
+   tagged 25
+   exit
+vlan 23
+   name "inet"
+   untagged 23
+   tagged 25
+   exit
+vlan 10
+   untagged 1-22,26
+   ip address 10.24.0.10 255.255.255.0
+   tagged 25
+   exit
+vlan 4004
+   name "bzz.vpu"
+   tagged 23,25
+   exit
+ip ssh

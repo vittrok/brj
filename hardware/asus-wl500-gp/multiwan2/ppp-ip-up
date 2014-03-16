@@ -1,0 +1,92 @@
+#!/bin/sh
+
+[ -z "$1" ] && echo "Error: should be called from pppd" && exit 1
+[ -z "$6" ] && echo "Error: set WAN interface name in 'ipparam' options!" && exit 1
+
+LOG="/usr/bin/logger -t ppp-$6"
+
+proto=`nvram get $6_protocol`
+ip_old=`nvram get $6_ipaddr_t`
+resolv_conf=/tmp/resolv.conf.$6
+
+IPT_MTU="-p tcp --syn -j TCPMSS --clamp-mss-to-pmtu"
+
+if [ "$proto" = "pppoe" ]; then
+	pppoe_mss=$(expr `nvram get $6_pppoe_mtu` - 40)
+	IPT_MSS="-p tcp --tcp-flags SYN,RST SYN -m tcpmss --mss $(expr $pppoe_mss + 1): -j TCPMSS --set-mss $pppoe_mss"
+fi
+
+$LOG "started"
+
+if [ ! -z $ip_old ]; then
+
+	$LOG "unset old configuration"
+	
+	gw_old=`nvram get $6_gateway_t`
+	pppdev_old=`nvram get $6_pppdev_t`
+
+	iptables -t nat -D POSTROUTING -o $pppdev_old ! -s $ip_old -j MASQUERADE
+	#iptables -t nat -D POSTROUTING -o $pppdev_old ! -s $ip_old -j SNAT --to-source $ip_old
+	iptables -t nat -D PREROUTING -d $ip_old -j VSERVER
+	iptables -D INPUT -i $pppdev_old ! -d $ip_old -j DROP
+	
+	case "$proto" in
+		pppoe)
+			iptables -D FORWARD -i $pppdev_old $IPT_MSS
+			iptables -D FORWARD -o $pppdev_old $IPT_MSS
+			;;
+		pptp)
+			iptables -D FORWARD -i $pppdev_old $IPT_MTU
+			iptables -D FORWARD -o $pppdev_old $IPT_MTU
+			;;
+	esac
+
+fi
+
+$LOG "get ip address $4"
+$LOG "add masquerade and route to dev $1"
+
+iptables -I INPUT 2 -i $1 ! -d $4 -j DROP
+iptables -t nat -A POSTROUTING -o $1 ! -s $4 -j MASQUERADE
+#iptables -t nat -A POSTROUTING -o $1 ! -s $4 -j SNAT --to-source $4
+iptables -t nat -A PREROUTING -d $4 -j VSERVER
+
+case "$proto" in
+	pppoe)
+		iptables -I FORWARD 3 -i $1 $IPT_MSS
+		iptables -I FORWARD 3 -o $1 $IPT_MSS
+		;;
+	pptp)
+		iptables -I FORWARD 3 -i $1 $IPT_MTU
+		iptables -I FORWARD 3 -o $1 $IPT_MTU
+		;;
+esac
+
+if [ ! -z `nvram get $6_testip_1` ]; then
+	$LOG "set routes for test ip adresses"
+	ip route replace `nvram get $6_testip_1` via $5
+	ip route replace `nvram get $6_testip_2` via $5
+fi
+
+if [ "$proto" = "pptp" ] && [ "`nvram get get $6_pptp_type`" = "vpn" ]; then
+	$LOG "remove route to pptp server for connection type vpn"
+	ip route delete `nvram get &6_pptp_server`
+fi
+
+if [ "$USEPEERDNS" -eq 1 ] && [ -z `nvram get $6_dns_1` ]; then
+	$LOG "change resolv.conf"
+	echo -n > $resolv_conf
+	[ -n "$DNS1" ] && echo nameserver $DNS1 >> $resolv_conf
+	[ -n "$DNS2" ] && echo nameserver $DNS2 >> $resolv_conf
+fi
+
+nvram set $6_ipaddr_t=$4                                                                                                            
+nvram set $6_pppdev_t=$1                                                                                                            
+nvram set $6_gateway_t=$5
+
+/usr/local/sbin/setroute.sh $6
+/usr/local/sbin/dyndns.sh $6 &
+
+$LOG "$proto connection up"
+
+exit 0

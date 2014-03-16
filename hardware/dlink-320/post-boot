@@ -1,0 +1,16 @@
+#!/bin/sh
+/usr/local/sbin/ledctl status off
+/usr/local/sbin/ledctl print off
+ipcp-accept-remote
+/usr/local/sbin/test-connect &
+sleep 30
+route add -net 172.16.0.0 netmask 255.255.0.0 gw 172.16.106.1
+echo "Running modem.sh" >> /usr/tmp/syslog.log
+/usr/local/sbin/modem.sh &
+sleep 30
+q='status'
+b='statusbad'
+#pingsite=$(nvram get pingsite)
+echo "Running pingtest.sh" >> /usr/tmp/syslog.log
+/usr/local/sbin/pingtest.sh &
+

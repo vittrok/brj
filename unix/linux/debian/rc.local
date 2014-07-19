@@ -1,0 +1,36 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# На всякий случай очистим цепочку FORWARD
+iptables -F FORWARD 
+
+# Разрешаем проходить пакетам по уже установленным соединениям
+iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+# Разрешаем исходящие соединения из локальной сети к интернет-хостам
+iptables -A FORWARD -m conntrack --ctstate NEW -i wlan1 -s 192.168.1.0/24 -j ACCEPT
+iptables -P FORWARD DROP 
+# Весь остальной транзитный трафик — запрещаем.
+iptables -t nat -F POSTROUTING
+# На всякий случай очистим цепочку POSTROUTING таблицы nat
+
+# Маскарадим весь трафик, идущий через wlan1 на tun0, tun1
+iptables -t nat -A POSTROUTING -o tun0 -j MASQUERADE
+iptables -t nat -A POSTROUTING -o tun1 -j MASQUERADE
+
+# mtu black hole
+iptables -I FORWARD -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+
+exit 0

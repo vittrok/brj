@@ -1,0 +1,7 @@
+base     navigation  
+author   Jan Decaluwe 
+email    jan@jandecaluwe.com 
+date     201212-19
+name     Better Navigation Template
+desc     Better navigation with dokuwiki 
+url      http://www.dokuwiki.org/template:navigation

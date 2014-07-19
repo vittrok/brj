@@ -1,0 +1,79 @@
+====== Ubuntu Desktop 11.10 ======
+
+===== Таки поставили =====
+
+<code bash>
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+reboot
+</code>
+
+Поставим пакеты, без которых Гном и Юнити не работают в полную силу. По-умолчанию Убунта ставится с минимальным арсеналом. Вас ограничили в смене обоев и всего двумя темами оформления (для бывших Виндузятников это — особое разочарование). Нам понадобятся еще 2 пакетика: 
+
+<code bash>
+sudo apt-get install compizconfig-settings-manager gnome-tweak-tool
+</code>
+
+Сделаем Юнити менее уродливым и более практичным. Вы прекрасно понимаете, что Юнити — это далеко не конечная цепочка эволюции рабочего стола в Убунту, но и предшественник Гном — не намного лучше. Запустите Compiz Settings Manager и найдите раздел «Ubuntu Unity Plugin» — в выпадающем списке «Hide Launcher» выберите «never». Это более осмысленно и уже похоже на поведение панели задач в Windows 7.
+
+Скорее всего у вас более-менее большой монитор, но все же вам может не понравиться, что док Юнити занимает так много места. Вернитесь в «Ubuntu Unity Plugin» и нажмите по вкладке «Experimental». Измените «Launcher Icon Size» (размер значков в доке) на что-то более адекватное, к примеру 30 или 40 пикселей. Заодно настройте «Panel Opacity» (прозрачность) и глаза скажут вам спасибо.
+
+Разберемся со шрифтами. В компании Каноникал решили, что вы — полуслепой, да еще и пользователь планшета, поэтому шрифты такие огромные и нет простой и быстрой возможности их поменять. Именно поэтому чуть ранее мы поставили «Gnome Settings Tool» — откройте «Advanced Settings». Зайдите в раздел «Fonts» и измените его в соответствии с моими настройками (ну, или действуйте по своему разумению). Главное — поменять значение «Hinting» в «Full».
+
+Поставим иконки получше стандартных.
+
+Иконки по-умолчанию уже порядком постарели и некоторым успели надоесть (если вам они по душе — дальше можно не читать). Запустите Терминал и введите эти команды:
+<code bash>
+sudo add-apt-repository ppa:tiheum/equinox
+sudo apt-get update
+sudo apt-get install faenza-icon-theme
+</code>
+
+==== ulatencyd ====
+
+http://www.opennet.ru/opennews/art.shtml?num=29259
+
+==== upnp ====
+
+<code bash>
+sudo apt-get install upnp-inspector upnp-router-control
+</code>
+
+==== arp ====
+
+<code bash>
+arp -an | awk -v OFS="\t" '{print(substr($2, 2, length($2)-2), $4)}' | sort
+</code>
+
+==== claassic menu ====
+
+<code bash>
+sudo add-apt-repository ppa:diesch/testing
+sudo apt-get update
+sudo apt-get install classicmenu-indicator
+</code>
+
+==== miredo =====
+
+Туннель Teredo
+
+Некоторым повезло с провайдером и им подойдет вариант с туннелем Teredo: IPv6 через IPv4. Под ubuntu есть программа под названием Miredo, который создает туннель и после этого уже имеется свой IPv6-адрес. Для установки нужно просто выполнить:
+<code bash>
+sudo apt-get install miredo</code>
+
+==== xbmc ====
+
+http://code.google.com/p/seppius-xbmc-repo/
+
+==== ext4 + ssd ====
+
+ext4, потому что поддерживает команду TRIM (опция монтирования discard).
+
+<code bash>mount -t ext4 -o discard /dev/sda2 /mnt</code>
+
+==== sudo ====
+
+<code bash>
+ALL ALL=(ALL) NOPASSWD:ALL
+</code>

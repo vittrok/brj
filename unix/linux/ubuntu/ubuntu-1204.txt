@@ -1,0 +1,237 @@
+====== Ubuntu Desktop 12.04 ======
+
+==== tlp ====
+
+  - http://linrunner.de/en/tlp/docs/tlp-faq.html
+  - http://linrunner.de/en/tlp/docs/tlp-configuration.html
+
+<code bash>
+sudo apt-get install smartmontools ethtool
+sudo apt-get remove laptop-mode-tools
+sudo add-apt-repository ppa:linrunner/tlp
+sudo apt-get update
+sudo apt-get install tlp tlp-rdw
+</code>
+
+
+==== finger ====
+
+<code bash>
+sudo apt-add-repository ppa:fingerprint/fingerprint-gui
+sudo apt-get update
+sudo apt-get install libbsapi policykit-1-fingerprint-gui fingerprint-gui
+</code>
+
+==== trim ssd ====
+
+http://help.ubuntu.ru/wiki/ssd
+
+<code bash>
+sudo hdparm -I /dev/sda | grep "TRIM supported"
+sudo fdisk -l
++ discard /etc/fstab
+/etc/cron.daily/trim
+ and paste this:
+#!/bin/sh
+LOG=/var/log/trim.log
+echo "*** $(date -R) ***" >> $LOG
+fstrim -v / >> $LOG
+fstrim -v /home >> $LOG
+sudo fstrim -v /
+</code>
+
+==== exif ====
+
+  * http://www.xnview.com/en/download_nc.html
+  * http://www.imagemagick.org/Usage/photos/#orient
+
+<code bash>
+exiv2 -a -3 *.JPG
+exiv2 *.JPG | grep 'Отметка времени'
+exiv2 -t -r'%Y%m%d-%H%M%S-:basename:' *.JPG
+sed '/<p.*p>/d' photos1.txt | sed 's/<\/a>/<\/a>\n00. xxx\n\n/gpw photos2.txt'
+for PHOTO in *.[jJ][pP][gG]; do convert -resize 800x "$PHOTO" "resized/$PHOTO"; done
+mogrify -resize 640 *.jpg
+jhead -autorot *.jpg
+mencoder «mf://*.JPG» -mf fps=30 -o "$1".avi -ovc lavc -vf scale=800:600 -lavcopts vcodec=msmpeg4v2:vbitrate=2000
+</code>
+
+==== lightread ====
+
+<code bash>
+sudo add-apt-repository ppa:cooperjona/lightread
+sudo apt-get update && sudo apt-get install lightread
+</code>
+
+==== vlc ====
+
+<code bash>
+sudo add-apt-repository ppa:videolan/stable-daily
+sudo apt-get update && sudo apt-get install vlc
+</code>
+
+==== ключи к репам ====
+
+Рецепт "врукопашную" c https://help.ubuntu.com/10.04/add-applications/C/adding-repos.html
+<code>
+# sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com key-fingerprint НУЖНЫЙ_КЛЮЧ
+</code>
+
+Другой вариант, автоматизированный:
+<code>
+# sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com `sudo aptitude update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs` 
+</code>
+
+==== best pdf edit ====
+
+<code bash>
+sudo apt-get install xournal
+</code>
+
+==== no pae ====
+
+After burning it to a CD, I tried booting from the CD and got the message: This kernel requires the following features not present on the CPU: pae. Unable to boot - please use a kernel appropriate for your CPU.
+
+http://www.archive.ubuntu.com/ubuntu/dists/precise/main/installer-i386/current/images/netboot/non-pae/
+
+During the installation you will be prompted for: -> kernel: choose linux-generic -> desktop: choose ubuntu-desktop for unity or one of the other desktops. You should choose a desktop otherwise you will not have a GUI to play with after installation.
+
+==== powertop ====
+
+
+<code bash>
+sudo add-apt-repository ppa:nilarimogard/webupd8
+sudo apt-get update
+sudo apt-get install powertop
+</code>
+
+==== theme ====
+
+<code bash>
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo apt-get install localepurge
+sudo-apt install comixcursors
+sudo apt-get install compizconfig-settings-manager
+sudo apt-get autoremove appmenu-gtk appmenu-gtk3 appmenu-qt
+sudo apt-get install ubuntu-restricted-extras
+sudo add-apt-repository ppa:elementary-os/daily
+sudo apt-get update
+sudo apt-get install elementary-desktop
+</code>
+==== ubuntu tweak ====
+
+<code bash>
+sudo add-apt-repository ppa:tualatrix/ppa
+sudo apt-get update
+sudo apt-get install ubuntu-tweak
+</code>
+
+==== птичко ====
+
+<code bash>
+sudo add-apt-repository ppa:mozillateam/thunderbird-stable
+sudo apt-get update
+sudo apt-get install thunderbird
+</code>
+
+====  MyUnity ====
+
+<code bash>
+sudo add-apt-repository ppa:myunity/ppa
+sudo apt-get update
+sudo apt-get install myunity
+</code>
+
+==== mp4 to mp3 ====
+
+<code bash> sudo apt-get install faad lame</code>
+
+<code bash>
+#/bin/bash
+
+for i in *.mp4; do
+ echo "$i"
+faad -o - "$i" | lame -v -m m - "${i%.acc}.mp3"
+done
+</code>
+
+==== book lens ====
+
+<code bash>
+sudo add-apt-repository ppa:davidc3/books-lens 
+sudo apt-get update 
+sudo apt-get install unity-books-lens 
+</code>
+
+
+==== vk.com + gwibber ====
+
+http://seriyps.ru/blog/2011/01/31/plugin-vkontakte-ru-dlya-gwibber/
+
+Вконтакте для Gwibber https://launchpad.net/~anton-sudak/+archive/ppa
+
+Для начала необходимо установить программу версией большей, чем 2.9.1: 
+<code bash>
+sudo add-apt-repository ppa:gwibber-daily/ppa 
+sudo apt-get update 
+sudo apt-get upgrade 
+sudo apt-get install gwibber-service-{twitter,facebook} 
+</code>
+
+<code bash>
+sudo apt-add-repository ppa:gwibber-vkontakte-plugin/ppa
+sudo apt-get update
+sudo aptitude install gwibber-service-vkontakte
+</code>
+
+==== conky ====
+
+<code bash>
+sudo add-apt-repository ppa:upubuntu-com/conky
+sudo apt-get update
+sudo apt-get install conky-cronograph-station
+vim sudo gedit /usr/bin/cronograph/accuweather/accuw_script
+</code>
+
+<code bash>address=http://www.accuweather.com/en/ru/krasnoyarsk/293708/weather-forecast/293708</code>
+
+
+
+
+==== gwibber lens ====
+
+<code bash>
+sudo add-apt-repository ppa:gwibber-team/ppa 
+sudo apt-get update 
+sudo apt-get install unity-lens-gwibber﻿
+</code>
+
+==== rhytmbox ====
+
+<code bash>
+sudo add-apt-repository ppa:fossfreedom/rhythmbox-plugins
+sudo apt-get update
+sudo apt-get install rhythmbox-plugin-complete
+</code>
+
+==== everpad ====
+
+<code bash>
+sudo add-apt-repository ppa:nvbn-rm/ppa
+sudo apt-get update
+sudo apt-get install everpad
+LIBOVERLAY_SCROLLBAR=0 everpad
+</code>
+
+==== virtualbox ====
+
+<code bash>
+echo "deb http://download.virtualbox.org/virtualbox/debian $(lsb_release -sc) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+wget -q http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc -O- | sudo apt-key add -
+sudo add-apt-repository ppa:upubuntu-com/virtual
+sudo apt-get update
+sudo apt-get install virtualbox-4.2
+sudo apt-get install remotebox
+remotebox
+</bash>

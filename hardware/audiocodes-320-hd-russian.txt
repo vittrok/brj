@@ -1,0 +1,23 @@
+====== AudioCodes 320HD ======
+
+http://www.audiocodes.com/320hd
+
+firmware: 1.2.2_build_5
+
+No Russian language in the LCD display the menu, чо.
+
+Как сделать русский? 
+
+на http://www.audiocodes.com/downloads ничо нет. Прошивки нет. Ок.
+
+Пишем в службу поддежки. Спрашивают серийные номера. И где купили.
+
+Описываем в dns ProvisioningServer на сервер tftp. 
+
+Складываем туда полученный 320HD_1.6.0_p003_build_44_ce6.img
+
+И все. Телефоны грузят прошивку. Ребутяться и русские.
+
+На новой прошивке только G729, а G711 куда-то ушол. Печальтоска.
+
+{{tag>audiocodes.com 320 hd 320hd русский язык прошивка}}

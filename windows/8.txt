@@ -1,0 +1,31 @@
+====== Windows 8: спасибо(tm) ======
+
+==== TRIM ====
+
+fsutil behavior query disabledeletenotify
+
+DisableDeleteNotify = 1 (Windows TRIM commands are disabled)
+DisableDeleteNotify = 0 (Windows TRIM commands are enabled)
+
+Get-EventLog -LogName Application -Source "microsoft-windows-defrag" | sort timegenerated -desc | fl timegenerated, message
+
+
+
+Пассы для установки Windows 7/8 на vhd-диск:
+
+Shift+F10
+<code bash>
+diskpart 
+create vdisk file = D:\VHD\hdd0-w8-40G.vhd type=expandable maximum=40000
+select vdisk file = D:\VHD\hdd0-w8-40G.vhd
+attach vdisk
+exit
+x:\sources\setup
+</code>
+
+===== автозагрузка =====
+
+<code bash>
+Win+R ---> shell:Startup ---> Enter.
+Win+R ---> shell:Common Startup ---> Enter.
+</code>

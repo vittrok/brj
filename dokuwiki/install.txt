@@ -1,0 +1,330 @@
+====== Инсталляция DokuWiki ======
+
+Для того, чтобы развернуть на своей площадке такой же сайт необходимо установить и настроить ядро DokuWiki, установить и настроить тему, установить и настроить необходимые плагины. 
+
+Ниже представлен примерный перечень шагов с описаниями, которые может быть необходимо выполнить:
+
+  - Работать в соответствии с инструкцией по установке [[doku>Install]]:
+    * Либо [[http://dev.splitbrain.org/view/darcs/dokuwiki-downloader/dokuwiki-downloader.php|web dokuwiki installer]] -> [[http://dev.splitbrain.org/download/darcs/dokuwiki-downloader/dokuwiki-downloader.php|тут]]
+    * Создать пустой файл **changes.log** в папке data (либо командой touch data/changes.log, либо копированием пустого файла через FTP)
+    * Установить папкам  **data** и **conf** и подпапкам атрибуты 755 или 777
+    * Установить всем файлам в **data** и **conf** атрибуты 644 или 666
+    * Копировать **conf/users.auth.php.dist** в **conf/users.auth.php** и установить атрибуты 644 или 666
+    * Копировать **conf/acl.auth.php.dist** в **conf/acl.auth.php** и установить атрибуты 644 или 666
+    * Копировать **conf/dokuwiki.php** в **conf/local.php** и установить атрибуты 644 или 666
+    * Создать первую страницу - средствами DokuWiki (кнопка Create Page)
+  - В соответствии с руководством по улучшению безопасности [[doku>security]]
+    * Переименовать папку data в другое имя, например data2((В некоторых случаях нужно указывать абсолютный путь (точка перед слэшем), './data2'. Например, плагин [[http://www.dokuwiki.org/plugin%3Acacherevisionseraser|СacheRevisionsEraser]] не работал, пока не был указан именно второй вариант.
+)) и внести соответствующее изменение в conf/local.php<code php>
+$conf['savedir'] = '/data2';
+</code>
+  - Включить поддержку авторизации в соответствии с [[doku>acl]]
+    * Исправить ''conf/local.php'' <code php>
+$conf['useacl']       = 1;        // this enables the ACL feature
+$conf['superuser']    = '@admin'; // admin group is superuser
+</code>
+    * Зарегистрировать в системе пользователя - средствами DokuWiki
+    * В файле **conf/users.auth.php** исправить группу у пользователя на группу суперюзера (указать после последнего двоеточия admin) - пользователь приобретёт администраторские права
+    * На первой странице (start) зайти в Admin/Access Control List Management и исправить права доступа для пространства имён, группа ALL оставить только чтение, нажать "Обновить"
+  - Настроить DokuWiki в соответствии с [[doku>config]]
+    * Зайти в DokuWiki под админским логином в раздел Admin/Configuration Manager (кнопка снизу) и поставить language=ru, применить настройки
+    * В "Управление/Настройки Вики" (бывшее Admin/Configuration Manager): 
+      * Права для создаваемых директорий - 0777 (чтобы не было проблем с бэкапом и управлением через FTP)
+      * Права для создаваемых файлов - 0666 (чтобы не было проблем с бэкапом и управлением через FTP)
+      * Включить отладку (отключите!) - убрать флажок
+      * Транслитерация в именах страниц - полная транслитерация (чтобы не было ссылок с %D0%A4...)
+      * Разрешить подписку на изменения - да
+      * Удобочитаемые адреса (URL) - Средствами DokuWiki
+  - установить плагин [[doku>plugin:txtconf]] и добавить ссылки на [[ya>yandex.ru]] и [[google.ru>google.ru]]:
+    * Вставить в **conf/interwiki.conf** строки:<code>
+ya        http://www.yandex.ru/yandsearch?text=
+google.ru http://www.google.ru/search?q=
+</code>
+    * Загрузить в **lib/images/interwiki** файлы {{:ya.gif|:ya.gif}} и {{:google.ru.gif|:google.ru.gif}}
+  - Настроить дату сервера в соответствии с [[doku>tips:timezone]], ниже приведён пример для Московского времени:
+    * Исправить файл **conf/local.protected.php**, добавив после %%<?php%% строку<code php>
+putenv("TZ=Europe/Moscow");// - для PHP4
+date_default_timezone_set("Europe/Moscow"); // - для PHP5
+</code>
+  - Добавить определения новых типов файлов ({{example.mpp}}, {{example.vsd}}, {{example.mp3}}, {{example.rar}}, {{example.djvu}})
+    * В **conf/mime.conf** дописать следующие строки((для DJVU файлов правильный mime тип ''image/x.djvu'', однако в таком случае они будут переданы на обработку в графическую библиотеку, которая попытается (безуспешно) сделать иконку. С типом ''application/x.djvu'' DokuWiki поступает проще - делает для таких файлов ссылку на скачивание и даёт стандартную иконку.)): <code ini>
+mpp     application/vnd.ms-project
+vsd     application/vnd.visio
+mp3     audio/mpeg
+rar     application/x-rar-compressed
+djvu    application/x.djvu
+djv     application/x.djvu
+</code> если установить плагин [[doku>plugin:txtconf]], то добавить эти строки в **mime.conf** можно с помощью этого плагина.
+   * Скопировать файлы {{:vsd.png|vsd.png}}, {{:mpp.png|mpp.png}}, {{:mp3.png|mp3.png}}, {{:rar.png|rar.png}}, {{:djvu.png|djvu.png, djv.png}} в директорию **lib/images/fileicons**
+
+===== Темы =====
+
+[[http://www.jandecaluwe.com/testwiki/doku.php/navigation:intro|Better Navigation Template]] - тема, в которой название сайта помещено в левый угол, сделана подсветка активной страницы в списке посещённых, добавлено боковое меню для разделов сайта. Либо тут -> http://www.jandecaluwe.com/testwiki/doku.php/navigation:sidebar_install
+
+После установки темы необходимо скопировать в папку темы из папки стандартной темы **lib\tpl\default\** файлы ''%%_admin.css%%'' и ''%%_linkwiz.css%%'', а также добавить пару строк в файл ''style.ini'' в раздел ''[stylesheets]'':
+<code ini>
+_admin.css     = screen
+_linkwiz.css   = screen
+</code>
+
+===== Дополнительные плагины =====
+
+<note warning>Никогда, **никогда не используйте** программу **MS Notepad**((он же Блокнот)) для редактирования файлов в **UTF-8** кодировке!
+Эта программа вставляет тройку символов в самое начало файла (EF BB BF), по которым определяет, что это UTF-8 кодировка, что иногда приводит к сбоям в PHP скриптах и порче разметки сайтов.
+</note>
+
+Конечно, эти символы не есть личная придумка Microsoft - это один из способов отмечать UTF-8 документы. Но MS Notepad **не умеет** сохранять документы **без** этого **префикса**.
+
+:!: Используйте редакторы, умеющие правильно работать с UTF-8((Текстовые редакторы, в которых можно без проблем работать с файлами Dokuwiki: [[http://notepad-plus.sourceforge.net/ru/site.htm|Notepad++]] (Опция "Кодировать в UTF-8 без BOM"), или встроенные в [[http://www.farmanager.com/|FAR]], либо в [[http://wincmd.ru/|Total Commander]], а также множество других более современных программ)).
+
+==== Google Analitycs ====
+
+Плагин для подключения статистики от [[http://www.google.com/analytics/|Google Analytics]].
+
+  * [[doku>plugin:google_analytics]]
+
+Надо модифицировать шаблон, вставив в файл ''lib/tpl/..../main.php'' следующие строки:
+<code php>
+было:
+</body>
+</html>
+
+стало:
+</body>
+  <?php
+    if (file_exists(DOKU_PLUGIN.'googleanalytics/code.php')) include_once(DOKU_PLUGIN.'googleanalytics/code.php');
+    if (function_exists('ga_google_analytics_code')) ga_google_analytics_code();
+  ?>
+</html>
+</code>
+
+=== BookmarkMe ====
+
+Вставляет блок кнопок для создания закладок на публичных серверах типа http://del.icio.us
+
+==== ActionLink ====
+
+Вставляет ссылки на служебные функции/специальные страницы DokuWiki. Например, {{actionlink>index}}.
+
+  * [[doku>plugin:actionlink]] - страница о плагине
+
+<code>{{actionlink>[action]|[title]}}</code>
+Элемент **action** может принимать следующие значения:
+  * edit    - редактировать/создать/показать страницу
+  * history - история страницы
+  * recent  - недавние изменения
+  * login   - войти/выйти
+  * index   - все страницы
+  * admin   - управление DokuWiki
+  * top     - ссылка "перейти к началу"
+  * back    - ссылка "вернуться назад"
+  * backlink - список обратных ссылок
+
+Элемент **title** является необязательным. Он позволяет вставить другой текст вместо стандартного 'Редактировать страницу', 'Старые версии', 'Недавние изменения', и т.д. 
+
+==== Search Index Manager ====
+
+Перестраивает индекс для полнотекстового поиска
+
+  * Страница о плагине - [[doku>plugin:searchindex_manager]]
+  * Загрузить исправленную версию плагина {{:searchindex.zip|searchindex.zip}} (добавлен русскоязычный интерфейс)
+  * Разархивировать плагин в папку /lib/plugins/searchindex
+  * Использование плагина - в панели управления выбрать строку "Менеджер индекса полнотекстового поиска"
+
+Иногда плагин не работает и выдаёт ошибку<code>
+Warning: array_keys(): The first argument should be an array in ...\inc\indexer.php on line 56
+Warning: join(): Bad arguments in ...\inc\indexer.php on line 56
+</code>
+В таком случае может помочь исправление в файле **inc\indexer.php**:<code php>
+// добавить следующую строку
+if (!is_array($links)) { $links = Array($links); }
+// перед строчкой 
+$tmp = join(' ',array_keys($links));
+</code>
+
+==== Note ====
+
+Оформляет текст как заметку (:!: Выглядит по-разному в Explorer'е и Firefox'е)
+<note>
+В таком виде можно оформлять всевозможные комментарии в справочных руководствах
+</note>
+  * Страница о плагине - [[doku>plugin:note]]
+  * Загрузить исправленную версию плагина {{:note.rar|:note.rar}} (изменён стиль обычной заметки)
+  * Разархивировать плагин в папку /lib/plugins/note
+  * Использование плагина - <code>
+<note>обычная заметка</note>
+<note tip>заметка-подсказка</note>
+<note important>важная заметка</note>
+<note warning>заметка-предупреждение</note>
+</code>
+<note tip>заметка-подсказка</note>
+<note important>важная заметка</note>
+<note warning>заметка-предупреждение</note>
+
+==== PageMove ====
+
+Переименовывает и переносит страницы между разными пространствами имён
+
+  * Страница о плагине - [[doku>plugin:rename]]
+  * Загрузить версию плагина с официальной страницы
+  * Разархивировать плагин в папку /lib/plugins/pagemove
+  * Использование - администраторский плагин - "Управление"/"Перемещение/Переименование страницы..."
+
+==== Discussion ====
+
+Добавляет форму отправки комментариев к странице, фактически позволяет разместить на странице ветку форума. Пример смотри в конце этой страницы.
+
+  * Страница о плагине - [[doku>plugin:discussion]]
+  * Установка - разархивировать плагин в папку /lib/plugins/discussion
+  * Использование плагина - вставить в конец текста страницы <code>~~DISCUSSION~~</code>
+  * До конца переведённый файл поддержки русского языка {{discussion_ru.rar}}
+
+<note important>Плагин не совместим с предыдущей версией плагина Blog, составной частью которого он является. Старую версию надо удалить перед инсталляцией Discussion.</note>
+
+
+==== ICQ ====
+
+Выводит номер ICQ с отображением текущего статуса пользователя (запрашивает картинку с сервера ICQ): [[icq>123456789]]
+
+  * Страница о плагине - [[doku>plugin:icq]]
+  * Загрузить исправленую версию плагина{{:icq.zip|:icq.zip}} (добавлена строка с номером ICQ)
+  * Разархивировать плагин в папку ''/lib/plugins/icq''
+  * Использование плагина - <code>[[icq>123456789]]</code>
+
+==== Highlight ====
+
+Выделяет текст цветом: <hi>выделение по умолчанию</hi> <hi red>выделение нужным цветом (red)</hi>
+
+  * Страница о плагине - [[doku>plugin:highlight]]
+  * Загрузить исправленную версию плагина (исправлена уязвимость XSS) - {{highlight.zip|highlight.zip}}
+  * Разархивировать плагин в папку ''/lib/plugins/highlight''
+  * Использование плагина: <code><hi>текст</hi>
+<hi red>текст</hi>
+<hi #A8F1F2>текст</hi>
+<hi rgb(255,34,123)>текст</hi>
+</code>
+<hi>текст</hi>
+<hi red>текст</hi>
+<hi #A8F1F2>текст</hi>
+<hi rgb(255,34,123)>текст</hi>
+
+
+==== FreeMind ====
+
+Выводит файлы сделанные в FreeMind в виде интерактивного Flash или Java.
+
+  * Страница о плагине - [[doku>plugin:freemind]]
+  * Требует установки плагина [[doku>plugin:command]]
+  * Разархивировать плагин в папку ''lib/plugins/command/ext''
+  * Добавить в ''conf/mime.conf'' строчку:<code>
+mm   text/xml</code>
+
+Пример использования:
+<code>#freemind?type=flash(dokuwiki.mm)#</code>
+#freemind?type=flash(dokuwiki.mm)#
+
+
+==== BackupTool ====
+
+Позволяет делать архивную копию страниц, предыдущих версий, meta-данных, media-файлов, файлов конфигурации, тем и плагинов.
+
+  * Страница о плагине - [[http://tjgrant.com/wiki/software:dokuwiki:plugin:backup|BackupTool]] (на английском)
+  * Скачать дистрибутив - [[http://tjgrant.com/files/dokuwiki/backuptool-current.tar.gz|backuptool-current.tar.gz]]
+  * Разархивировать плагин в папку ''lib/plugins/backup''
+
+<note>**Замечание:** Данный плагин использует библиотеку [[http://pear.php.net/|PEAR]]. Если эта библиотека не установлена, то вы получите сообщение о невозможности создания архивной копии.</note>
+
+
+===== Инфа на будущее =====
+
+  * [[doku>tips:pdfexport]] - о том, как настроить экспорт в PDF
+  * [[doku>tips:htmltowiki]] - конвертор из HTML в WIKI
+
+===== Миграция со старых версий =====
+
+Когда обновляется DokuWiki со старой версии, которая ещё не поддерживала функцию "транслитерация" сталкиваешься с проблемой, что получается практически нечитабельная структура файлов и директорий.
+
+Например : "%D0%BA%D1%8B%D1%80%D0%B3%D1%8B%D0%B7%D1%81%D1%82%D0%B0%D0%BD.txt" это тоже самое, что "кыргызстан.txt"
+
+Это происходит потому что имена файлов в UTF-8 подвергаются url-кодированию.
+
+В последних версиях DokuWiki есть опция "транслитерация" для того, чтобы изменить такое поведение. Однако простая смена настроек DokuWiki недостаточна - все старые файлы переименованы не будут. 
+
+Для того, чтобы конвертировать нечитабельную файловую структуру в "транслитерированный формат" был написан следующий скрипт:
+
+<code php>
+<?php
+
+if(!defined('DOKU_INC')) define('DOKU_INC',realpath(dirname(__FILE__).'/../').'/');
+require_once(DOKU_INC.'inc/utf8.php');
+ 
+ 
+/**
+ * Copy a file, or recursively copy a folder and its contents, and clean up the filenames according to the dokuwiki UTF-8 
+ *
+ * @original_author      Aidan Lister <aidan@php.net>
+ * @link        http://aidanlister.com/repos/v/function.copyr.php
+ * @param       string   $source    Source path
+ * @param       string   $dest      Destination path
+ * @return      bool     Returns TRUE on success, FALSE on failure
+ */
+function copyr($source, $dest)
+{
+	$dest2=cleanID($dest);
+	echo $source."->".$dest." ->$dest2<br/>";
+    // Simple copy for a file
+    if (is_file($source)) {
+        return copy($source, $dest2);
+    }
+ 
+    // Make destination directory
+    if (!is_dir($dest)) {
+        mkdir($dest2);
+ 
+	}
+ 
+    // Loop through the folder
+    $dir = dir($source);
+    while (false !== $entry = $dir->read()) {
+        // Skip pointers
+        if ($entry == '.' || $entry == '..') {
+            continue;
+        }
+ 
+        // Deep copy directories
+        if ($dest !== "$source/$entry") {
+            copyr("$source/$entry", "$dest/$entry");
+        }
+    }
+ 
+    // Clean up
+    $dir->close();
+    return true;
+}
+ 
+copyr("/srv/www/htdocs/data/","/srv/www/htdocs/datanew/"); // пути к папкам на сервере (исходный и конечный)
+ 
+function cleanID($id,$ascii=false){
+  $id = trim(urldecode($id));
+  $id = utf8_strtolower($id);
+  $id = utf8_romanize($id);
+  utf8_deaccent($id,-1);
+  $id = preg_replace('#\'+#','_',$id);
+  return($id);
+}
+ 
+?>
+</code>
+
+В скрипте надо исправить путь к директории с данными, поместить его в папку **bin** и запустить из браузера www.yoursite.ru/bin/convert.php
+
+После этого будет создана папка с копией данных но в транслитерированном формате. Теперь осталось только зайти в настройки DokuWiki, исправить путь к папке с данными на **datanew** и выбрать вариант "Полная транслитерация в именах страниц", а также "Использовать первый заголовок вместо имени".
+
+Также может потребоваться чистка кэша DokuWiki (для этого можно использовать соответствующий плагин).
+
+<note important>
+После использования скрипт надо удалить!
+Также не помешает проверить структуру созданных папок и файлов на корректность --- в именах файлов могут появиться символы типа «'» (если в названии страницы был твёрдый знак).
+</note>
+
+{{tag>fixme dokiwiki установка настройка plugin}}

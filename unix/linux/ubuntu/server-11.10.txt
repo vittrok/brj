@@ -1,0 +1,243 @@
+====== Ubuntu Server 11.10 ======
+
+<code bash>
+ sudo apt-get install iptables-persistent
+</code>
+==== virtualbox ====
+
+<code bash>
+sudo apt-get install virtualbox-guest-additions virtualbox-guest-dkms virtualbox-guest-x11 virtualbox-guest-utils
+</code>
+
+http://www.nerve.org.za/mdma/
+==== модем ====
+
+перезапустить usb хаб
+
+<code bash>
+cat /usr/work/sms/script/restart_hub.sh
+echo '1-1' | tee /sys/bus/usb/drivers/usb/unbind
+sleep 3
+echo '1-1' | tee /sys/bus/usb/drivers/usb/bind
+</code>
+
+/etc/udev/rules.d/60-symlinks.rules
+
+<code bash>
+# Create /dev/com symlink
+KERNEL=="ttyUSB*", ATTRS{serial}=="0000:00:1d.2",       SYMLINK+="com1"
+KERNEL=="ttyUSB*", ATTRS{serial}=="0000:00:1d.0",       SYMLINK+="com2"
+KERNEL=="ttyUSB*", ATTRS{serial}=="0000:00:1d.3",       SYMLINK+="com3"
+</code>
+
+<code bash>udevadm info -a -p $(udevadm info -q path -n /dev/ttyUSB0) | more</code>
+
+<code bash>
+#USB Modev Via HUB
+#Alias for  DLINk USB HUB DUB-H7 in 1st notebook port
+#SUBSYSTEM=="tty", ENV{ID_PATH}=="pci-0000:00:1d.7-usb-0:1.5:1.0", SYMLINK+="USB_HUB_1_1"
+#select
+#SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="12d1", ENV{ID_MODEL_ID}=="1001", ENV{ID_PATH}=="pci-0000:00:1d.7-usb-0:1.5:1.0", SYMLINK+="USB_HUB_1_1"
+#SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="19d2", ENV{ID_MODEL_ID}=="2003", ENV{ID_PATH}=="pci-0000:00:1d.7-usb-0:1.5:1.1", SYMLINK+="USB_HUB_1_1"
+
+
+#Alias for dlink hub DUB-H7 in ANY notebook port
+#Ports in DUB-H7 IS NOT BY ORDER
+#1 hub port
+SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="12d1", ENV{ID_MODEL_ID}=="1001", ENV{ID_PATH}=="pci-0000:00:1d.7-usb-0:?.5:1.0", SYMLINK+="USB_HUB_1_1"
+SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="19d2", ENV{ID_MODEL_ID}=="2003", ENV{ID_PATH}=="pci-0000:00:1d.7-usb-0:?.5:1.1", SYMLINK+="USB_HUB_1_1"
+#2
+SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="12d1", ENV{ID_MODEL_ID}=="1001", ENV{ID_PATH}=="pci-0000:00:1d.7-usb-0:?.6:1.0", SYMLINK+="USB_HUB_1_2"
+SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="19d2", ENV{ID_MODEL_ID}=="2003", ENV{ID_PATH}=="pci-0000:00:1d.7-usb-0:?.6:1.1", SYMLINK+="USB_HUB_1_2"
+#3
+SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="12d1", ENV{ID_MODEL_ID}=="1001", ENV{ID_PATH}=="pci-0000:00:1d.7-usb-0:?.1:1.0", SYMLINK+="USB_HUB_1_3"
+SUBSYSTEM=="tty", ENV{ID_VENDOR_ID}=="19d2", ENV{ID_MODEL_ID}=="2003", ENV{ID_PATH}=="pci-0000:00:1d.7
+</code>
+
+==== мышка ====
+
+<code bash>sudo apt-get install gpm</code>
+
+==== диски ====
+
+<code bash>
+sudo lshw -C disk
+sudo fdisk /dev/sda1
+n
+p
+1
+sudo mkfs -t ext4 /dev/sda1
+sudo tune2fs -m 1 /dev/sda1
+sudo mkdir /media/500
+touch /media/500/.nomount
+ls -l /dev/disk/by-uuid/
+sudo blkid
+</code>
+
+==== transmission ====
+
+<code bash>
+chgrp -R debian-transmission /media/500/torrent
+chmod -R 777 /media/500/torrent
+sudo apt-get install transmission-daemon
+sudo usermod -a -G debian-transmission brj
+</code>
+
+==== dropbox ====
+
+http://wiki.dropbox.com/TipsAndTricks/UbuntuServerInstall
+
+<code bash>
+sudo -s
+groupadd dropbox
+useradd -r -d /etc/dropbox -g dropbox -s /bin/false dropbox
+wget -O /tmp/dropbox.tar.gz http://www.dropbox.com/download/?plat=lnx.x86_64
+mkdir -p /usr/local/dropbox /etc/dropbox
+chown dropbox.dropbox /etc/dropbox
+chmod 700 /etc/dropbox
+tar xvzf /tmp/dropbox.tar.gz -C /usr/local/dropbox --strip 1
+rm /tmp/dropbox.tar.gz
+su -l dropbox -s /bin/bash
+umask 0027
+/usr/local/dropbox/dropboxd
+</code>
+==== miredo ====
+
+<code bash>
+apt-get install miredo
+ping6 -c 3 www.debian-administration.org
+</code>
+
+==== sshd ====
+
+
+==== ssh ====
+
+  - skip-name-resolve и UseDNS no в /etc/ssh/sshd_config
+  - update-motd --disable
+  - aptitude remove landscape-client landscape-common
+  - comment line session optional pam_motd.so in /etc/pam.d/login and /etc/pam.d/sshd
+  - В файлах /etc/pam.d/login и /etc/pam.d/sshd выпиливаем начисто строчки «session optional pam_motd.so»
+  - В /etc/ssh/sshd_config смотрим, есть ли 'PrintMotd yes'
+  - в /etc/ssh/ssh_config поставьте GSSAPIAuthentication no
+
+<code bash>
+ControlMaster auto
+ControlPersist 5m
+ControlPath ~/.ssh/%r@%h:%p
+</code>
+
+==== Midnight Commander ====
+
+<code bash>
+sudo add-apt-repository ppa:voronov84/andreyv
+sudo apt-get update
+sudo apt-get install mc
+</code>
+
+<code bash>
+export TERM=xterm-256color
+mc -S xoria256
+</code>
+mcedit ~/.mc/ini
+Найдите внутри строку вида «skin=default» и замените на «skin=xoria256»
+</code>
+
+==== скрипт ====
+
+Скрипт простой до боли в печени, при достижении отметки менее 10% свободного места мылит на мыло. Это грубо говоря игрушечный вариант, т.к. лучше все-таки использовать системы мониторинга.
+
+<code bash>
+#!/bin/bash
+used=`df -hl / | awk {'print $4'} | grep "%"`
+used=${used/\%/}
+if [ $used -gt 90 ];
+then
+echo "Achtung! Available space less than 10%. Used space = $used"% | mail -s "DISK ALERT" root@mail.ru
+fi
+</code>
+
+==== jabber ====
+
+<code bash>
+bash$ /usr/local/bin/rrdtool create /usr/local/jabber/rrd/status.rrd --start N \
+DS:users:GAUGE:600:U:U  \
+DS:s2s:GAUGE:600:U:U  \
+DS:icq:GAUGE:600:0:300  \
+RRA:AVERAGE:0:1:4464
+</code>
+
+Этой командой мы создадим архив /usr/local/jabber/rrd/status.rrd(можете подставить свой любимый путь), в который будут складываться данные из трех источников (DATA SOURSES) с именами users, s2s, icq. Значения источников users и s2s неограничены, а icq должно находиться в пределах от 0 до 300
+База есть. Дело за наполнением. Снимать данные будем с помощью netstat(как я уже говорил – не очень правильно, но быстро). Напишем для этого скрипт statrrd.sh.
+
+<code bash>
+#!/bin/sh
+
+# добавить значения в базу
+/usr/local/bin/rrdupdate /usr/local/jabber/rrd/status.rrd N:\
+`netstat -an | grep 522[23] | grep ESTABLISHED |wc -l | sed 's/ //g'`:\
+`netstat -an | grep 5269 | grep ESTABLISHED |wc -l | sed 's/ //g'`:\
+`netstat -an | grep 5190 | grep ESTABLISHED |wc -l | sed 's/ //g'`
+
+# нарисовать картинки
+/usr/local/jabber/rrd/statimagerrd.sh rrd-day.png d > /dev/null 2>&1
+/usr/local/jabber/rrd/statimagerrd.sh rrd-week.png w > /dev/null 2>&1
+/usr/local/jabber/rrd/statimagerrd.sh rrd-month.png m > /dev/null 2>&1
+</code>
+
+Запускать его будет неутомимый труженик CRON:
+
+<code bash>
+bash$ cronatb -e
+..
+добавляем строку
+*/5 * * * * /usr/local/jabber/rrd/statrrd.sh > /dev/null 2>&1
+</code>
+
+<code bash>
+#!/bin/sh
+/usr/local/bin/rrdtool graph /usr/local/www/data/jabber-stats/$1 \
+-t "jabber.kiev.ua stats" \
+--interlace \
+--color CANVAS#000000 \
+--color BACK#101010 \
+--color FONT#C0C0C0 \
+--color MGRID#80C080 \
+--color GRID#808020 \
+--color FRAME#808080 \
+--color SHADEA#404040 \
+--color SHADEB#404040 \
+-u 400 -l 5 -a PNG -h 200 -w 600 \
+-s "now-1$2"  \
+DEF:users=/usr/local/jabber/rrd/status.rrd:users:AVERAGE \
+DEF:s2s=/usr/local/jabber/rrd/status.rrd:s2s:AVERAGE \
+DEF:icq=/usr/local/jabber/rrd/status.rrd:icq:AVERAGE \
+CDEF:usersonl=users \
+CDEF:p0=users \
+CDEF:p1=users,5,- \
+CDEF:p2=users,10,- \
+CDEF:p3=users,15,- \
+CDEF:p4=users,20,- \
+CDEF:p5=users,25,- \
+CDEF:p6=users,30,- \
+CDEF:p7=users,35,- \
+VRULE:1#FF0000 \
+AREA:usersonl#008800    \
+LINE1:p0#005500 \
+AREA:p1#009900 \
+AREA:p2#00AA00 \
+AREA:p3#00BB00 \
+AREA:p4#00CC00 \
+AREA:p5#00DD00 \
+AREA:p6#00EE00 \
+AREA:p7#00FF00:"Users Online   " \
+GPRINT:usersonl:MAX:"Max. %3.0lf\l" \
+LINE2:s2s#F75500:"S2S" \
+GPRINT:s2s:MAX:"Max. %3.0lf\l" \
+LINE2:icq#007700:"ICQ" \
+GPRINT:icq:MAX:"Max. %3.0lf\l"
+</code>
+
+Цветовая гамма несколько мрачная. Но, поэкспериментировав с рисовальщиком, вполне можно подобрать что-то более веселенькое.
+
+{{tag>ubuntu usbtty модем добавить порт правила привязать перезапустить usb хаб}}

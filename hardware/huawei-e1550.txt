@@ -1,0 +1,184 @@
+====== Huawei E1550 ======
+
+Почти все про Huawei E1550.
+
+===== AT команды =====
+
+AT команды USB модемов HUAWEI
+
+Reset device 
+ATZ
+
+Modem information 
+ATI
+
+Selecting an APN 
++CGDCONT=1,”IP”,”apn name” e.g. for Vodafone UK - AT+CGDCONT=1,”IP”,”internet”
+
+Querying signal strength 
++CSQ 
+Returns two comma separated numbers. The first number is the signal strength (RSSI), the second number is unused. Here’s how to interpret RSSI: 0 ⇐ -113dBm 1 -111dBm 2 – 30 -109dBm to -53dBm 31 >= -51dBm 99 Unknown
+
+Setting operating mode 
++CFUN=x 0 Low power mode 1 Online 4 Offline 6 Reset device 7 Turn off radio
+
+Get manufacturer information 
++CGMI
+
+Get software version 
++CGMR
+
+Get SIM IMSI number 
++CIMI
+
+Get device IMEI 
++CGSN
+
+Get hardware version 
+Change PIN 
++CPWD=SC,old pin, new pin
+
+Enable PIN 
++CLCK=SC,mode,pin Mode: 0=unlock, 1=lock, 2=query state
+
+Query system information 
+Returns: status, domain, roaming status, mode, SIM state Status 0 No service. 1 Restricted service 2 Valid service 3 Restricted regional service. 4 Power-saving and deep sleep state Domain 0 No service. 1 Only CS service 2 Only PS service 3 PS+CS service 4 CS and PS not registered, searching Roaming 0 Non roaming state 1 Roaming state Mode 0 No service. 1 AMPS mode (not in use currently) 2 CDMA mode (not in use currently) 3 GSM/GPRS mode 4 HDR mode 5 WCDMA mode 6 GPS mode SIM state 0 Invalid USIM card state or pin code locked 1 Valid USIM card state 2 USIM is invalid in case of CS 3 USIM is invalid in case of PS 4 USIM is invalid in case of either CS or PS 255 USIM card is not existent,
+
+==== MTS ====
+
+<code bash>
+AT+CGDCONT=1,"IP","internet.mts.ru"
+</code>
+===== Про модем =====
+
+Вполне православный и годный USB-3G модем незалоченный на оператора. Без тонны говно софта под windows для управления. Можно подключить к роутеру а-ля [[hardware:router-asus-wl500gp|WL500G Premium]] или [[hardware:tl-wr1043nd|1043]] с dd-wrt и получить некое подобие счастия. Ещё можно пользовать на [[hardware:gpad-g10|планшетах андроидах]] или книгочиталках, или принтерах TSC для печати наклеек и чеков, т.е. где требуется только функция собственно модема.
+
+  - Поддерживаемые стандарты ->  GSM, GPRS, EDGE, 3G, HSDPA, HSPA+
+  - Размещение -> внешний по интерфейсу USB
+  - Размеры -> (ШxВxГ)	26 x 11 x 87 мм
+  - Вес -> 40 г
+  - Дополнительная информация -> слот для карт памяти microSD
+  - Поддерживает SMS (групповые рассылки)
+  - WCDMA/GSM голосовые вызовы, поддерживает стандарт WCDMA
+  - Внешне модем Huawei E1550 немногим больше стандартной «флэшки»
+
+Поддерживаемые модемом технологии в теории обеспечивают следующие скорости:
+
+  - GPRS: до 85,6 Кбит/сек;
+  - EDGE: до 236,8 Кбит/сек;
+  - HSDPA: до 3,6 Мбит/сек (DL);
+  - UMTS: до 384 Кбит/сек (UL).
+  
+==== Индикация ====
+
+  - Зеленый мигает дважды каждые 3 секунды - подключение модема к компьютеру.
+  - Зеленый мигает 1 раз каждые 3 секунды - модем регистрируется в сети 2G.
+  - Синий мигает 1 раз каждые 3 секунды - модем регистрируется в сети 3G/3G+.
+  - Зеленый горит постоянно - модем зарегистрировался в сети 2G.
+  - Синий горит постоянно - модем зарегистрировался в сети 3G.
+  - Голубой горит постоянно - модем зарегистрировался в сети 3G+.
+
+Кроме того модем достаточно оперативно переключается на другой стандарт, в случае неустойчивой свзи по основному каналу. Например, если связь с сетью 3G неустойчивая, модем переключается в стандарт 2G без разрыва соединения.
+  
+==== Windows ====
+
+Что касается программного обеспечения Windows и драйверов модема, то помимо всего, во избежание лишних трудностей следует помнить одно простое правило -> Дело в том, что устройство после установки в определенный USB порт должен быть установлен именно в этот же порт, поскольку установленные драйвера воспринимают только один USB порт. 
+
+Если возникла необходимость перестановки устройства в другой USB порт, тогда все драйвера необходимо переустановить снова.
+
+В диспетчере устройств появляется три новых устройства:
+
+  - Huawei Mass Storage USB Device -> так называемый дисковод, с которого производится установка драйверов. 
+  - HUAWEI MMC Storage USB Device —> кард-ридер Micro SD;
+  - HUAWEI Mobile Connect -> 3G Modem — сам модем.
+
+===== Разлочка =====
+
+Идем читать:
+
+  - http://forum.oszone.net/thread-170078.html
+  - http://a-zgsm.com/freecode/
+
+Операторские заморочеки с блокировкой. Железо в модемах одно и то же, и работать они будут стабильно с любой симкой.
+
+  - Для получения заветного кода разблокировки нам необходимо перейти на вкладку HUAWEI IMEI и в поле ввести IMEI модема, который можно найти под крышечкой на задней панели.
+  - Нажимаем CALC, в левой части окна появятся два значения: Flashing и Unlocking. 
+  - Нас интересует значение Unlocking, копируем его в “Мегафон Интернет”, после чего модем считается разблокированным. 
+
+Руками:
+  
+  - AT^CARDLOCK="XXXXXXXX"
+  
+Тут XXXXXXXX - Unlock-код, который вы получили в самом начале. Вытаскиваем модем, вставляем в него симку и втыкаем обратно. Все, разлочка закончена.
+  
+===== Юниксы =====
+  
+Детали подключения и особенности настройки 3G USB модема в *nix системах. Множество современных USB-модемов для удобства пользования имеют на себе драйвера и сопутствующие программы от производителя, а сам модем при подключении определяется как CD-ROM.
+
+Проблема заключается в том, что *nix-система тоже определяет наш модем как CD-ROM, в следствии чего соединение с интернетом становится невозможным.
+
+Узнаем идентификатор устройства. Этот шаг нужен не всегда, так как зачастую можно обойтись именем модели, но будем методичны. Теперь вытаскиваем симку из модема и вставляем его в USB, смотрим как он определился:
+<code bash>
+$ ls -1 /dev/ttyUSB*
+/dev/ttyUSB_utps_diag
+/dev/ttyUSB_utps_modem
+/dev/ttyUSB_utps_pcui
+</code>
+
+<code bash>
+$ lsusb
+Bus 004 Device 003: ID 12d1:1001 Huawei Technologies Co., Ltd. E1550 USB Modem
+</code>
+
+Какой пакет поддерживает нужное нам оборудование?
+
+Это просто, очень просто - установим apt-file, который умеет искать по списку всех файлов для всех подключенных в системе репозиториев пакетов. Сначала поищем по имени модели:
+
+<code bash>$ apt-file search e1550</code>
+
+Ничего не нашли. Не беда, это был лишь пробный выстрел. Теперь пробуем по идентификатору устройства:
+
+<code bash>apt-file search 12d1 | grep 1001
+usb-modeswitch-data: /etc/usb_modeswitch.d/12d1:1001</code>
+
+Как видим, поддержка оборудования есть и предоставляется пакетом usb-modeswitch-data. Но это низкоуровневый пакет, а нам удобно было бы поставить что-то более дружелюбное к пользователю. Что же, продолжаем.
+
+<code bash>sudo apt-get install usb-modeswitch</code>
+
+На винде мы будем использовать модем из комплекта МТС-Коннект, модель Huawei E1550. Берем putty / kitty, указываем порт, параметры 9600/8/N1, теперь можно нажимать Open, чтобы подключиться к модему и вводить команды.
+
+Включаем CAPS LOCK и печатаем команду АТ. Жмем ENTER. Появляется ответ: ОК. Значит связь с модемом установлена. Вводим одну из следующих команд:
+
+<code bash>
+AT^U2DIAG=0 (устройство в режиме только модем) 
+AT^U2DIAG=1 (устройство в режиме модем + CD-ROM) 
+AT^U2DIAG=255 (устройство в режиме модем + CD-ROM + Card Reader) 
+AT^U2DIAG=256 (устройство в режиме модем + Card Reader)
+</code>
+
+Я советую воспользоваться командой AT^U2DIAG=0 и в дальнейшем отказаться от возможности использовать устройство как флешку. Это облегчит Вам жизнь при настройке модемного соединения под linux.
+
+А если возникнет необходимость вернуть прибор в первобытное состояние, то никто не запрещает повторить всю процедуру, но уже с командой AT^U2DIAG=255 (устройство в режиме модем + CD-ROM + Card Reader).
+
+После установки идем редактировать файл по пути /etc/wvdial.conf. Вот пример конфигурации при использовании модема от МТС:
+
+<code bash>
+# sudo apt-get install wvdial
+[Dialer Defaults] 
+Init1 = ATZ 
+Init2 = AT+CGDCONT=1,"IP","internet.mts.ru" 
+Modem Type = USB Modem 
+Baud = 57600 
+New PPPD = yes 
+Modem = /dev/ttyUSB0 
+Phone = *99# 
+Password = mts 
+Username = mts 
+Stupid Mode = yes
+</code>
+
+===== Полезное =====
+
+http://rtzra.ru/wiki/ubuntu/huawei-173
+
+{{tag>Huawei E1550 прошивка линукс разблокировка оператор ubuntu}}

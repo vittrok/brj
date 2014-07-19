@@ -1,0 +1,177 @@
+====== ЦОД ======
+
+<code>“Зачем он сдался, маленькой,
+Малюсенькой такой компании
+И скромной такой компании,
+Огромный такой сервак?!”</code>
+
+===== Где брать? =====
+
+Общество с ограниченной ответственностью "Омиком-Красноярск" (ООО "Омиком-Красноярск"), 
+ИНН 2463223463, КПП 246301001, 660061, Красноярский край, г.Красноярск, ул.Калинина, дом № 85, 
+тел.: (391) 291-18-08
+
+www.omikom.ru
+
+==== Инструмент ====
+
+  - Набор инструментов CТN-211 -> http://shop.siriust.ru/product_info.php/products_id/3358
+  - Набор инструментов CT-863 -> http://shop.siriust.ru/product_info.php/products_id/10381
+
+
+==== Движуха ====
+
+Как известно, любое позитивное шевеление жопом начинается с фразы "Как же вы заебали, блять, лучше сам сделаю" и начать строить свой датацентр <del>[[http://lurkmore.ru/Блэкджек_и_шлюхи|с покером и балеринами]]</del>.
+
+Хочеца:
+
+  - Нормального, качественного охлаждения с большим запасом на случай выхода одного из кондиционеров.
+  - Беспроблемного электричества и обязательно собственный дизель.
+  - Каналы и до местных Tier1 и до пира. Трафик должен стоить нормальных денег.
+  - Своей, вышколенной и вменяемой круглосуточной смены на площадке.
+
+==== ЦОД ====
+
+^ Что ^ Кто ^ Как звать? ^ Партнамбер ^ Сколько? ^
+| ИБП |  APC  | Бальшой бесперебойник | SURT6000RMXLI |  1  |
+| ИБП |  APC  | Доп. Батарея | SURT192RMXLBP |  2  |
+| ИБП |  APC  | Байпасная панель | SBP5000RMI2U |  1  |
+| СТОЯК |  APC  | Блок розеток (PDU Zero U) | AP7552 |  1  |
+| СТОЯК |  APC  | Стойка 4-х опорная | AR203 |  1  |
+| СТОЯК |  APC  | Комплект для крепления PDU | AR8415 |  1  |
+| СТОЯК |  APC  | Полка для оборудования | AR8105BLK |  по вкусу  |
+| KVM |  ATEN  | Клава, мыша, монитор, 8 портов | CL-1208 |  1  | 
+| KVM |  ATEN  | 8 кабелей к штуке выше | 2L-5202P |  8  |
+| БОТЦ |  APC  | Настенный нетботц с камерой | NBWL0320 |  1  |
+| БОТЦ |  APC  | Выносной термодатчик к нетботцу | NBTS0100 |  1  | 
+| БОТЦ |  APC  | Гарантия и запись видео с нетботца на сетевую шару | NBSP0131 |  1  | 
+| РОУТЕР |  Cisco  | Catalyst 3560 24 10/100/1000T + 4 SFP + IPB Image | WS-C3560G-24TS-S |  1  |
+
+^ Что ^ Кто ^ Как звать? ^ Партнамбер ^ Сколько? ^
+| ДИСКИ |  HP  | P2000 G3 MSA FC Dual Controller LFF Model | AP845A | 1 |
+| ДИСКИ |  HP  | P2000 300GB 6G SAS 15K LFF DP HDD | AP858A | 8 | 
+| ЖУЖЫК |  HP  | DL360G7 E5620 (2.4GHz-12MB) Quad Core 1P, 3x4GB SFF 3x146GB 10k P410i-516MB FBWC DVDRW | 470065-363 | 2 |
+| ЖУЖЫК |  HP  | ProLiant DL360 G7 E5620 (2.4GHz-12MB) Quad Core Processor Option Kit | 588072-B21 | 2 |
+| ЖУЖЫК |  HP  | 4GB 2Rx4 PC3-10600R-9 Kit | 500658-B21 | 6 |
+| ЖУЖЫК |  HP  | FC1242SR 4Gb PCI-E DC HBA | AE312A | 2 | 
+| ЖУЖЫК |  HP  | 5M SW LC/LC FC Cable ALL | 221692-B22 | 4 |
+
+^ Что ^ Кто ^ Как звать? ^ Партнамбер ^ Сколько? ^
+| ДИСКИ |  HP  | Дисковый массив HP 2012 FC | AJ742A |  2  |
+| ДИСКИ |  HP  | Стораджеворковская ХБАшка PCI-E 4GB | A8002A |  4  |
+| ДИСКИ |  HP  | Винты 300GB 15K SAS | AJ736A |  24  |
+| ДИСКИ |  HP  | Шнурки от контроллера к ХБАшке 15 метров | 221692-B23 |  4  | 
+
+туду: дописать про межсетевку, типа ASA5510 Security Plus, к ней типа пограничник в минималке типа cisco 2811 HSEC bundle, ченить типа L2/3 стекируемого, и какойнить тупой L2 на базе cisco 2960 и про сервера.
+
+==== HP DL 180 ====
+
+Платформа DL180 — стоечный сервер высотой 2U, это позволяет помимо имеющейся корзины на 4 SAS диска добавить ещё одну корзину и ещё 4 SAS диска  в будущемв состав платформы входит HP Smart Array P410 controller, который сразу имеет 8 sas портовсервер имеет 12 слотов для модулей памяти, что при установке модулей по 16Gb  позволяет получить 192 Gb оперативной памятина начальном этапе мы предлагает поставить 40 Gb памяти, что займёт 6 слотов. В дальнейшем при добавлении модулей, например, по 8 Gb сервер получит  88 Gb памяти
+
+  - 590638-421 Платформа DL180G6 E5620 (2.4GHz-12MB) Quad Core, 2x4GB 8LFF SATA/SAS Model
+  - 590609-B21 Дополнительный CPU для ProLiant DL180 G6 E5620 (2.4GHz-12MB) Quad Core Processor Option Kit
+  - 516814-B21 300GB Hot-Plug 15K 3.5" DP 6G SAS Enterprise (ENT) Drive
+  - 500658-B21 4GB 2Rx4 PC3-10600R-9 Kit
+  - 500670-B21 2GB 2Rx8 PC3-10600E-9 Kit
+  - 481041-B21 Slim 12.7mm SATA DVD Kit 
+==== Vmware ====
+
+VMwarevSphere + vCenterStandard.
+
+^ Партнамбер ^ Кто ^ Как звать? ^ Сколько? ^
+| VS4-MS-AK-C | VMware | VMware vSphere Midsize Acceleration Kit for 6 processors | 1 |
+| VS4-MS-AK-G-SSS-C | VMware | Basic Support/Subscription for VMware vSphere Midsize Acceleration Kit for 6 processors for 1 year | 1 |
+| VS4-ENT-C | VMware | VMware vSphere 4 Enterprise for 1 processor (Max 6 cores per processor) | 4 |
+| VS4-ENT-G-SSS-C | VMware | Basic Support/Subscription for VMware vSphere Enterprise for 1 processor for 1 year | 4 |
+
+==== ЦОВ ====
+
+^ Партнамбер ^ Как звать? ^ Сколько? ^
+| CCX-80-NEW-LIC | CCX 8.0 NEW PREMIUM - Physical Delivery LICENSES ONLY | 1 |
+| CCX-80-P-PAK | CCX 8.0 autoexpanded Physical Delivery PAK | 1 |
+| CCX-80-N-P-LIC | CCX 8.0 NEW PREMIUM Seat Qty 1 LICENSE | 6 |
+| CCX-80-N-PHA-LIC | CCX 8.0 NEW PREMIUM HA (Dual Server Cluster) Qty 1 LICENSE	| 1 |
+| CCX-80-N-PSS-LIC | CCX 8.0 NEW PREMIUM Non HA (Single Server) Qty 1 LICENSE | 1 |
+| CON-ESW-80NWL | ESSENTIAL SW CCX 8.0 NEW PREMIUM - Physical Delivery | 1 |
+| CON-ESW-CCX80NP | ESSENTIAL SW CCX 8.0 NEW PREMIUM | 6 |
+| CON-ESW-CCX80PHA | ESSENTIAL SW CCX 8.0 NEW PREMIUM HA | 1 |
+
+^ Партнамбер ^ Как звать? ^ Сколько? ^
+| CP-7942G | Cisco Unified IP Phone 7942, spare	| 6 |
+| CON-SNT-CP7942 | SMARTNET 8X5XNBD Cisco Unified IP Phone 7942 | 6 |
+| CP-PWR-CUBE-3 | IP Phone power transformer for the 7900 phone series | 6 |
+
+^ Партнамбер ^ Как звать? ^ Сколько? ^
+| CON-ESW-EUSRA1 | ESSENTIAL SW Unified Comm Mgr Enh Sngle User Under 1K | 50 |
+| LIC-CUCM-USR | License - 1 Enhanced User | 50 | 
+| UCM-7835-71-XU | CUCM 7.1 7835 Export Unrestricted | 2 |
+
+^ Партнамбер ^ Как звать? ^ Сколько? ^
+| CISCO2821-V/K9 | 2821 Voice Bundle,PVDM2-32,SP Serv,64F/256D ? (хотя оно щас вроде EOL) | 1 | 
+| VWIC2-2MFT-T1/E1 | 2-Port 2nd Gen Multiflex Trunk Voice/WAN Int. Card - T1/E1	| 2 |
+| PVDM2-64 | 64-Channel Packet Voice/Fax DSP Module | 1 |
+| WS-C2960-24PC-S | Catalyst 2960 24 10/100 PoE + 2 T/SFP LAN Lite Image | 1 |
+| WS-C2960-48PST-S | Catalyst 2960 48 10/100 PoE + 2 1000BT +2 SFP LAN Lite Image | 1 |
+
+Для справки, различные модели телефонов	-> http://www.cisco.com/en/US/products/hw/phones/ps379/index.html -> http://www.cisco.com/en/US/products/ps10453/index.html	
+
+^ Партнамбер ^ Как звать?
+| CP-7911G | Cisco UC Phone 7911G |
+| CP-7931G | Cisco UC phone 7931G |
+| CP-7942G | Cisco UC Phone 7942, spare |
+| CP-7945G | Cisco UC Phone 7945, Gig Ethernet, Color, spare |
+| CP-7962G | Cisco UC Phone 7962, spare |
+| CP-7965G | Cisco UC Phone 7965, Gig Ethernet, Color, spare |
+| CP-7965G-CCME | Cisco UC Phone 7965, Gig, Color, with 1 CCME RTU License |
+| CP-7975G | Cisco UC phone 7975, Gig Ethernet, Color, spare |
+| CP-9951-C-CAM-K9 | Cisco UC Phone 9951, Charcoal, Std Hndst with Camera |
+| CP-9971-C-CAM-K9 | Cisco UC Phone 9971, Charcoal, Std Hndst with Camera |
+| L-IPCOMM7-LIC	| Cisco IP Communicator - Communications Client |
+| L-IPCOMM7-SW | Cisco IP Communicator 7.x |
+| CP-PWR-CUBE-3 | IP Phone power transformer for the 7900 phone series |
+
+==== СПД ====
+
+Прямые и косвенные риски, затраты в потере времени сотрудников компании, в связи с техническими ограничениями накладываемыми на бизнес-процессы каналами связи.
+
+  - Разработка сетевой инфраструктуры для связанности всех офисов и активов компании. 
+  - Возможность игнорировать ограничения накладываемые географической и территориальным положением активов (офисов компании), при планировании, перемещении ресурсов, задач и сопровождаемых бизнес процессов.
+  - Снижение затрат на внедрение и поддержку сети административным персоналом.
+  - Упрощение процедуры администрирования и снижение затрат на высококвалифицированный обслуживающий персонал.
+  - Единая архитектура, обеспечивающая прозрачное централизованное управление сетью.
+  - Оборудование и поставщики решений используемое в проектировании решения, должно иметь подтверждающие сертификаты соответствия.
+  - Используемое техническое решения должно обеспечить надежность, скорость и конфиденциальность передаваемой информации.
+  - В решении необходимо учесть требования системы сертификации в области связи: РД: 45.038-99, РД45.046-99, РД45.080-99, РД45.176-2001, РД45.121-99;
+  - Возможность защиты от вирусов, хакерских атак, запрет посещения сайтов, контроль трафика, статистика и мониторинг нагрузки.
+
+^ Партнумба ^ Наименование ^
+| CISCO2901/K9 | Маршрутизатор Cisco 2901 w/2 GE,4 EHWIC,2 DSP,256MB CF,512MB DRAM,IP Base |
+| CON-SNT-2901 | Смартнет | 
+| WS-C2960-24TC-S | Коммутатор Catalyst 2960 24 10/100 + 2 T/SFP |
+| SUA1500RMI2U | ИБП Smart-UPS 1500 VA, RackMount, 2U, AVR+LI |
+| WS-C3560G-24TS-S | Catalyst 3560 24 10/100/1000T + 4 SFP Standard Image |
+| WS-C2960-24TT-L | Catalyst 2960 24 10/100 + 2 1000BT LAN Base Image |
+| WS-C2960-48TT-L | Catalyst 2960 48 10/100 Ports + 2 1000BT LAN Base Image |
+
+===== Чпяки-пепяки! =====
+
+VMware from HP, ProLiant server VMware support matrix, [[http://h71028.www7.hp.com/enterprise/us/en/servers/4x-servers.html|туду2]]: Проверка совместимости сервера HP и версии ESX - Список серверов от HP, сертифицированных на совместимость как с ESX4i, так и с ESX3i. Фанатам HP рекомендуется к ознакомлению.
+
+==== контроллер + точко ====
+
+Cisco 2106 Wireless LAN Controller -> http://www.cisco.com/en/US/products/ps7221/index.html
+
+Cisco Aironet 1130 AG Access Point -> http://www.cisco.com/en/US/products/ps6131/index.html
+
+только Lightweight-модификацию, разумеется.
+
+| AIR-WLC2106-K9 | 2100 Series WLAN Controller for up to 6 Lightweight APs | $ 3250,00 |
+| AIR-LAP1131G-E-K9 | 802.11g Integrated Unified AP; Int Antennas; ETSI Cnfg | $ 499,00 |
+| AIR-LAP521G-E-K9 | 802.11g LWAPP AP Integrated Antennas ETSI Cnfg | $499,00 |
+| AIR-WLC526-K9 | Cisco WLC526 Mobility Express Controller | $ 1 799,00 |
+
+Последнее правда в EoS объявлено было месяца три назад, поэтому купить их можно будет где-то до осени 2010  --- //[[sam@brj.pp.ru|Roman Y. Bogdanov]] 2010/03/02 12:04//
+
+http://www.technorium.ru/vpn/compare-vpn-cisco.shtml
+
+{{tag>fixme cisco mtu path discovery}}

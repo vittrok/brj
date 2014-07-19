@@ -1,0 +1,46 @@
+====== Google Chrome ======
+
+профиль %LOCALAPPDATA%\Google\Chrome\User Data\
+
+
+==== отключить рекламу ====
+
+  - https://plus.google.com/settings/endorsements?hl=ru
+  - [ ] Основываясь на информации о моих действиях, Google может показывать мои имя и фото профиля в рекламных рекомендациях для моих друзей
+  - Webmail Ad Blocker (outlook.com)
+  
+===== как вернуть внешний вид? =====
+
+  - <code bash>chrome://flags/#enable-instant-extended-api</code>
+  - Вот за каким художником улучшили хром после обновления так, что очень хочется его как-то ухудшить, я вас внимательно спрашиваю?
+  - Enable Instant Extended API - выключить
+
+===== html5 =====
+
+Включалка html5 на ютубе -> http://www.youtube.com/html5
+http://www.youtube.com/html5 -> И внизу экрана нажать на ссылку “Join the HTML5 trial”. После этого в окошке проигрывателя появится новая опция — выбор скорости. Большинство видеоинтервью можно смотреть в ускоренном режиме без потери смысла. Более того, на скорости качество понимания только возрастает. Парадокс, но это так. Ты лучше вычленяешь главные идеи, быстрее складываешь общую картину. Плюс, конечно же, экономия времени.
+
+Из фишек можно смотреть видео в 1,5 раза быстрее.
+
+
+==== feedly =====
+
+<code bash>
+http://www.feedly.com/home#subscription/feed/%s
+</code>
+
+==== плагины ====
+
+  - http://code.google.com/p/ruadlist/
+  - адблоцк https://chrome.google.com/webstore/detail/gighmmpiobklfepjocnamgkkbiglidom
+  - Copy fixer
+  - Ghostery
+  - Vkontakte Music Downloader v2
+  - Attachments.me
+  - Instagram for Chrome
+  - VK last.fm scrobbler
+  - adblock
+  - attachemets.me
+  - disconnect
+  - post to tumblr -> https://chrome.google.com/webstore/detail/dbpicbbcpanckagpdjflgojlknomoiah
+  - wunderlist for chrome

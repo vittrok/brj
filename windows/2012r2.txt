@@ -1,0 +1,31 @@
+====== 2012R2 ======
+
+However, accessing the same folder using a Windows 2003 R2 or Windows XP machine does not work
+
+А так-же принтеры самсунг.
+
+Чо делать?
+
+<code bash>
+sc query srv 
+sc query srv2
+sc config srv start=demand
+</code>
+
+<code bash>
+Set-SmbServerConfiguration -EnableSMB1Protocol $true
+get-SMBserverconfiguration
+Set-SmbServerConfiguration –RejectUnencryptedAccess $false
+</code>
+
+Windows cannot find "\\servername\test".  Check the spelling and try again, or try bt blah blah blah.
+
+<code bash>
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\LanmanServer\DependOnService
+Original Value: SamSS Srv2
+Change to: SamSS Srv
+</code>
+
+reboot the server!
+
+{{tag>Can't access UNC share on Windows Server 2012 R2 xp 2012 r2 открыть диск не доступен совсем охуели}}

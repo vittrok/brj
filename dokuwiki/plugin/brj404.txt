@@ -1,0 +1,14 @@
+====== Плагин brj404 ======
+
+Плагин показывает любую заданный наймспейс, если страницы нет или 404. 
+
+У меня вот это -> [[brj:kuda|]] и если URL не валиден.
+
+  - https://www.dokuwiki.org/plugin:brj404
+  - https://github.com/brjppru/public/tree/master/dokuwiki/plugin/brj404
+  - lated tarrball https://github.com/brjppru/public/raw/master/dokuwiki/plugin/brj404-12-18.2012.tar.gz
+
+<note important>[[https://github.com/brjppru/public/tree/master/dokuwiki/plugin/brj404|Вот тут]] более допиленная версия, настройки через admin консоль.</note>
+
+
+{{tag>fixme dokiwiki brj404 plugin}}

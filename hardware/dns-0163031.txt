@@ -1,0 +1,72 @@
+====== ПЭВМ 14" DNS 0163031 ======
+
+  - http://www.dns-shop.ru/catalog/i163031/14-noutbuk-dns.html
+  - http://pastebin.com/6n1VscJP
+
+  - Дешёвый. 
+  - Хороший процессор по 22 ни технологии. Intel Celeron -> Код процессора -> 1037U -> иви бридж, чо.
+  - Работает шустро. 
+  - Отлично совместим с Ubuntu 13.10 идёт "искаропке"
+  - Приятный дизайн, достаточно тонкий. 
+  - Не самая худшая матрица экрана. 
+  - Батарея на 7200 мА/ч.
+  - wifi по pci-e подключен.
+  - Клавиатура местами шумная в этих же местах проседает. 
+  - Ход короткий (на любителя)
+  - Точпад вроде норм.
+
+===== Эксплуатация =====
+
+==== После покупки ====
+
+  - Всего 2 ГБ ОЗУ - мало -> Только один слот под ОЗУ -> память заменил на -> Память SODIMM DDR3 8192Mb 1333MHz Crucial (CT102464BF1339) RTL
+  - HDD 500 gb аццкий тормоз -> купил kingmax ssd 128gb
+
+  - по детекту оно 59230mWh
+  - по маркеровке на бате оно 7600 mWh
+  - sdd + память и оно стало работать 6 часов от батарейки, что очень даже збс.
+
+==== Первый месяц ====
+
+  - разболтался экран. разобрал протянул петли.
+  - лопнула пластмасса где 2 усб порта и выход на vga монитор
+  - около точпада - отвалились крепления внутри.
+
+  - разобрал бук. проклеил. 
+  - два болта "взаду" бука и два болта у точпада - должны быть короче, чем остальные болты.
+  - пришлось их подрезать. иначе когда закручиваешь - они вырывают пластмассовые крепления.
+  - приходиться обрезать и клеить
+
+===== lspci =====
+
+<code bash>user@user-laptop:~$ lspci
+00:00.0 Host bridge: Intel Corporation 3rd Gen Core processor DRAM Controller (rev 09)
+00:02.0 VGA compatible controller: Intel Corporation 3rd Gen Core processor Graphics Controller (rev 09)
+00:16.0 Communication controller: Intel Corporation 7 Series/C210 Series Chipset Family MEI Controller #1 (rev 04)
+00:1a.0 USB controller: Intel Corporation 7 Series/C210 Series Chipset Family USB Enhanced Host Controller #2 (rev 04)
+00:1b.0 Audio device: Intel Corporation 7 Series/C210 Series Chipset Family High Definition Audio Controller (rev 04)
+00:1c.0 PCI bridge: Intel Corporation 7 Series/C210 Series Chipset Family PCI Express Root Port 1 (rev c4)
+00:1c.2 PCI bridge: Intel Corporation 7 Series/C210 Series Chipset Family PCI Express Root Port 3 (rev c4)
+00:1c.3 PCI bridge: Intel Corporation 7 Series/C210 Series Chipset Family PCI Express Root Port 4 (rev c4)
+00:1d.0 USB controller: Intel Corporation 7 Series/C210 Series Chipset Family USB Enhanced Host Controller #1 (rev 04)
+00:1f.0 ISA bridge: Intel Corporation 7 Series Chipset Family LPC Controller (rev 04)
+00:1f.2 SATA controller: Intel Corporation 7 Series Chipset Family 6-port SATA Controller [AHCI mode] (rev 04)
+00:1f.3 SMBus: Intel Corporation 7 Series/C210 Series Chipset Family SMBus Controller (rev 04)
+02:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev 06)
+03:00.0 Network controller: Qualcomm Atheros AR9485 Wireless Network Adapter (rev 01)
+</code>
+
+===== lsusb =====
+
+<code bash>
+user@user-laptop:~$ lsusb
+Bus 002 Device 003: ID 046d:c52f Logitech, Inc. Unifying Receiver
+Bus 002 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 005: ID 13d3:3362 IMC Networks 
+Bus 001 Device 004: ID 090c:37c0 Silicon Motion, Inc. - Taiwan (formerly Feiya Technology Corp.) Silicon Motion Camera
+Bus 001 Device 002: ID 8087:0024 Intel Corp. Integrated Rate Matching Hub
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+</code>
+
+{{tag>DNS 0163031 драйвера скачать}}

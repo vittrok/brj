@@ -1,0 +1,27 @@
+====== Правим tag ======
+
+  * http://dokuwiki.org/plugin:tag
+  * заменить картинку -> можно взять тут http://brj.pp.ru/wiki/lib/plugins/tag/images/tag.gif
+  * запачить css что бы без полоски
+
+<code html>
+div.dokuwiki div.tags {
+  font-size: 95%;
+  clear: both;
+  margin-bottom: 1.4em;
+}
+
+div.dokuwiki div.tags span {
+  padding-top:15px;
+  background: transparent url(images/tag.gif) 0px 1px no-repeat;
+  padding: 1px 0px 1px 25px; /* for small icon (16x16) */
+}
+
+/* make it easier to select the +/- checkboxes in the tagsearch table by making them block elements */
+div.dokuwiki form.plugin__tag_search label.plus, div.dokuwiki form.plugin__tag_search label.minus {
+  display: block;
+}
+
+</code>
+
+{{tag>dokuwiki tag plugin}}

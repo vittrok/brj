@@ -1,0 +1,175 @@
+====== HP iLO ======
+
+Ключи для [[http://forum.ru-board.com/topic.cgi?forum=35&bm=1&topic=11628&start=200#lt|iLO]]
+
+==== Сертификаты ====
+
+Есть пара HP ProLiant DL3xx-ых, которые оснащены iLO (это ip-kvm, power management и многое другое через вебморду). Покупать ssl сертификаты для iLO на мой взгляд глупо, по этому решено было сгенерить self signed
+
+<code bash>
+openssl genrsa -out ca.key 1024
+openssl req -new -x509 -days 365 -key ca.key -out ca.pem -subj /CN=ilo.server.com/O=Company/C=RU
+</code>
+
+теперь из Administration -> Certificate Administration делаем «Generate a certificate request» и полученный ключ Certificate Signing Request кладем в ilo-server1.csr ну и подписываем его:
+
+<code bash>openssl x509 -req -days 365 -in ilo-server1.csr -CA ca.pem -CAkey ca.key -set_serial 01 -out ilo-server1.crt</code>
+
+Для второго сервера из того же Administration -> Certificate Administration делаем «Generate a certificate request» и полученный ключ Certificate Signing Request кладем в ilo-server2.csr и подписываем его тем же ключом но с другим серийником:
+
+<code bash>openssl x509 -req -days 365 -in ilo-server2.csr -CA ca.pem -CAkey ca.key -set_serial 02 -out ilo-server2.crt</code>
+
+полученные ilo-server1.crt и ilo-server2.crt вставляем в форму на следующем шаге Certificate Administration, а именно на Step 3 -> Import Certificate
+
+via: http://itblog.su/hp-ilo-self-signed-sertificate.html
+
+==== Linux ====
+
+Что делать, если необходимо обнулить или сбросить пароль для iLO на сервере HP, но перезагрузить мы его не можем, или попросту нет физического доступа к серверу? Или может iLO у нас вообще не настроен и нам надо сделать это удаленно, имея лишь ssh доступ к серверу. Для выполнения вышеперечисленных действий нужен инструмент hponcfg, который входит в ProLiant Support Pack (можно скачать на hp.com) -> Для примера приведу скрипты для выполнения основных задач настройки HP iLO -> Сброс-установка пароля администратора:
+
+<code bash>
+
+<ribcl VERSION="2.0">
+<login USER_LOGIN="Administrator" PASSWORD="boguspassword">
+<user_INFO MODE="write">
+<mod_USER USER_LOGIN="Administrator">
+<password value="new_pass"/>
+</mod_USER>
+</user_INFO>
+</login>
+</ribcl>
+</code>
+
+Настройка сети:
+
+<code bash>
+<RIBCL VERSION="2.0">
+<LOGIN USER_LOGIN="adminname" PASSWORD="password">
+<RIB_INFO MODE="write">
+<MOD_NETWORK_SETTINGS>
+<SPEED_AUTOSELECT value="No"/>
+<FULL_DUPLEX value="Yes"/>
+<NIC_SPEED value="100"/>
+<DHCP_ENABLE value="No"/>
+<IP_ADDRESS value="172.17.1.136"/>
+<SUBNET_MASK value="255.255.255.0"/>
+<GATEWAY_IP_ADDRESS value="172.17.1.1"/>
+<DNS_NAME value="ILOCZC73424J4"/>
+<DOMAIN_NAME value=""/>
+<DHCP_GATEWAY value="No"/>
+<DHCP_DNS_SERVER value="No"/>
+<DHCP_STATIC_ROUTE value="No"/>
+<REG_WINS_SERVER value="No"/>
+<PRIM_DNS_SERVER value="0.0.0.0"/>
+<SEC_DNS_SERVER value="0.0.0.0"/>
+<STATIC_ROUTE_1 DEST="0.0.0.0" GATEWAY="0.0.0.0"/>
+<STATIC_ROUTE_2 DEST="0.0.0.0" GATEWAY="0.0.0.0"/>
+</MOD_NETWORK_SETTINGS>
+</RIB_INFO>
+</LOGIN>
+</code>
+
+Перезагрузить iLO (для применения наших изменений):
+
+<code bash>
+<LOGIN USER_LOGIN="Administrator" PASSWORD="password">
+<RIB_INFO MODE="write">
+<RESET_RIB/>
+</RIB_INFO>
+</LOGIN>
+</RIBCL>
+</code>
+
+Естественно, в этих скриптах пароли, параметры сети следует заменить на свои. Для выполнения скриптов просто сохраняем их отдельными файлами и запускаем hponcfg, передавая имя скрипта как параметр с ключем -f. Например:
+
+<code bash>hponcfg -f ~diesel/ilo/pass_reset.xml</code>
+
+via: http://diesel.pp.ua/?p=66
+
+==== linux 2 ====
+
+http://hosting-notes.ru/sbros-parolya-hp-ilo-iz-konsoli-os-debian/
+
+уквально на прошлой неделе сталкнулся с проблемой – есть сервер HP DL360G4, у него есть iLO, но пароль на iLO утерян. Немного погуглив, нашел способ сброса пароля с помощью утилиты hponcfg. Под винду найти ее, наверное, не проблема, но вот под debian пришлось поискать некоторое время. Поэтому выкладываю ссылку на утилиту – hponcfg_3.1.0.0.18-19_i386.deb. Так же нам понадобятся следующие пакеты от HP – hp-health_8.5.0.1.2-1_i386.deb. Скачиваем эти файлы, например, в /tmp.
+
+  - http://downloads.linux.hp.com/SDR/psp/pool/non-free/hponcfg_3.1.0.0.18-19_i386.deb
+  - http://downloads.linux.hp.com/SDR/psp/pool/non-free/hp-health_8.5.0.1.2-1_i386.deb
+
+<code bash>
+debian:~# apt-get install binutils
+debian:/tmp# dpkg -i hp-health_8.5.0.1.2-1_i386.deb; dpkg -i hp-health_8.5.0.1.2-1_i386.deb
+</code>
+
+Дополнительные утилиты для управления iLO с консоли ОС Debian установлены. Настройка iLO осуществляется через xml-файлы, поэтому создаем их.
+Файл ilo_reset_password.xml для сброса пароля iLO:
+
+<code bash>
+<RIBCL VERSION="2.0">
+<LOGIN USER_LOGIN="Administrator" PASSWORD="some_ilo_password">
+<USER_INFO MODE="write">
+<MOD_USER USER_LOGIN="Administrator">
+<PASSWORD value="new_password"/>
+</mod_USER>
+</user_INFO>
+</LOGIN>
+</RIBCL>
+</code>
+
+В параметре PASSWORD значение new_password заменяем на необходимый пароль и выполняем команду:
+
+<code bash>debian:~# hponcfg -f ~/ilo_reset_password.xml</code>
+
+Файл ilo_network.xml для настройки сети iLO:
+
+<code bash>
+<RIBCL VERSION="2.0">
+<LOGIN USER_LOGIN="Administrator" PASSWORD="iLOPassword">
+<RIB_INFO MODE="write">
+<MOD_NETWORK_SETTINGS>
+<SPEED_AUTOSELECT value="No"/>
+<FULL_DUPLEX value="Yes"/>
+<NIC_SPEED value="100"/>
+<DHCP_ENABLE value="No"/>
+<IP_ADDRESS value="10.20.30.2"/>
+<SUBNET_MASK value="255.255.255.0"/>
+<GATEWAY_IP_ADDRESS value="10.20.30.254"/>
+<DNS_NAME value="ILOCZC73424J4"/>
+<DOMAIN_NAME value=""/>
+<DHCP_GATEWAY value="No"/>
+<DHCP_DNS_SERVER value="No"/>
+<DHCP_STATIC_ROUTE value="No"/>
+<REG_WINS_SERVER value="No"/>
+<PRIM_DNS_SERVER value="0.0.0.0"/>
+<SEC_DNS_SERVER value="0.0.0.0"/>
+<STATIC_ROUTE_1 DEST="0.0.0.0" GATEWAY="0.0.0.0"/>
+<STATIC_ROUTE_2 DEST="0.0.0.0" GATEWAY="0.0.0.0"/>
+</MOD_NETWORK_SETTINGS>
+</RIB_INFO>
+</LOGIN>
+</code>
+
+Меняем значения параметров на свои и выполняем команду:
+
+<code bash>debian:~# hponcfg -f ~/ilo_network.xml</code>
+
+Чтобы применить настройки, нужно перегрузить iLo. Для этого создаем файл.
+
+Файл ilo_reboot.xml для перезагрузки iLO:
+
+<code bash>
+<RIBCL VERSION="2.0">
+<LOGIN USER_LOGIN="Administrator" PASSWORD="iLOPassword">
+<RIB_INFO MODE="write">
+<RESET_RIB/>
+</RIB_INFO>
+</LOGIN>
+</RIBCL>
+</code>
+
+Ребутим iLO:
+
+<code bash>debian:~# hponcfg -f ~/ilo_reboot.xml</code>
+
+Вот собственно и все. Надеюсь данная информация по сбросу пароля и настрйоке сети Integrated Lights-Out кому-нибудь пригодится.
+
+{{tag>hp ilo ключи linux пароль}}

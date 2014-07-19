@@ -1,0 +1,771 @@
+====== Cisco ======
+
+<code>
+- Что такое TFTP сервер?
+- TFTP - это такой тупой сервер где хранят самый крутой варез - ИОСы.
+</code>
+
+==== Качать ====
+
+[[http://nnm-club.ru/forum/viewtopic.php?t=185744|накачать]] себе иосов.
+
+Cisco IOS это многозадачная операционная система, выполняющая функции сетевой организации, маршрутизации, коммутации и передачи данных. Используется в маршрутизаторах и L3 коммутаторах. Для подробной информации о каждом IOS образе идем на Cisco Feature Navigator http://cisco.com/go/fn и ищем по названию образа, либо по названию нужной вам фичи. Там же можно сравнить разные версии IOS, узнать требования к памяти и флэшу, etc.
+
+Примерные отличия фичерсетов:
+
+  - IP Base - начальный уровень функциональности, включается во все другие feature sets. Обеспечивает базовый роутинг, т.е. статик роуты, RIP, OSPF, EIGRP, только на IPv4. Включает вланы (802.1q и ISL), которые ранее были доступны только в "IP Plus". Также включает NAT.
+  - IP Services (для L3 свичей) - протоколы динамической маршрутизации, NAT, IP SLA.
+  - IP Voice - добавляет функциональность VoIP and VoFR.
+  - Advanced Security - Добавляется IOS/Firewall, IDS, SSH, и IPSec (DES, 3DES, and AES).
+  - Service Provider Services - Добавляется IPv6, Netflow, SSH, BGP, ATM, и VoATM.
+  - Enterprise Base - Добавляется поддержка "унаследованных" L3 протоколов, таких как IPX и Appletalk. Также включаются IBM features типа DLSw+, STUN/BSTUN, и RSRB.
+  - Advanced IP Services - Добавляется поддержка IPv6.
+
+==== Читать ====
+
+  - http://www.ietf.org/rfc/rfc896.txt
+  - http://www.cisco.com/en/US/tech/tk801/tk36/technologies_tech_note09186a00801365f3.shtml
+  - http://www.ietf.org/rfc/rfc2018.txt
+  - http://www.ietf.org/rfc/rfc1323.txt
+
+==== Сбросить ====
+
+Как это обычно это бывает? Нашли старую циску 26xx на складе. Надо бы настроить. Пароля нет. Спросить некого. Как его сбросить? [[http://www.cisco.com/en/US/products/hw/routers/ps259/products_password_recovery09186a0080094675.shtml|А вот так!]]
+
+==== bpdu ====
+
+Если BPDU от злобного провайдера валит порт в Down (%SPANTREE-7-RECV_1Q_NON_TRUNK: Received 802.1Q BPDU on non trunk), то команда spanning-tree bpdufilter enable на данном порту поможет сохранить нервы и аппетит.
+
+<code bash>
+Service#sh run int gi1/0/21
+Building configuration...
+Current configuration : 181 bytes
+!
+interface GigabitEthernet1/0/21 
+description ### link2 ### 
+switchport access vlan 112 
+switchport mode access 
+spanning-tree portfast 
+spanning-tree bpdufilter enable
+end
+</code>
+==== Full-View ====
+
+http://habrahabr.ru/blogs/internet/113906/ -> Фулвью ор нот фулвью: о пользе и вреде полной BGP-таблицы
+==== Швайне билайне ====
+
+Швайне красноярскен билайне, это которые бывшый красадсл, это которые бывшый сибчелендж, это которые бывший scn.ru мсс клиентен хуевертен. Хуй ложили на автоматический размер виндова. Поэтому нужно регулировать мсс на диллере. 
+
+Настройка для Cisco Small Business 107 -> Рахмат дяде Вове. 
+
+<code bash>
+interface Dialer0
+ ip address negotiated
+ ip mtu 1492
+ ip adjust-mss 1452
+ encapsulation ppp
+ dialer pool 5
+ dialer-group 1
+ no cdp enable
+</code>
+==== Catalyst 3560 ====
+
+В Cisco IP-адреса по умолчанию (это же не Dlink), все настраивается ручками и сначала через консоль -> Подключаемся к cisco по консольному кабелю через com порт, в Windows можно использовать Hiper Terminal для подключения к com порту, в FreeBSD через com порт, либо через переходник USB -> Com:
+
+<code bash>
+kldload uplcom.ko
+kldstat | grep uplcom
+cu -l /dev/cuad0 или -l /dev/cuaU0
+</code>
+
+<code bash> 
+Switch> enable
+Switch# configure terminal
+Switch(config)# enable password my-secret-password
+Switch(config)# line vty 0 15
+Switch(config-line)#password my-telnet-password
+Switch(config-line)# login
+Switch(config)# exit
+Switch(config)# service password-encryption
+Switch(config)# hostname c3560G
+c3560G(config)# interface vlan 1
+c3560G(config-if)# ip address 192.168.1.2 255.255.255.0
+c3560G(config-if)# exit
+c3560G(config)# no ip domain-lookup
+c3560G(config)# ip domain-name my-domain.ru
+c3560G(config)# ip name-server 192.168.1.15
+c3560G(config)# ntp server 192.168.1.1 version 2 source vlan 1
+c3560G(config)# ntp clock-period 36029056
+c3560G(config)# ntp max-associations 1
+c3560G(config)# exit
+c3560G# clock set 20:00:50 23 Aug 2008
+c3560G# configure terminal
+c3560G(config)# clock timezone KRSK 7
+c3560G(config)# clock summer-time KRSK recurring last Sun Mar 3:00 last Sun Oct 3:00
+c3560G(config)# service timestamps log datetime localtime
+c3560G(config)# interface range gi 0/1 – 28
+c3560G(config-if-range)# description not_used
+c3560G(config-if-range)# shutdown
+c3560G(config-if-range)# no cdp enable
+c3560G(config-if-range)# switchport nonegotiate
+c3560G(config-if-range)# switchport mode access
+c3560G(config-if-range)# exit
+c3560G(config)# vlan 999
+c3560G(config-vlan)# name unused_ports
+c3560G(config-vlan)# shutdown
+c3560G(config-vlan)# exit
+c3560G(config)# interface range gi 0/1 – 28
+c3560G(config-if-range)# description not_used
+c3560G(config-if-range)# shutdown
+c3560G(config-if-range)# no cdp enable
+c3560G(config-if-range)# switchport nonegotiate
+c3560G(config-if-range)# switchport access vlan 999
+c3560G(config-if-range)# switchport mode access
+c3560G(config-if-range)# exit
+c3560G(config)# no ip http server
+c3560G(config)# ip default-gateway 192.168.1.1
+c3560G(config)# ip routing
+c3560G(config)# ip classless
+c3560G(config)# ip subnet-zero
+c3560G(config)# ip route 0.0.0.0 0.0.0.0 192.168.1.1
+c3560G(config)# ip access-list standard TELNET
+c3560G(config-std-nacl)# permit 192.168.1.1
+c3560G(config-std-nacl)# permit 192.168.1.15
+c3560G(config-std-nacl)# exit
+c3560G(config)# line vty 0 15
+c3560G(config-line)# access-class TELNET in
+c3560G(config-line)# exec-timeout 5 0
+c3560G(config-line)# exit
+c3560G(config)# snmp-server community private RO
+c3560G(config)# snmp-server trap-source Vlan1
+c3560G(config)# snmp-server source-interface informs Vlan1
+c3560G(config)# snmp-server location SWITCH-LOCATION
+c3560G(config)# snmp-server contact my-email@my-domain.ru
+c3560G(config)# snmp-server host 192.168.1.1 RO-MY-COMPANY-NAME
+c3560G(config)# exit
+c3560G# copy running-config startup-config
+c3560G# wri
+</code>
+
+==== Catalyst 2950 ====
+
+<code bash>
+service nagle
+no service pad
+service tcp-keepalives-in
+service tcp-keepalives-out
+service timestamps debug datetime msec localtime
+service timestamps log datetime localtime
+service password-encryption
+service sequence-numbers
+no service dhcp
+hostname sw1.msk8
+logging buffered 262144 debugging
+logging rate-limit 10 except warnings
+logging console critical
+aaa new-model
+aaa authentication login default group tacacs+ enable
+aaa authorization exec default group tacacs+ if-authenticated
+aaa accounting send stop-record authentication failure
+aaa accounting exec default start-stop group tacacs+
+aaa accounting system default start-stop group tacacs+
+enable secret good_password
+clock timezone MSK 3
+clock summer-time MSD recurring last Sun Mar 2:00 last Sun Oct 2:00
+errdisable recovery cause security-violation
+errdisable recovery interval 120
+ip subnet-zero
+no ip source-route
+ip icmp rate-limit unreachable 1000
+ip icmp rate-limit unreachable DF 1000
+ip tcp selective-ack
+ip tcp timestamp
+ip tcp path-mtu-discovery
+ip domain-list example.ru
+ip domain-list msk8.example.ru
+ip domain-name example.ru
+ip name-server 192.168.144.68
+ip name-server 192.168.146.6
+spanning-tree mode pvst
+spanning-tree portfast bpdufilter default
+no spanning-tree optimize bpdu transmission
+spanning-tree extend system-id
+interface FastEthernet0/1
+   description -- to gw1.msk8
+   switchport mode trunk
+   switchport nonegotiate
+   load-interval 60
+   spanning-tree portfast trunk
+
+interface FastEthernet0/2
+   description -- to sw2.msk8
+   switchport mode trunk
+   switchport nonegotiate
+   load-interval 60
+
+interface FastEthernet0/3
+   description ““--”” 1111 Firmname, office 303
+   switchport access vlan 100
+   switchport mode access
+   switchport nonegotiate
+   switchport port-security
+   load-interval 60
+   no cdp enable
+   spanning-tree portfast
+
+interface FastEthernet0/4
+   description -- 2222 Firm2name, room 302
+   switchport access vlan 14
+   switchport mode access
+   switchport nonegotiate
+   load-interval 60
+   no cdp enable
+   spanning-tree portfast
+   
+interface FastEthernet0/5
+   switchport access vlan 1001
+   switchport mode access
+   switchport nonegotiate
+   load-interval 60
+   spanning-tree portfast
+   
+interface Vlan1
+   description -- management interface
+   ip address 192.168.144.51 255.255.255.248
+   no ip redirects
+   no ip proxy-arp
+   no ip route-cache
+
+ip default-gateway 192.168.144.49
+no ip http server
+
+ip access-list extended vty-access
+   remark -- hosts permitted to access the router
+   permit tcp 192.168.144.0 0.0.0.255 any
+   permit tcp 192.168.146.0 0.0.0.7 any
+   deny tcp any any range 0 65535 log-input
+   deny ip any any log-input
+
+logging 192.168.144.67
+
+access-list 2 remark -- ntp hosts to which the router can synchronize
+access-list 2 permit 192.168.144.80
+access-list 2 permit 192.168.144.68
+access-list 2 deny any log
+
+access-list 4 remark -- tftp servers to/from which config download/upload is permitted
+access-list 4 permit 192.168.144.67
+access-list 4 deny any
+
+access-list 5 remark -- hosts permitted to read snmp MIBs on the switch
+access-list 5 permit 192.168.144.34
+access-list 5 permit 192.168.144.64 0.0.0.7
+access-list 5 deny any log
+
+access-list 6 remark -- hosts permitted to write snmp MIBs on the switch
+access-list 6 permit 192.168.144.67
+access-list 6 deny any log
+
+snmp-server community XXXXX RO 5
+snmp-server community XXXXX RW 6
+snmp-server location Dmitrovka 98, 2 floor
+snmp-server contact noc@example.ru
+snmp-server tftp-server-list 4
+
+alias exec acl show access-lists
+alias exec sm show mac-address-table
+alias exec srb sh run | b
+alias exec uptime show version | i uptime
+alias exec cpu show proces cpu | inc CPU
+alias exec d debug
+alias exec nd undebug all
+alias exec sd show debug
+alias exec mn terminal monitor
+alias exec nm terminal no monitor
+alias exec sl show log
+alias exec cl clear log
+alias exec ct configure terminal
+alias exec sr show running-config
+
+line con 0
+history size 256
+transport preferred none
+escape-character 3
+line vty 0 15
+access-class vty-access in
+exec-timeout 300 0
+history size 256
+transport preferred none
+transport input telnet
+transport output telnet
+escape-character 3
+
+ntp authentication-key 1 md5 xxxxxx xx
+ntp authenticate
+ntp trusted-key 1
+ntp access-group peer 2
+ntp server 192.168.144.80 key 1
+ntp server 192.168.144.68 key 1
+</code>
+
+===== пинги и трейсы =====
+
+<note important>- Мыкола, ты слыхал, як москали ICMP-пакеты называють? - Як? - Пинги!</note>
+
+Пинги это такие запросы типа Echo-Request протокола Internet Control Message Protocol (ICMP) указанному узлу сети и фиксирует поступающие ответы (ICMP Echo-Reply). Время между отправкой запроса и получением ответа (RTT, от англ.Round Trip Time) позволяет определять двусторонние задержки (RTT) по маршруту и частоту потери пакетов, то есть косвенно определять загруженности каналов передачи данных и промежуточных устройств. Также пингом называется время, затраченное на передачу пакета информации в компьютерных сетях от клиента к серверу и обратно от сервера к клиенту, оно измеряется в миллисекундах. Время пинга связано со скоростью соединения и загруженностью каналов на всём протяжении от клиента к серверу. Полное отсутствие ICMP-ответов может также означать, что удалённый узел (или какой-либо из промежуточных маршрутизаторов) блокирует ICMP Echo-Reply или игнорирует ICMP Echo-Request.
+
+Программа ping является одним из основных диагностических средств в сетях TCP/IP и входит в поставку всех современных сетевых операционных систем. Функциональность ping также реализована в некоторых встроенных ОС маршрутизаторов.
+
+http://www.cisco.com/en/US/products/sw/iosswrel/ps1831/products_tech_note09186a00800a6057.shtml
+==== Всегда ====
+
+Всегда пасуем и стейтим следующие типы. 0,3,4,8,11
+
+<code bash>
+icmp_serve	= "0,3,4,8,11" 
+pass in on $ttk reply-to ($ttk $ttk_gw) inet proto icmp icmp-type { $icmp_serve } keep state
+pass in on $ttk inet proto icmp from ($ttk:network) icmp-type { $icmp_serve } keep state 
+</code>
+
+==== Типы ICMP ====
+
+  - 0 echo-reply
+  - 3 destination unreachable
+  - code 0 = net unreachable
+    - 1 = host unreachable
+    - 2 = protocol unreachable
+    - 3 = port unreachable
+    - 4 = fragmentation needed and DF set
+    - 5 = source route failed
+    - 4 source-quench
+  - 5 redirect
+    - code 0 = redirect datagrams for the network
+    - 1 = redirect datagrams for the host
+    - 2 = redirect datagrams for the type of service and network
+    - 3 = redirect datagrams for the type of service and host
+  - 6 alternate-address
+  - 8 echo request
+  - 9 router-advertisement
+  - 10 router-solicitation
+  - 11 time-exceeded
+    - 0 = time to live exceeded in transit 
+    - 1 = fragment reassembly time exceeded
+  - 12 parameter-problem
+  - 13 timestamp-request
+  - 14 timestamp-reply
+  - 15 information-request
+  - 16 information-reply
+  - 17 mask-request
+  - 18 mask-reply
+  - 31 conversion-error
+  - 32 mobile-redirect
+
+==== пинги и циски ====
+
+Многие знают и умеют пользоваться командой ping и traceroute, но не все знают, что же означают символы выводимые на консоль в устройствах Cisco Systems:
+
+<code bash>
+Router1#debug ip packet detail 
+IP packet debugging is on (detailed)
+
+Router1#ping 12.0.0.2
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 12.0.0.2, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 4/6/8 ms 
+
+Router1#
+Jan 20 15:54:47.487: IP: s=12.0.0.1 (local), d=12.0.0.2 (Serial0), len 100,  sending
+Jan 20 15:54:47.491: ICMP type=8, code=0
+
+!--- Это ICMP пакет от 12.0.0.1 для 12.0.0.2.
+!--- ICMP type=8 это echo request (запрос). 
+
+Jan 20 15:54:47.523: IP: s=12.0.0.2 (Serial0), d=12.0.0.1 (Serial0), len 100, rcvd 3
+Jan 20 15:54:47.527: ICMP type=0, code=0
+
+!--- А это ответ от 12.0.0.2.
+!--- ICMP type=0 это echo reply (ответ).  
+</code>
+
+Рассмотрим символы выводимые в консоль cisco при команде ping:
+
+<code sql>
+! - Каждый символ восклицательно знака показывает ответ (echo reply).
+. - Каждый символ точки показывает потерю пакета, таймаут ожидания (echo reply).
+U - Указанный хост недостижим (был получен destination unreachable error PDU).
+Q - сдерживание источника (есть угроза перегрузки (destination too busy)).
+M - Невозможность фрагментировать.
+? - Неизвестный тип пакета.
+& - Время жизни пакета истекло.
+</code>
+
+==== трейсы и циски ====
+
+traceroute — это служебная компьютерная программа, предназначенная для определения маршрутов следования данных в сетях TCP/IP. Traceroute так же как и ping основана на протоколе ICMP.
+
+Программа traceroute выполняет отправку данных указанному узлу сети, при этом отображая сведения о всех промежуточных маршрутизаторах, через которые прошли данные на пути к целевому узлу. В случае проблем при доставке данных до какого-либо узла программа позволяет определить, на каком именно участке сети возникли неполадки.
+
+traceroute входит в поставку большинства современных сетевых операционных систем:
+
+  - в системах Microsoft Windows эта программа носит название tracert
+  - в системах Unix — traceroute
+
+Для определения промежуточных маршрутизаторов traceroute отправляет серию пакетов данных целевому узлу, при этом каждый раз увеличивая на 1 значение поля TTL («время жизни»). Это поле обычно указывает максимальное количество маршрутизаторов, которое может быть пройдено пакетом. Первый пакет отправляется с TTL, равным 1, и поэтому первый же маршрутизатор возвращает обратно сообщение ICMP, указывающее на невозможность доставки данных. Tracerouteфиксирует адрес маршрутизатора, а также время между отправкой пакета и получением ответа (эти сведения выводятся на монитор компьютера). Затем traceroute повторяет отправку пакета, но уже с TTL, равным 2, что позволяет первому маршрутизатору пропустить пакет дальше.
+
+Процесс повторяется до тех пор, пока при определённом значении TTL пакет не достигнет целевого узла. При получении ответа от этого узла процесс трассировки считается завершённым.
+
+Пример команды на оборудовании Cisco Systems:
+
+<code bash>
+Router1#traceroute 34.0.0.4 
+
+Type escape sequence to abort.
+Tracing the route to 34.0.0.4 
+
+  1 12.0.0.2 4 msec 4 msec 4 msec
+  2 23.0.0.3 20 msec 16 msec 16 msec
+  3 34.0.0.4 16 msec *  16 msec
+</code>
+
+В консоль так же могут выводиться спец. символы, вот они:
+
+<code bash>
+* – Таймаут ожидания ответа (timed out)
+A – Административно запрещено (трафик запрещен администратором сети, например в access-list)
+Q – сдерживание источника (есть угроза перегрузки (destination too busy)).
+I – Пользователь прервал выполнение теста
+U – Порт недостижим (закрыт)
+H – Хост недоступен (unreachable), например отсутствует маршрут до сети хоста
+N – Сеть недоступна (unreachable)
+P – Протокол недоступен (unreachable)
+T – Таймаут (timeout)
+? – Неизвестный тип пакета
+</code>
+
+===== Проблемы ipv4 фрагментации и методы определения Path MTU =====
+
+[[http://dbg.livejournal.com/58171.html?nc=1&style=mine|Интересная заметка]] про icmp и Path MTU Discovery. Рассказывается про проблемы с определением минимального MTU по пути пакета (наиболее типична проблема фрагментации при использовании туннелей и блокированием/лимитированием ICMP).
+
+[[http://www.ciscolab.ru/tcpip/31-gre_fragment.html|Проблема DF бита]] и фрагментации в GRE туннелях
+
+[[http://www.ietf.org/rfc/rfc4459.txt|RFC4459]] MTU and Fragmentation Issues with In-the-Network Tunneling
+
+[[http://www.cisco.com/en/US/tech/tk827/tk369/technologies_white_paper09186a00800d6979.shtml|Resolve]] IP Fragmentation, MTU, MSS, and PMTUD Issues with GRE and IPSEC
+
+For MTU 1500 do the following test:
+
+Windows command prompt: ping -f -l 1472 www.dyndns.com
+
+Linux shell box: ping -s 1472 www.dyndns.com
+
+Mac OS X shell box: ping -D -s 1472 www.dyndns.com
+
+If you can ping through with the number at 1472, you are done! Stop right there. Add 28 and your MaxMTU is 1500.
+
+If you get "100% loss", then reduce 1472 by 10 until you no longer get the "packet needs to be fragmented" error message.
+Then increase by 1 until you are 1 less from getting "packet need to be fragmented" message again. Add 28 more to this (since you specified ping packet size, not including IP /ICMP header of 28 bytes) And this is your MaxMTU.
+
+You can use [[http://www.speedguide.net/downloads.php|SG TCP Optimizer]] for Windows 9x/ME/2K/XP/XP-SP2/2k3
+
+<code bash>tcpdump -ptnv -s0 "icmp[icmptype] = icmp-unreach and icmp[icmpcode] = 4"</code>
+
+http://paranoia.spb.ru/unix/mtu.html
+
+http://www.nil.com/ipcorner/IP_Fragmentation/
+
+http://www.nil.com/C1256F0A00429755/DisplayProducts?Open&offer=6B6ECEBADF6E1097C1257417002C0895
+
+http://www.nil.com/C1256F620032CACB/NILLookup/LE_IP_Fragment?Open
+
+===== cisco: два провайдера =====
+
+Жила была фирма. Небольшая, 30-40 компьютеров, IP-телефоны у сотрудников, сведенные в пару коммутаторов. И был у них интернет канал оптический. Но вот незадача, падал "интернет" частенько, иногда даже на несколько часов, и не работали телефоны, аська, хуяска, почта и прочая. Становилось грустно и печально - время идет, прибыли нет. Решили завести второго провайдера и сделать автоматический бэкап. С кабелем просто - провайдеров в районе - пальцев на руке не хватит. А вот с переключением при аварии сложнее. Стал горемыка-админ думать, решил зверя-киску заморскую поставить. 
+
+Как поднять три интерфейса и NAT админ разобрался, но настроить бэкап и слежение за каналами - вопрос. Начал админ пытать умых людей-кисководов, сертифицированных по данным устройствам, но все как один говорили стандартные ответы:
+
+  - зачем вам это надо получите автономку;
+  - организуйте BGP с провайдерами;
+
+На что был дан простой ответ - кризис на дворе... Работать надо, а не тратить деньги на заморские штуки хитрые. И так никто и не помог, только один человек без сертификата сказал, что слышал он о SLA мониторе. И стал админ читать умные мануалы и раскопал, что надо бы ios посвежее поставить, не хуже 12.4.16.
+
+Методом проб и ошибок получилась конфигурация для киско-зверя, чтоб и переключение автоматическое было, и load balance (деление трафика на провайдеров, если оба доступны). Да еще один интерфейс админ создал для ресурса местного и многими любимого - чтоб напрямую им пользоваться и деньги экономить.
+
+==== Решение один ====
+
+<code bash>
+ip cef
+ip name-server 192.168.100.2
+ip sla monitor 1
+ type echo protocol ipIcmpEcho 212.49.XXX.XX1 source-interface FastEthernet0/0.100
+ timeout 1000
+ threshold 40
+ frequency 3
+ip sla monitor schedule 1 life forever start-time now
+ip sla monitor 2
+ type echo protocol ipIcmpEcho 195.64.YYY.YY2 source-interface FastEthernet0/0.200
+ timeout 1000
+ threshold 40
+ frequency 3
+ip sla monitor schedule 2 life forever start-time now
+!
+track 100 rtr 1 reachability
+!
+track 200 rtr 2 reachability
+! 
+interface FastEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+ no cdp enable
+!
+interface FastEthernet0/0.1
+ description Local-Net
+ encapsulation dot1Q 1
+ ip address 192.168.10.1 255.255.255.0
+ ip access-group 100 in
+ ip helper-address 192.168.10.2
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip nat inside
+ ip virtual-reassembly
+ ip policy route-map forced-proxy
+ no cdp enable
+!
+interface FastEthernet0/0.2
+ description Proxy-web-dhcp
+ encapsulation dot1Q 2
+ ip address 192.168.100.1 255.255.255.0
+ ip nat inside
+ ip virtual-reassembly
+ no cdp enable
+!
+interface FastEthernet0/0.100
+ description ISP0
+ encapsulation dot1Q 100
+ ip address 212.49.XXX.XX2 255.255.255.224
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip nat outside
+ ip virtual-reassembly
+ ip policy route-map ISP0
+ no keepalive
+ no cdp enable
+!
+interface FastEthernet0/0.200
+ description ISP1
+ encapsulation dot1Q 200
+ ip address 195.64.YYY.YY2 255.255.255.252
+ no ip redirects
+ no ip unreachables
+ no ip proxy-arp
+ ip nat outside
+ ip virtual-reassembly
+ ip policy route-map ISP1
+ no keepalive
+ no cdp enable
+!
+interface FastEthernet0/0.999
+ encapsulation dot1Q 999 native
+ no cdp enable
+!
+ip route 0.0.0.0 0.0.0.0 212.49.XXX.XX1 track 100
+ip route 0.0.0.0 0.0.0.0 195.64.YYY.YY1 track 200
+!
+ip dns server
+!
+no ip http server
+no ip http secure-server
+ip nat translation timeout 30
+ip nat inside source route-map ISP0 interface FastEthernet0/0.100 overload
+ip nat inside source route-map ISP1 interface FastEthernet0/0.200 overload
+!
+logging trap debugging
+access-list 1 permit any
+access-list 100 permit ip 192.168.10.0 0.0.0.255 any
+access-list 101 deny   tcp host 192.168.10.2 any eq www
+access-list 101 permit tcp 192.168.10.0 0.0.0.255 any eq www
+no cdp run
+!
+route-map forced-proxy permit 10
+ match ip address 101
+ set ip next-hop 192.168.100.2
+!
+route-map ISP0 permit 10
+ match interface FastEthernet0/0.100
+!
+route-map ISP1 permit 10
+ match interface FastEthernet0/0.200
+!
+control-plane
+!
+end
+</code>
+
+==== Решение два ====
+
+Хотя в приведенном решении - можно тестировать только шлюз провайдера, тесты на другие узлы - будут уходить по текущему дефолту. Не хватает локальной политики, которая заставляла бы уходить icmp пакеты по сети нужного провайдера.
+
+<code bash>
+#Проверяется два узла в интернете
+
+ip sla 1
+ icmp-echo 194.87.x.x source-interface GigabitEthernet0/1.21
+ timeout 1000
+ threshold 800
+ frequency 5
+ip sla schedule 1 life forever start-time now
+
+ip sla 2
+ icmp-echo 81.211.y.y source-interface GigabitEthernet0/1.21
+ timeout 1000
+ threshold 800
+ frequency 5
+ip sla schedule 2 life forever start-time now
+
+# Решение о падении каждого принимается с задержкой в 11 секунд, иначе
+# будет постоянно прыгать дефолт
+
+track 1 rtr 1 reachability
+ delay down 11
+!
+track 2 rtr 2 reachability
+ delay down 11
+!
+
+# Решение об отказе текущего провайдера принимается только в 
+# случае если оба тестируемых узла упали. Иначе опять же будет прыгать
+
+track 123 list boolean or
+ object 1
+ object 2
+ delay down 11
+
+# Вот это ключевое, иначе тестовые пакеты (кроме тестирования дефолта)
+# будут все равно уходить по текущему шлюзу и SLA будет считать, что
+# канал работоспособен
+
+ip local policy route-map icmp.tst
+
+# Ну здесь возможны вариации
+
+ip route 0.0.0.0 0.0.0.0 194.186.defaultgateway1 track 123
+ip route 0.0.0.0 0.0.0.0 195.144.defaultgateway2 254
+
+# Пакеты должны уходить именно нужным путем
+
+route-map icmp.tst permit 10
+ match ip address icmp.tst
+ set ip next-hop 194.186.defaultgateway1
+
+ip access-list extended icmp.tst
+ permit icmp any host 194.87.x.x echo
+ permit icmp any host 81.211.y.y echo
+
+Нат определяется таким же образом.
+</code>
+
+==== Решение три ====
+
+Есть два канала между точками А и Б, чаще всего от разных провайдеров. Необходимо обеспечить учет качества обслуживания на данных каналах, а именно:
+
+  - При потерях >0.5% на канале, канал не должен использоваться.
+  - При jitter > 10мс, канал не должен использоваться.
+
+Такая задача возникла у меня на работе, поскольку два города соединены двумя каналами, по которым бегает в большом количестве голос, который, как известно, весьма капризен в отношении вышеописанных показателей. Кому интересно — милости прошу под кат.
+
+Первоначальное решение. Изначально было даже два корявых варианта. Первый заключался в поднятии на циске пинговалки, проверяющей живучесть канала и переключение по его смерти. Решение справлялось до тех пор, пока у нас не появились проблемы с джиттером при отсутствии потерь.
+
+Второе решение заключалось в создании монитора на основе udp пакетов, имитирующих G729 кодек. Монитор показывал потери и джиттер, в случае проблем со связью, админ лез на кошку, наблюдал на ней текущие значения джиттера и потерь, и по обстоятельствам принимал решение об отключении канала. Работало, конечно. Но это какая-то полуавтоматическая система получилась. Поэтому я взял себя в руки и довел-таки данную ситуацию до некоторого конечного решения.
+
+Текущее решение. Итак, как и во втором случае, создаем udp-монитор качества канала, имитирующий G729a кодек (так называемый SLA-монитор).
+
+<code bash>
+ip sla 33
+udp-jitter 172.16.1.66 49333 source-ip 172.16.1.65 codec g729a codec-size 20
+tos 70
+threshold 10
+</code>
+
+Данный монитор будет отправлять 1000 пакетов с интервалом в минуту на порт 49333 у точки назначения, маркировка tos= 70=0x46=EF. На точке назначения должен быть включен
+
+<code bash>ip sla responder</code>
+
+Далее создаем стабовый трек (создается специально для того, чтобы управлять им с помощью апплетов, а не привязывать жестко к SLA-монитору):
+
+<code bash>
+track 20 stub-object
+default-state up
+</code>
+
+Теперь наша задача вынуть результаты из SLA-монитора и по их значениям оставить track 20 в состоянии UP или же положить его. Это можно сделать например с помощью Cisco EEM (Embedded Event Manager), который позволяет отслеживать текущее состояние Вашей железки и выполнять определенные действия. Для этого создадим два апплета. Один будет класть track в состояние Down, если хотя бы один из параметров (джиттер или число потерь) нас не устраивает. Второй будет поднимать его обратно, если ОБА параметра в норме.
+
+Конфигурация
+1. Создаем первый апплет:
+<code bash>event manager applet LB trap</code>
+Создаем два события на основе SNMP OID для RTT и jitter От нашего SLA-монитора:
+
+<code bash>
+event tag jitter snmp oid 1.3.6.1.4.1.9.9.42.1.5.2.1.46.33 get-type exact entry-op ge entry-val "10" entry-type value poll-interval 4
+event tag loss snmp oid 1.3.6.1.4.1.9.9.42.1.5.2.1.1.33 get-type exact entry-op le entry-val "994" entry-type value poll-interval 4
+</code>
+
+Здесь последняя цифра 33 в SNMP OID — номер SLA-инстанции. 10 — порог для джиттера (в мс), 994 — минимально допустимое число вернувшихся пакетов из тысячи посланных (1000 — packet_loss). poll-interval — интервал с которым кошка опрашивает состояние значений. Здесь 4с. Указываем, что наш апплет должен сработать при ЛЮБОМ из событий, т.е. используется логическое ИЛИ.
+
+<code bash>
+trigger
+correlate event loss or event jitter
+</code>
+
+Далее действие:
+<code bash>action 20 track set 20 state down</code>
+
+Т.е. наш трек укладывается в состояние Down.
+
+Второй апплет аналогично:
+
+<code bash>
+event manager applet LB2 trap
+event tag jitter snmp oid 1.3.6.1.4.1.9.9.42.1.5.2.1.46.33 get-type exact entry-op lt entry-val "10" entry-type value poll-interval 4
+event tag loss snmp oid 1.3.6.1.4.1.9.9.42.1.5.2.1.1.33 get-type exact entry-op gt entry-val "994" entry-type value poll-interval 4
+trigger
+correlate event loss and event jitter
+action 20 track set 20 state up
+</code>
+
+Только апплет срабатывает по логическому И между событиями. И трек взводится в состояние Up. Видно, что опрос происходит с интервалом 4с и текущее состояние трека не учитывается, т.е. трапы срабатывают постоянно, раз в 4с. Я пытался прикрутить еще мониторинг состояния самого трека, но работало очень глючно, срабатывало не всегда. Так что я пожертвовал парой процентов проца и оставил так. Дополнительно есть еще апплеты, информирующие меня о проблемах на канале и их исчезновении:
+
+<code bash>
+event manager applet LB_info
+event syslog pattern "20 stub Up->Down"
+action 10 syslog msg "applet works!"
+action 11 cli command "enable"
+action 12 cli command "show ip sla stat 33"
+action 13 mail server "192.168.6.20" to "ilya@tut_domen.ru" from "alert@tut_domen.ru" subject "Frame loss or high jitter on NiS channel" body "$_cli_result"
+</code>
+и в переменной $_cli_result содержится результат вывода последней команды, т.е. в нашем случае — show ip sla stat 33.
+
+<code bash>
+event manager applet LB2_info
+event syslog pattern "20 stub Down->Up"
+action 10 syslog msg "applet 2 works!"
+action 11 cli command "enable"
+action 12 cli command "show ip sla stat 33"
+action 13 mail server "192.168.6.20" to "ilya@tut_domen.ru" from "alert@tut_domen.ru" subject "NiS channel is correct" body "$_cli_result"
+</code>
+
+Другими словами, мы шлем себе письмо, в теле которо – результат последнего запуска SLA-монитора, собственно и вызвавшего переключение трека.
+
+Так, теперь собственно как это учитывать. Я вижу два способа:
+
+1. строчка в route-map (как и работает у меня, собственно, но там просто схема хитрая)
+<code bash>set ip next-hop verify-availability 172.16.1.66 1 track 20</code>
+2. трекинг статики, когда у нас есть маршрут вида
+<code bash>ip route 172.16.0.0 255.255.255.0 192.168.1.1 track 20</code>
+При потерях или джиттере на канале данный маршрут просто уберется из таблицы маршрутизации и трафик пойдет по альтернативному пути. Может и коряво, но я промучившись неделю лучше ничего не придумал. Чем богаты, как говорится. 
+
+P.S. Синтаксис ip sla команд разнится на 12.4Т и 12.4, но смысл такой же.
+
+{{tag>fixme cisco mtu path discovery скачать ios icmp ping ip sla}}

@@ -1,0 +1,9 @@
+====== Калькулятор для android ======
+
+{{:soft:best-calc.jpg|Калькуятор}}
+
+Узрел в [[http://habrahabr.ru/company/boxowerview/blog/166479/|обзоре]] Lenovo P770. Вытащил из прошивки в виде .apk файла.
+
+[[http://turbobit.net/21lvvi3vbwdk.html|Скачать]] тут.
+
+{{tag>Калькулятор для android скачать}}

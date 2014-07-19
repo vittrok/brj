@@ -1,0 +1,378 @@
+====== Накопители: Dlink DNS-323 ======
+
+===== Что это? =====
+
+{{:hardware:dns-323_main.jpg|это совершенное устройство, если не считать четыре синих светодиода на морде}}
+
+D-link DNS-323 - это сетевой дисковый массив с 2 отсеками для жестких дисков. 
+
+Так маленькие NAS накопители позволяют создать домашнее хранилище контента (документы, фотографии, музыка, видео, бекапы и т.п.) и физически разместить его там, где удобно, ибо необходима только сетевая розетка и LAN и нет никаких проблем с охлаждением. DNS-323 - Действительно маленький, что позволяет без труда <del>найти наиболее удобное место в квартире для размещения домашнего сетевого хранилища</del> его заныкать на антрисоль шкафа. 
+
+===== Железо =====
+
+==== Что внутри? ====
+
+| CPU | 500 Mhz Marvell 88F5181 proprietary Feroceon ARM CPU architecture |
+| RAM | Two 32 MB Nanya NT5DS16M16CS-6K | 
+| Flash ROM | 8 MB Spansion S29GL064M90TFIR4 |
+| USB | 1 port USB2.0 | 
+| IDE controller | Marvell 88X7042 |
+| LAN | Marvell 88E1111 |
+| Cooling | Speed controlled 40 mm fan |
+| Serial | 115200 8N1 TTL |
+
+==== Какие аппетиты? ====
+
+^ Что делаем? ^ Сколько кушаем? ^
+| off | 0 watts (ya think?) |
+| Initial boot, pre-disk spinup | 16 watts |
+| Initial boot disk spinup | 63 watts |
+| Idle with disk spinning | 16 watts |
+| Web access | 16 watts (no change from idle) |
+| reading/writing files | 31-39 watts variable |
+| printing small files | 16 watts (no change from idle) |
+| inting large files | 31 watts (spool to disk?) |
+| Idle w/ disk in power save | 8 watts |
+
+
+===== Костылизм =====
+
+Сетевой накопитель DNS-323 представлен на рынке исключительно как идеальное порождение идеологии костылизма. 
+
+Продукт на рынке давно и поэтому хорошо изучен энтузиастами. Благодаря тому, что в этом накопителе все построено на базе ядра Linux, имеется полный набор <del>костылей и подпорок</del> и превосходная возможность для <del>"допиливания напильником"</del> применении идеологии костылизма, т.е. настройки под свои задачи, например, установка альтернативного медиа-сервера, веб сервера, апачей, перлов, пыхпыхов, торрент-клиента и т.д.
+
+Существует специализированный ресурс, где суровые мужыки делятся своим опытом -> <del>http://wiki.dns323.info/</del> -> старый умер -> http://dns323.kood.org/howto:ffp
+
+===== 2014 год =====
+
+решил установить debian.
+
+http://ftp.nl.debian.org/debian/dists/stable/main/installer-armel/current/images/orion5x/network-console/d-link/dns-323/netboot.img
+
+  * If your original firmware is configured to use DHCP (the default configuration from D-Link and Conceptronic), Debian installer will try to acquire an IP address with DHCP. You can use the MAC address listed at the bottom of your device to tell your DHCP server to give out a specific IP address to your machine.
+  * If you configured a static address in your original firmware, this configuration will be used. However, if your network configuration was incomplete (e.g. IP address or DNS were missing), the installer will use DHCP instead.
+  * If DHCP is used but your DHCP server does not respond, the installer will use the fallback address 192.168.0.32. This is the default IP address used by the D-Link firmware, but please note that it is different to the default IP address from the Conceptronic firmware. If you are unsure what the address of your device is, unplug the Ethernet cable, start the machine again, wait until Debian installer is ready for SSH and then plug the cable back in and connect to this fallback address.
+
+==== после того как зашили ====
+
+<code bash>
+ssh 192.168.1.33
+
+u: installer
+p: install
+</code>
+
+http://www.debian.org/releases/stable/armel/
+
+<code bash>
+apt-get remove avahi-daemon
+apt-get remove cups-*
+apt-get autoremove
+</code>
+
+==== Настройка локали ====
+
+<code bash>
+$ locale -a
+C
+en_US.utf8
+POSIX
+</code>
+
+<code bash>
+dpkg-reconfigure locales
+</code>
+
+нам нужен ru_RU.UTF-8
+
+<code bash>
+cat /root/.profile
+LANGUAGE=C
+LANG=ru_RU.UTF-8
+</code>
+
+
+==== вентиляторы ====
+
+After a reboot, you can control the fan this way:
+<code bash>
+echo   0 > /sys/class/hwmon/hwmon?/device/pwm1  # turn it off
+echo 255 > /sys/class/hwmon/hwmon?/device/pwm1  # turn it to full speed
+</code>
+
+==== Разираемсо с вентиляторами ====
+
+<code bash>
+apt-get install fancontrol lm-sensors
+sensors-detect
+pwmconfig
+fancontrol &
+watch sensors
+</code>
+
+==== прикручиваем свистулю ====
+
+Tp-Link (TL-WN722N) driver for Debian7
+
+Совсем нетривиальный вопрос — как сделать так, чтобы при обнаружении Ethernet отключался WiFi, но... он в линуксе настолько нетривиальный, что проще взять ипотеку на 20 лет, чем написать скрипты.
+
+<code bash>
+
+apt-get install wireless-tools
+apt-get install wpasupplicant
+apt-get install firmware-atheros
+cd /lib/firmware
+wget http://wireless.kernel.org/download/htc_fw/1.3/htc_9271.fw
+# for Tp-Link (TL-WN722N) driver for Debian7
+wget ftp://ftp.mirrorservice.org/sites/raspbmc.com/downloads/bin/lib/wifi/rt73.bin
+# for dlink dwa-110
+modinfo ath9k
+apt-get install ifmetric
+
+vi /etc/network/interfaces
+
+auto wlan1
+iface wlan1 inet static
+<------>address 192.168.1.44
+<------>netmask 255.255.255.0
+<------>network 192.168.1.0
+<------>broadcast 192.168.1.255
+<------>gateway 192.168.1.1
+<------>dns-nameservers 192.168.1.1
+<------>wpa-ssid "ololo"
+<------>wpa-psk "jigurda"
+
+/etc/init.d/networking restart
+</code>
+===== 2013 год =====
+
+В 2013 он все ещё работает.
+
+Поскольку DNS-323 старый продукт, на обновления все забили. В том числе и длинк. Чего собственно и следовало ожидать.
+Но кое, что можно добыть -> http://dns323.kood.org/howto:ffp
+
+Теперь прошивка называется oabi -> The oabi version (also called oarm/0.7.1) needs the old-fashioned OABI support in the kernel.
+
+===== Прошывка 2013 =====
+
+  - ftp://ftp.dlink.com/Multimedia/dns323/Firmware/dns323_fw_109.zip
+  - изменения в .10 версии мутные. ставить не стал. и так все хорошо.
+
+===== Что сделал? =====
+
+  - Залил последней прошивкой
+  - Заклеил изолентой светодиоды на морде. Иначе пиздец.
+  - ffp_v0.7
+  - midc ;-)
+  - sshd
+  - samba
+  - git ;-)
+  - Разобрался как корректно выключать железку, что бы файловая система не повреждалась (cleanboot)
+  - Разобрался как корректно проверить диски (см. выше) не вытаскивая винты из коробки
+  - Настроил самбу и сделал из неё WINS сервер
+  - Настроил мониторинг жеских дисков по S.M.A.R.T.
+
+===== Настройка =====
+
+Сначала нужно зашить последнюю прошивку. 
+
+==== Зависаем на 94% ====
+
+При форматировании дисков коропка зависает на 94%. Баг изучен. Это таймаут веб-интерфейса. Идём в закладку [Tools] -> закладка [System] -> set "Config Inactivity Timer" = 90min -> Apply. Ура! Мы его починили!
+
+==== Два дибила - это сила ====
+
+  - Два дибила - это сила
+  - Засунули диски в длинк
+  - Как бы понять, где какой? 
+  - Вот эта [[http://duplo.org/~conny/dns-323/index-Pages/Image9.html|картинка]] многое объясняет. 
+  - С лева - HDD1. 
+  - С права - HDD0. 
+  - Делал видимо "чурка не русскай". 
+  - Смотрим дальше и какая-то херня получается:
+
+<code>
+# cat /etc/shared_name
+Volume_1 = HD_b2
+Volume_2 = HD_a2
+</code>
+
+  - Шары перевернуты! 
+  - Длинк два раза инвертирует винты. 
+  - Дибилы, блядь. 
+  - Я пока это понял - чуть голову себе не сломал.
+
+===== FFP =====
+
+==== Всё волшебство ====
+
+В прошивке 1.09 в конце файла /usr/sbin/chk_fun_plug содержится вызов скрипта /mnt/HD_a2/fun_plug. У файла стоит атрибут +x.
+
+==== Установка fun_plug 0.7 ====
+
+  - Идём сюда: http://ffp.inreto.de/ffp/0.7/oabi/
+  - Загружаем это fun_plug и это fun_plug.tgz
+  - Потом копируем fun_plug и fun_plug.tgz на шару с именем Volume_1 (вспоминаем про перевернутые два разом длинком шары). Перезагружаемся. 
+  - Если все хорошо, то при старте fun_plug.tgz будет распакован и удален. 
+  - Потому, что атрибут +x. После этого запустится сервер telnet. 
+  - Это действительно не волшебство. Это просто шелл. Тупо шелл.
+
+==== Скрипты ====
+
+ <note important>Выпилил на github https://github.com/brjppru/public/tree/master/dns-323</note>
+
+==== Эксплуатация ====
+
+<code bash>
+usermod -s /ffp/bin/sh root
+mkdir -p /ffp/home/root/
+sed -ie 's#:/home/root:#:/ffp/home/root:#g' /etc/passwd
+pwconv
+
+passwd
+login
+
+store-passwd.sh
+
+wget http://ffp.inreto.de/ffp/0.7/oabi/fun_plug
+wget http://ffp.inreto.de/ffp/0.7/oabi/fun_plug.tgz
+chmod 777 fun_plug fun_plug.tgz
+
+chmod a+x /ffp/start/sshd.sh
+sh /ffp/start/sshd.sh start
+
+поправить пермитрултлогин = yes, usedns =no. дома то зачем?
+
+mkdir -p /ffp/pkg/
+cd /ffp/pkg/
+chmod a+x /ffp/pkg/updater.sh
+sh /ffp/pkg/updater.sh
+
+/ffp/start/optware.sh
+chmod a+x /ffp/start/optware.sh
+/ffp/start/optware.sh start
+
+/opt/bin/ipkg install mc
+/opt/bin/ipkg install htop
+/opt/bin/ipkg install git
+/opt/bin/ipkg install smartmontools
+/opt/bin/ipkg install whois
+/opt/bin/ipkg install cups
+
+sync
+reboot
+
+</code>
+
+==== Удаляем старый FFP ====
+
+<code bash>
+cd /mnt/HD_a2
+rm -r ffp
+rm ffp.log
+rm fun_plug
+reboot
+</code>
+
+==== fsck ====
+
+<code bash>
+cd /ffp/fsck
+./reload.sh
+uname -r
+free
+e2fsck -y -f -D -C 0 /dev/sda2
+e2fsck -y -f -D -C 0 /dev/sdb2
+reboot
+</code>
+
+Вентилятор на этот момент отключен. Порулить таходатчиком через /dev и /sys не получается. Греется.
+
+
+====== Уехало в архив ======
+
+<note warning>Писалось в 2010 году, мало актуально</note>
+
+==== ~2012-2011 ====
+
+Новый модельный ряд
+
+D-Link обнародовал два новых NAS-а – DNS-320 и DNS-325. Поскольку сам являюсь обладателем DNS-323 уже продолжительное время, то пройти мимо этой новости не мог. Бюджетная модель DNS-320, оснащенная процессором 800 МГц и имеющая 128 Мб ОП, обойдется в $110, тогда как DNS-325 стоит $200. Но там и процессор помощнее – 1.2 ГГц, и памяти побольше – 256Мб. Обе модели позволяют установить два 3.5″ HDD, суммарным объемом до 4 Тб (без RAID, естественно), и имеют по USB порту, гигабитному Ethernet и набор приложений, способных превратить их в домашние серверы.
+
+Сравнивая новинки со старичком DNS-323 – процессор 500МГц и 64Мб RAM, явно виден рост NAS-ов D-Link. Однако судя по картинкам проблему с шумом решать они не собираются. В обеих моделях стоит тот же самый вентилятор на 40 мм, который просто в принципе тихим не бывает. Почему не поставить туда бесшумный фан на 80 мм, как в NAS-ах Synology, мне не понять. По всей видимости, это результат стремления максимально удешевить устройство. За исключением относительно громкой работы, никаких других проблем с NAS-ом от D-Link быть не должно.
+
+==== 2010 ====
+
+В 2010 с ION2, adm e350 и доступных винтов на 2,5" - не актуально. <del>Использование компа, пусть даже маленького обладает существенными недостатками: место для размещения (особенно если посчитать стоимость квадратного метра квартиры) постоянно включенный компьютер, высокий уровень шума и высокая стоимость, особенно, если выделять в домашней сети отдельный сервер-хранилище.</del> 
+
+==== Вентилятор ====
+
+<note tip>Вентилятор размером 40mm x 40mm x 10mm на семи тысячах оборотах – это ебанный вертолёт. </note>
+
+Климат в Красноярске сугубо сибирский — ебун зимой и двухнедельная жара летом. Летом хорошо. Зимой тоже хорошо. Вентилятор ведет себя хорошо уже четыре года.
+
+<note info>инфа про винты, температуры и диски - будет дальше</note>
+
+==== Не потребовалось ====
+
+Куллер ведет себя хорошо. Думал будет хуже. Все, что ниже не состоялось.
+
+Я говорил с [[http://bitoniau.livejournal.com/|Романом]] на тему вентиляторов. В DNS323 вентилятор и его контроллер [[http://wiki.dns323.info/hardware:fan|такой]]. Поэтому решено взять дремель и лишиться гарантии. Вместо 40mm сделать 90mm или 80mm и поставить вентилятор с решеткой за пределы корпуса на сквозной выдув (или вдув. нужно ещё помониторить, что лучше). На самом деле мне лениво выяснять какой там максимальный ток выдержит регулирующий элемент в контроллере. Поэтому решено подключать новый вентилятор через отдельный резистор прямо на шину питания, мимо штатного разъема, а сигнал тахометра - пустить на штатный разъем. Температуру меряет терморезистор на плате, он к вентилятору не имеет отношения. Поэтому новый вентилятор подключаем к фан-мейту. Земляной вывод фан-мейта - на массу. Один из боковых выводов фан-мейта (таходатчк) - на штатный коннектор, туда, где подключался штатный таходатчик. Вывод питания фан-мейта - на +12В.
+
+**Итог**: Вентилятор 90mm подключить к +12В и врезать резистор мощностью 2-5Вт 30 Ом в цепь питания кулера. Сбиваем с 12V до 5V вот [[http://www.zalman.co.kr/ENG/product/Product_Read.asp?idx=205|этой штукой]] Zalman FanMate ( я её с AlCu 7000 залманом брал. В комплекте шла). Судя по спецификации - это то, что нужно:
+
+| Output Voltage | 5V ~ 11V ± 2% |
+| Allowable Power | 6W or lower |
+
+{{:hardware:fan_conn.jpg|схемка, что и куда. что бы не втуплять.}}
+
+==== Жесткие диски ====
+
+  - [[http://www.ixbt.com/storage/hdd-for-nas.shtml|Выбор]] жестких дисков для работы в NAS. Для информации.
+  - [[http://habrahabr.ru/blogs/sysadm/106273/|тыц]] WD Green Caviar + Linux = убей свой диск! -> у меня все ок.
+
+==== Быстро ехать? ====
+
+В DNS-323 имеется функционал и возможность по-разному конфигурировать работу жестких дисков. Возможны следующие варианты:
+
+    * Standart (два жестких диска будут работать самостоятельно)
+    * JBOD (два диска объединяются в один)
+    * RAID0 (дисковый массив повышенной производительности - за счет разделения функций записи/чтения по дискам)
+    * RAID1 ("зеркалирование" - диски содержат идентичную информацию, за счет чего достигается отказоустойчивость)
+
+RAID в DNS323 софтовый. Со всеми вытекающими. Нет смысла делать софтварный raid1 или raid0 при заявленных характеристиках софторейда. Это даёт возможность развала массива даже без поломки винчестера. Как следствие мутотень с ребилдами, перезагрузками и выверкой софторейда всякими e2fsck, подсовывание параметров во флеш и прочее связанное с этим всем, т.е. такие аццкие пляски с бубном вокруг дисков делает RAID НАХУЙ НЕ НУЖНЫМ для нормального, обычного домашнего пользователя. Но если очень хочется подрочить вприпрыжку — прыгай себе на здоровье. Лично я - пасс.
+
+Смысл гнаться за супер-пупер скоростными и горячими HDD нет. В DNS-323 SATA1 контроллер. Поэтому с винтов читать быстрее чем гигабитная сетевка позволяет передавать - смысла нет. Объем кеша в 32 мегабайта на HDD тоже по большому счету нахер не нужен, ибо диски используется как склад файлов - записал один раз фильму какую и она лежит себе место занимает. 
+
+Скорость передачи данных с компьютера на NAS составляла для обоих накопителей около 9 Мб/сек. Передача файла в обратном направлении идет в среднем со скоростью 8 Мб/сек. В случае если DNS-323 сконфигурирован в RAID0, скорость передачи выше - где-то на уровне 15 Мб/сек. C RAID0 и jumbo frames - 29 Мб/сек.
+
+==== WD Caviar ====
+
+<note info>Купил [[http://www.thg.ru/storage/western_digital_wd10eads_green_power/print.html|WD10EADS]]. два штуки. </note>
+
+WD Caviar и WD Caviar GreenPower 1 ТБ SATA и тепловыделение:
+
+^ Информация ^  [[http://www.wdc.com/ru/products/Products.asp?DriveID=336|WD10EACS]]  ^  [[http://www.wdc.com/ru/products/Products.asp?DriveID=559|WD10EADS]]  ^  [[http://www.wdc.com/ru/products/products.asp?driveid=385|WD1000FYPS]]  ^
+| Размер |  1 000 204 МБ  |||
+| Объем кешу |  16 mb  |  32 mb  |  16 mb  |
+| На холостом ходу |  25 dBA (в среднем)  ||  24 dBA (в среднем)  |
+| Режим поиска 0 |  27 dBA (в среднем)  ||  29 dBA (в среднем)  | 
+| Режим поиска 3 |  25 dBA (в среднем)  ||  25 dBA (в среднем)  | 
+| Чтение / запись |  кушает 5,40 Вт  ||  кушает 7,4 Вт  |
+| На холостом ходу |  кушает 2,8 Вт  ||  кушает 4,0 Вт  |
+| В режиме ожидания |  кушает 0,40 Вт  ||  кушает 0,97 Вт  |
+| В режиме сна |  кушает 0,40 Вт  ||  кушает 0,97 Вт  |
+| Цена по Красноярску |  ~ 3600  |  ~ 4300  |  ~4400  |
+
+==== Samsung Spinpoint ====
+
+Samsung [[http://www.thg.ru/storage/samsung_spinpoint_f_raid_ecogreen/print.html|Spinpoint]] как вариант на 2x1Tb?
+
+^ Модель Spinpoint ^  F1  ^  RAID Class  ^  EcoGreen  ^
+| Модельный номер |  HD103UJ  |  HE103UJ  |  HD103UI  |
+| Скорость вращения шпинделя |  7200 об/мин  |||
+| Число пластин |  3  |||
+| Заявленное энергопотребление при простое |  6,7 Вт   |  7,7 Вт  |  5,0 Вт  | 
+| Измеренное энергопотребление при простое |  7,2 Вт   |  6,8 Вт  |  4,3 Вт  |
+
+{{tag>d-link dlink dns 323 dns-323 прошивка скрипты fun_plug optware обзор}}

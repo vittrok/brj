@@ -1,0 +1,49 @@
+====== Касперский и мыща ======
+
+Ситуация: Девочка купила касперский. KIS2013. Утилитой сноса KAV удалила, старую версию. по совету тех. поддержки. 
+После удаления KAV 13 перестала работать клавиатура и мышь. Официального KB нет. Тех поддержка послала на хуй, т.к. это не проблема с антивирусом. Не, ну так то логично. Да.
+
+Касперский пишет свой дравер клавиатуры в систему, вперед основного, типа дохуя защита от клавиатурного фишинга. 
+При удалении оно выносит дравера клавиатуры и мышки. Как ps/2 так и USB. Хотплуг не работает, сидишь и видишь окно ввода пароля для входа в Windows и собственно все. Вводить нечем. Ебитесь, как хотите.
+
+Самый простой способ это закинуть обратно файлы драйверов продукта klkbdflt.sys и klmouflt.sys в папку \Windows\System32\drivers и потом думать дальше.
+
+Можно через SonyaPe Live CD или KAV 10 rescue disc вернуть это обратно. Вот реестр.
+
+<code bash>
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E96B-E325-11CE-BFC1-08002BE10318}]
+"UpperFilters"="kbdclass"
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E96B-E325-11CE-BFC1-08002BE10318}]
+"UpperFilters"="kbdclass"
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4D36E96F-E325-11CE-BFC1-08002BE10318}]
+"UpperFilters"="mouclass"
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\usbstor]
+"Start"=dword:00000003
+</code>
+
+===== Не ставица =====
+
+Но и это ещё не все. После установки и возвращения клавиатуры и мышки, при запуске появляется баннер Кис 2013 с надписью выполняется загрузка.
+
+И собственно все.
+
+<code bash>
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\State]
+"ImageState"="IMAGE_STATE_COMPLETE"
+</code>
+
+Типа касперский говорит, что это криво установленная винда. Что отражается ключом реестра. -> HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\State, там обычно "ImageState" в "IMAGE_STATE_UNDEPLOYABLE"
+
+Правим на то, что выше. Вот тут вот про это http://technet.microsoft.com/en-us/library/cc721913%28v=ws.10%29.aspx
+
+===== Лицензия не лицензия =====
+
+After you install security update 2823324, Kaspersky Anti-Virus for Windows Workstations or Kaspersky Anti-Virus for Windows Servers versions 6.0.4.1424 and 6.0.4.1611 may display an error message that resembles the following: 
+
+**Your license is not valid.**
+
+Сносим http://support.microsoft.com/kb/2839011
+
+{{tag>не работает клавиатура и мышь после удаления касперского KIS 2013 keyboard mouse не работает выполняется загрузка висит реестр совсем охуели блеать}}

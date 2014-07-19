@@ -1,0 +1,7 @@
+====== ПЭВМ 11,6" DNS 0139810 ======
+
+Ссылка на модельку http://www.dns-shop.ru/catalog/i139810/116-noutbuk-dns.html
+
+Отличается от [[hardware:dns-0153784]] бабой на крышке и батарейкой на 5300.
+
+Драйвера брать тут http://ftp.dns-shop.ru/Notebooks/P116/

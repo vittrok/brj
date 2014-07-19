@@ -1,0 +1,54 @@
+====== Debian 7.4 ======
+
+  - http://habrahabr.ru/post/92701/
+  - http://stackp.online.fr/?p=28
+
+
+<code bash>
+apt-get install rsync
+ssh-keygen -t dsa
+ssh-copy-id -i .ssh/id_dsa.pub user1@192.168.18.16
+rsync -avh --progress . root@192.168.18.16:/backup
+</code>
+
+<code bash>
+
+wlan1 + 
+
+apt-get install firmware-atheros
+
+vi /etc/network/interfaces          
+
+allow-hotplug wlan1
+auto wlan1
+iface wlan1 inet dhcp
+<------>wpa-ssid brjppru
+<------>wpa-psk>ololoev
+<------>address 192.168.1.51
+<------>gateway 192.168.1.1
+<------>netmask 255.255.255.0
+
+
+apt-get install acpi acpi-support hal usbmount halevt cpufrequtils
+
+$ sudo apt-get install cpufrequtils
+$ cpufreq-info
+$ sudo cpufreq-set -c 1 -u 1.2GHz
+
+sudo gedit /etc/default/grub
+GRUB_CMDLINE_LINUX="acpi_enforce_resources=lax"
+
+update-grub2
+
+it87 force_id=0x8721
+coretemp
+/etc/modules.conf
+
+vi /etc/hdparm.conf
+
+/dev/sda {
+apm = 255
+spindown_time = 0
+}
+
+</code>

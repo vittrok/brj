@@ -1,0 +1,195 @@
+====== Как готовить Skype? ======
+
+Skype (рус. скайп, араб. اسكايب) — ещё одна программа для обмена сообщениями, но изначально ориентированная на общение голосом, а не на стучание по клавишам. Хоть сейчас подобные болталки есть в каждом клиенте, даже в асечке, скайп считается самой популярной. 
+
+10 мая 2011 года куплен майкрософтом. После этого ожидается расово верная версия с синими экранами, вылетами, глюками, стоимостью использования 1000$ в час и только на лицензионных Windows, а также с Live Id и другими ожидаемыми плюшками.
+
+Алсо, Skype для Windows начиная с версии 5 умудряется, будучи свёрнутым в трей без активных чатов и разговоров, отжирать более 200 Мб оперативки. Блондиночки с розовыми карманными ноутбучками на атомчике или чём попроще в ахуе, равно как и обладатели грозно скрипящих и воющих четвёртых пней 2001-03 годов сборки.
+
+===== Актуальная версия скачать =====
+
+  * Однажды я заебался искать ссылку на полный оффлайн инсталлер скайпа
+  * Ссылку для скачивания отдают после регистрации на веб сайте
+  * Зачем оно нам надо?
+
+  * Я нашел полную ссылку
+  * Пусть тут лежыт
+  * Скачать скайп актуальная версия
+  * без смс и регистрации
+
+  * Для offline инсталятора
+  * http://download.skype.com/SkypeSetupFull.exe
+  * http://www.skype.com/go/getskype-full
+
+  * скайп фор бизнесс. 
+  * дают скачать мсай. 
+  * оно такое же но нет фейсбуков. 
+  * его так фик найдеш http://www.skype.com/go/getskype-msi
+===== Прошлые версии =====
+
+<note important>because newer is not always better!</note>
+
+  * http://www.oldversion.com/windows/skype
+
+  * и то что новое не всегда лучше - это 100% про скайп
+  * потому, что обновления скайпа ему не идут на пользу
+
+  * совсем совсем
+  * и это бесит
+
+  * потому, что на моем [[hardware:dns-0153784|]] скайп 6.3 уже не тянет
+  * после запуска 6.3, оно что-то делает минут так 15
+  * а это вообще за гранью зла и добра
+  * и хочеться взять и разломать свой ноутбук об колено
+  * а скайп хочу
+  * я не хочу треды дебажыть в этих ваших софтайсах
+  * разбираться зачем он там жрет процессор
+  * и чо он там делает
+  * при этом 5ая версия скайпа работает просто на ура
+
+  * вот про неё тут и будет
+
+===== Внешний вид =====
+
+Чтобы вернуть список контактов Skype 5 к привычному виду:
+
+  * нужно убрать галку в Общих настройках "Показать аватары в списке контактов"
+  * ещё в опшенс -> нотификейшен -> алертс -> мессаджес 
+  * выключить "промошенс" и "хелп анд скайпе типс"
+  * выключить [ ] не убирать скайп из панели задачь когда я в сети -> [[http://24.media.tumblr.com/84b2e011347f20e3f1c205e5fcad3524/tumblr_mmrwzyIPyl1qzs7j8o1_1280.png|тыц]]
+===== Реклама =====
+
+  * Стало разворачиваться пиздецовое окно с рекламой во время беседы. 
+  * Версия не изменилась - 5.3.0.120
+  * А вот Главная страница Skype изменилась. 
+  * Эти уроды делают всё, чтобы народ перестал пользоваться этой программой?   
+ 
+==== Нашёл лечение! ====
+ 
+Удаляем по пути %appdata%\skype все файлы temp-(много цифро-букв) и это: 
+
+  * shared_dynco\ 
+  * shared_httpfe\ 
+  * shared.lck 
+  * shared.xml 
+ 
+Всё - окно больше не показывается... Если начнёт показываться, то сделаю скрипт при загрузке винды на удаление этого мусора... 
+ 
+=== Добавлено  ===
+
+  * В общем, зараза прячется в папке %appdata%\skype\shared_dynco 
+  * Удаляете там файл dc.db и запрещаете запись в эту папку. 
+  * Всё - скайп больше не обновляет главную страницу и не выскакивает из трея. 
+
+===== Создание репака =====
+
+<note tip>Создаем свой универсальный репак.</note>
+
+Вкратце как это работает: 
+
+  * В  папку с конструктором Вы подкладываете оригинальный 5-ой версии Skype от производителя. 
+  * Имя файла должно быть SkypeSetupFull.exe 
+  * Если вы это не сделали, запустив файл !constructor.cmd конструктор сам
+  * скачает  последнюю  доступную версию установщика на сайте производителя по адресу 
+  * http://download.skype.com/SkypeSetupFull.exe 
+  * Конструктор распаковывает дистрибутив до административной установки
+  * Удаляя SkypeToolbars
+  * Следом упаковывает в 7zip sfx архив
+  * Который появляется в папке с именем Skype_RePack.exe  
+
+==== Что получаем? ====
+
+RePack 2в1 (Автоматическая установка + портативная версия) 
+ 
+  - По  нажатию  'ОК'  установка происходит в скрытом режиме.  Чтобы пропустить  это  окно например во время автоматической установки можно запускать установщик с ключем /ais 
+  - Нажав 'Да',  удерживая клавишу [Shift],  можно запустить программу в портативном режиме. Можно запустить несколько копий и работать с несколькими учетными записями - также возможно с ключем /aip 
+  - Скачать Skype Constructor 285 Кб -> http://kop.karelia.ru/SkypeConstructor.7z
+
+===== Готовый репак =====
+
+  * [[http://turbobit.net/fiqihua5zydy.html|SkypeSetupFull_5.10.0.116.exe]]
+  * [[http://turbobit.net/j9jscd6uha9a.html|Skype_5.10.0.116_RePack.exe]]
+  * [[http://turbobit.net/6gqomrdi1qlh.html|SkypeConstructor.7z]]
+  * [[http://turbobit.net/pdp16y91zpar.html|brj.skype.disable.supernode.v2013.03.05.reg]]
+
+===== Обновления =====
+
+  - Click Start >> Run >> Type services.msc /s
+  - Right click on the Skype Updater and click on Properties and in the Startup type box select Disabled. Click Apply and OK.
+  - Restart your PC.
+  - Замочить C:\Program Files\Skype\Updater.
+
+===== Реестр =====
+
+ Отсюда - http://download.skype.com/share/security/network-admin-guide-version2.2.pdf
+
+<code bash>
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisableApi, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisableFileTransfer, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, MemoryOnly, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisableContactImport, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisableVersionCheck, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisablePersonalise, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisableLanguageEdit, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, ListenPort, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, ListenHTTPPorts, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisableTCPListen, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisableUDP, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, DisableSupernode, REG_DWORD = {0,1} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, ProxySetting, REG_SZ = {string} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, ProxyAddress, REG_SZ = {string} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, ProxyUsername, REG_SZ = {string} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, ProxyPassword, REG_SZ = {string} 
+HKEY_LOCAL_MACHINE\Software\Policies\Skype\Phone, WebStatus, REG_DWORD = {0,1}
+</code>
+===== SuperNode =====
+
+  * Совсем охуели
+  * http://www.skype.com/en/security/
+  * Your Network and Skype
+  * Find out more in the IT administrator guide.
+  * Внимательно курим
+  * http://www.skype.com/go/administrators.guide
+
+<note warning>Supernode - In peer-to-peer networking, a supernode works as one of that network’s relayers and proxy servers, handling data flow and connections for other users. This usually requires a fairly fast Internet connection with a lot of bandwidth and a modest amount of CPU time, as a lot of data will invariably pass through the supernode and needs to be processed. Some peer-to-peer designs allow for the user to choose whether they ever want to be treated as supernodes; others do not. Skype by default is configured as a supernode, an issue that has caused controversy.
+</note>
+
+  * Skype имеет особенность жрать трафик
+  * Skype имеет особенность жрать оперативку
+  * Skype имеет особенность жрать процессор
+  * Причем особенность эта по умолчанию.
+  * Ну вот и нахуй вот оно надо? 
+
+  * Особенно если ты на спутнике, в сибири и в глухой тайге?
+  * И мегабайт стоит стопицот тыш денег?
+  * Или на три джы в красноярске с лимитом в 50 мегабайт в день?
+  * И через твой инет другие клиенты скайпа смогут использовать твой комп и твой инет как прокси?
+  * Типа обеспечиваешь качество связи, тем у кого с интернетом печалька
+
+  * А что будет если все отключат? А все не отключат.
+==== Как лечить supernode? ====
+
+Содержымое brj.skype.disable.supernode.v2013.03.05.reg или возьмете на гитхабе моём
+<code bash>
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Skype]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Skype\Phone]
+"DisableSupernode"=dword:00000001
+"DisableSupernodePolicy"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Skype]
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Skype\Phone]
+"DisableSupernode"=dword:00000001
+"DisableSupernodePolicy"=dword:00000001
+</code>
+
+Скачать [[http://turbobit.net/pdp16y91zpar.html|brj.skype.disable.supernode.v2013.03.05.reg]]
+
+===== Выводы? =====
+
+И какие выводы можно сделать из этих посылок? А никаких. Успехов со скайпой.
+
+{{tag>skype super disable node supernode .reg download repack репак 2в1 портативная версия скачать конструктор совсем охуели Setup Full 5.10.0.116}}

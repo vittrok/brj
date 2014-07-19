@@ -1,0 +1,7 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\SoftwareProtectionPlatform]
+"KeyManagementServiceName"="ololoev.djigurda.ru"
+"KeyManagementServicePort"="1666"
+
+

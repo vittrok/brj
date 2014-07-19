@@ -1,0 +1,40 @@
+#!/usr/bin/expect -f
+ 
+set timeout 20
+set name "admin"
+ 
+# router password
+set pass "admin"
+ 
+# router IP address
+set routerip "192.168.1.1"
+ 
+# Read command as arg to this script
+#set routercmd [lindex $argv 0]
+ 
+# start telnet
+spawn telnet $routerip
+sleep 10
+
+# send username & password
+expect "Login:"
+send -- "$name\r"
+expect "Password:"
+send -- "$pass\r"
+ 
+# get out of ISP's  Stupid menu program, go to shell
+expect "(config)>"
+send --  "system\r"
+expect "(system)>"
+send --  "reboot\r"
+
+# ndm: Core::Session: client disconnected
+# ok add 20 sec spawn
+sleep 20
+
+#send -- "^D"
+#sleep 20
+#
+send -- "^C"
+
+# exit after zyxel reboot? ok.

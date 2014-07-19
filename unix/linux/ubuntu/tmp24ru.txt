@@ -1,0 +1,70 @@
+====== tmp24.ru ======
+
+http://tmp24.ru/
+
+{{:os:nix:tmp24ru.jpg|хуяк-хуяк и в продакшн}}
+
+===== Клиентская часть =====
+
+ubuntu 12.04.02 LTS i386 + openssh
+
+<code bash>
+sudo apt-get install gpm
+sudo apt-get install digitemp
+sudo apt-get install mc
+sudo apt-get install ncdu
+</code>
+
+и все собственно
+
+==== ssh ====
+
+  - skip-name-resolve и UseDNS no в /etc/ssh/sshd_config
+  - update-motd --disable
+  - aptitude remove landscape-client landscape-common
+  - comment line session optional pam_motd.so in /etc/pam.d/login and /etc/pam.d/sshd
+  - В файлах /etc/pam.d/login и /etc/pam.d/sshd выпиливаем начисто строчки «session optional pam_motd.so»
+  - В /etc/ssh/sshd_config смотрим, есть ли 'PrintMotd yes'
+  - в /etc/ssh/ssh_config поставьте GSSAPIAuthentication no
+
+<code bash>
+ControlMaster auto
+ControlPersist 5m
+ControlPath ~/.ssh/%r@%h:%p
+</code>
+
+<code bash>
+touch /root/.ssh/authorized_keys
+echo "ssh-rsa key-here " > /root/.ssh/authorized_keys
+</code>
+
+==== sudo ====
+
+<code bash>
+ALL ALL=(ALL) NOPASSWD:ALL
+</code>
+
+==== digitemp =====
+
+<code bash>
+/usr/bin/digitemp_DS9097 -i -s /dev/ttyUSB0
+/usr/bin/digitemp_DS9097 -c /root/.digitemprc -t 0 -s /dev/ttyUSB0 -q -o "%.2C"
+</code>
+
+==== push-up ====
+
+<code bash>
+#!/bin/bash
+
+while true
+
+do
+
+    DT24=`/bin/date "+%Y-%m-%d"`
+    TM24=`/bin/date "+%H:%M:%S"`
+    TMP24=`/usr/bin/digitemp_DS9097 -c /root/.digitemprc -t 0 -s /dev/ttyUSB0 -q -o "%.2C"`
+    echo $DT24 $TM24 $TMP24
+    curl http://$url/ -d "date=$DT24%20$TM24&temp=$TMP24"
+    sleep 60
+done
+</code>

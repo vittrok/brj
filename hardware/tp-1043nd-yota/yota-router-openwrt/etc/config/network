@@ -1,0 +1,39 @@
+
+config interface 'loopback'
+	option ifname 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config interface 'lan'
+	option type 'bridge'
+	option proto 'static'
+	option ipaddr '192.168.1.1'
+	option netmask '255.255.255.0'
+	option _orig_ifname 'eth0.1 radio0.network1'
+	option _orig_bridge 'true'
+	option ifname 'eth0.1'
+
+config interface 'wan'
+	option ifname 'eth0.2'
+	option proto 'dhcp'
+
+config switch
+	option reset '1'
+	option enable_vlan '1'
+	option name 'switch0'
+
+config switch_vlan
+	option vlan '1'
+	option ports '1 2 3 4 5t'
+	option device 'switch0'
+
+config switch_vlan
+	option vlan '2'
+	option ports '0 5t'
+	option device 'switch0'
+
+config interface 'Yota'
+	option proto 'dhcp'
+	option ifname 'eth1'
+

@@ -1,0 +1,14 @@
+====== Торрент ======
+
+Трекер (англ. tracker) — специализированный сервер, работающий по протоколу HTTP. Трекер нужен для того, чтобы клиенты могли найти друг друга. Фактически, на трекере хранятся IP-адреса, входящие порты клиентов и хэш-суммы, уникальным образом идентифицирующие объекты, участвующие в закачках. По стандарту, имена файлов на трекере не хранятся, и узнать их по хэш-суммам нельзя. 
+
+<note important>Поиск по куче русскоязычных торрент-трекеров -> http://ts.saahov.ru/</note>
+
+По ссылке предлагается интересная и интерактивная визуализация работы BitTorrent протокола, реализованная на HTML5 Canvas. В процессе демонстрации можно добавлять или удалять новые сиды и пиры -> http://mg8.org/processing/bt.html
+
+
+===== opentracker =====
+
+OpenTracker is a simplistic, lightweight, standards-compliant BitTorrent peer tracker. It is written in PHP and requires only a single MySQL table to function. It does not create or use files on disk, nor is it a continuously executing process, making it ideal for virtual web hosts.
+
+http://www.whitsoftdev.com/opentracker/

@@ -1,0 +1,390 @@
+====== Ubuntu Desktop 11.04 ======
+
+===== Таки поставили =====
+
+<code bash>
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get dist-upgrade
+reboot
+</code>
+
+==== super os ====
+
+http://hacktolive.org/wiki/Super_OS
+
+<code bash>
+wget http://hacktolive.org/download/super-os-repo-installer.deb
+sudo apt-get update
+sudo apt-get install super-os
+reboot
+</code>
+
+==== broadcomm ====
+
+Как раз собирался писать о той же проблеме. Но удалось решить    .
+Не знаю что из этого списка помогло, но у меня wi-fi Broadcom 4311 заработал. 
+Мои действия:
+1. удалил драйвер STA в "Дополнительных драйвеах/ Additional drivers". 
+2. из менеджера пакетов Synaptic установил firmware-b43-installer.
+3. в консоли: rfkill list. Если хотя бы один пункт стоит YES, то надо выполнить команду rfkill unblock all .
+4. в консоли команда: sudo apt-get install linux-backports-modules-net-2.6.38-8-generic .
+
+Перезагрузил - и все заработало  .
+
+===== Таки поставили =====
+
+<code bash>
+sudo apt-get install compizconfig-settings-manager
+sudo apt-get install dconf-tools
+sudo add-apt-repository ppa:alexeftimie/ppa
+sudo apt-get update
+sudo apt-get install indicator-sysmonitor
+cd
+wget http://webupd8.googlecode.com/files/fixdropbox
+chmod +x fixdropbox
+./fixdropbox
+sudo add-apt-repository ppa:rye/ubuntuone-extras
+sudo apt-get update
+sudo apt-get install ubuntuone-indicator
+sudo apt-get install lo-menubar
+sudo apt-get install indicator-weather
+</code>
+
+<code bash>
+sudo add-apt-repository ppa:webupd8team/y-ppa-manager
+sudo apt-get update
+sudo apt-get install y-ppa-manager
+</code>
+
+==== pidgin ====
+
+<code bash>
+sudo add-apt-repository ppa:jfi/pidgin
+sudo apt-get update
+sudo apt-get install pidgin-libnotify
+</code>
+
+http://cdn.omgubuntu.co.uk/wp-content/uploads/2011/04/screenshotae_thumb.png
+
+Remember to run an update to refresh your package list then install ‘Pidgin-libnotify’.
+
+==== ulatencyd ====
+
+http://www.opennet.ru/opennews/art.shtml?num=29259
+==== upnp ====
+
+<code bash>
+sudo apt-get install upnp-inspector upnp-router-control
+</code>
+
+==== arp ====
+
+<code bash>
+arp -an | awk -v OFS="\t" '{print(substr($2, 2, length($2)-2), $4)}' | sort
+</code>
+==== udev-notify ====
+
+http://udev-notify.learnfree.eu/
+
+<code bash>
+echo "deb http://download.learnfree.eu/repository/skss / #SKSS" | sudo tee -a /etc/apt/sources.list
+wget http://download.learnfree.eu/repository/skss/repo.pub.asc -q -O- | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install udev-notify
+</code>
+
+==== GR Offline =====
+
+Offline RSS Reader -> http://code.google.com/p/google-reader-offline-client/
+
+==== claassic menu ====
+
+<code bash>
+sudo add-apt-repository ppa:diesch/testing
+sudo apt-get update
+sudo apt-get install classicmenu-indicator
+</code>
+==== cairo ====
+
+<code bash>
+sudo add-apt-repository ppa:cairo-dock-team/ppa
+sudo apt-get update
+sudo apt-get install cairo-dock
+</code>
+==== gnome ====
+
+<code bash>
+sudo add-apt-repository ppa:gnome3-team/gnome3
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo apt-get install gnome-shell
+</code>
+
+<code bash>
+sudo apt-get install ppa-purge
+sudo ppa-purge ppa:gnome3-team/gnome3
+</code>
+
+
+==== pae ====
+
+<code bash>sudo apt-get install linux-image-generic-pae linux-generic-pae linux-headers-generic-pae</code>
+
+==== miredo =====
+
+Туннель Teredo
+
+Некоторым повезло с провайдером и им подойдет вариант с туннелем Teredo: IPv6 через IPv4. Под ubuntu есть программа под названием Miredo, который создает туннель и после этого уже имеется свой IPv6-адрес. Для установки нужно просто выполнить:
+<code bash>
+sudo apt-get install miredo</code>
+
+==== X11VNC ====
+
+<code bash>
+sudo apt-get install x11vnc
+x11vnc -display :0 -forever -unixpw -noxrecord -noxfixes -ncache 10
+</code>
+
+==== autoswitch ====
+
+Если вы часто подключаете внешние мониторы или проекторы, то вам, наверняка, надоело каждый раз заходить в настройки и настраивать конфигурацию.
+Установив приложение Autoswitcher, компьютер сам будет переключаться на монитори\проектор при подключении.
+
+<code bash>
+sudo add-apt-repository ppa:hughescih/ppa
+sudo apt-get update
+sudo apt-get install autoswitcher
+</code>
+==== xbmc ====
+
+http://code.google.com/p/seppius-xbmc-repo/
+==== xclip ====
+
+<code bash>
+$ sudo apt-get install xclip
+$ alias clipboard='xclip -selection clipboard'
+$ cat ~/.ssh/id_rsa.pub | clipboard
+</code>
+
+==== virtualbox ====
+
+<code bash>
+sudo apt-get install virtualbox-ose-guest-utils
+</code>
+
+==== skype ====
+
+<code bash>
+sudo aptitude install skype
+sudo gedit /usr/share/applications/skype.desktop
+
+Добавить строку 
+StartupNotify=true
+
+sudo gedit /usr/share/indicators/messages/applications/skype
+
+Добавить строку
+/usr/share/applications/skype.desktop
+</code>
+
+==== ssh ====
+
+  - skip-name-resolve и UseDNS no в /etc/ssh/sshd_config
+  - update-motd --disable
+  - aptitude remove landscape-client landscape-common
+  - comment line session optional pam_motd.so in /etc/pam.d/login and /etc/pam.d/sshd
+  - В файлах /etc/pam.d/login и /etc/pam.d/sshd выпиливаем начисто строчки «session optional pam_motd.so»
+  - В /etc/ssh/sshd_config смотрим, есть ли 'PrintMotd yes'
+  - в /etc/ssh/ssh_config поставьте GSSAPIAuthentication no
+
+<code bash>
+ControlMaster auto
+ControlPersist 5m
+ControlPath ~/.ssh/%r@%h:%p
+</code>
+
+==== boot splash ====
+
+‘Fixing’ the Plymouth boot screen in Ubuntu. Open a terminal and enter the following commands separately, allowing for each to complete before entering the next.
+
+<code bash>
+wget http://launchpadlibrarian.net/57638460/fixplymouth
+chmod +x fixplymouth
+./fixplymouth
+</code>
+
+<code bash>
+sudo apt-add-repository ppa:mefrio-g/plymouthmanager
+sudo apt-get update
+sudo apt-get install plymouth-manager
+</code>
+
+==== звуки ====
+
+http://people.ubuntu.com/~dylanmccall/soundgallery/
+
+==== virtualbox ====
+
+Как писал ранее под моей любимой фряшкой напилил гостевой ОС Windows в VirtualBOX и в один прекрасный день захотелось добавить в нее еще один виртуальный винт, делается это очень просто:
+Создаем еще один жесткий диск
+# VBoxManage createhd --filename /usr/local/vbox/iso/WindowsXP2.vdi --size 15360
+0%...10%...20%...30%...40%...50%...60%...70%...80%...90%...100%
+Disk image created. UUID: fddd7d65-0624-420c-b8ce-832c9de20eea
+Цепляем его к IDE контроллеру
+# VBoxManage storageattach WindowsXP --storagectl "IDE Controller" --port 0 --device 1 --type hdd --medium /usr/local/vbox/iso/WindowsXP2.vdi
+Запускаем нашу виртуалку по-новой:
+# VBoxHeadless -s WindowsXP -n -m 5900 -o passw &
+
+Создание и настройка виртуальной машины
+
+
+Создаем виртуальную машину (посмотреть все возможные ostype: VBoxManage list ostypes)
+
+# VBoxManage createvm --name MicroXP --ostype WindowsXP --register --basefolder /usr/vbox
+Задаем парамерты виртуалки (bridgeadapter1 указывает адаптер хоста, к которому привязываем виртуалку)
+
+
+# VBoxManage modifyvm MicroXP --memory 512 --floppy disabled --audio none --nic1 bridged --bridgeadapter1 em0 --vram 4 --accelerate3d off --boot1 disk --acpi on --cableconnected1 on
+Создаем жесткий диск, размер указывается в мегабайтах
+
+# VBoxManage createhd --filename /usr/local/vbox/iso/MicroXP.vdi --size 1000 --register
+Создаем контроллер на виртуалке
+
+# VBoxManage storagectl MicroXP --name "IDE Controller" --add ide
+Подключаем диск к контроллеру
+
+# VBoxManage storageattach MicroXP --storagectl "IDE Controller" --port 0 --device 0 --type hdd --medium /usr/local/vbox/MicroXP.vdi
+Подключаем установочный образ к контроллеру
+
+ 
+
+# VBoxManage storageattach MicroXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium /usr/local/vbox/MicroXP-v0.82.iso
+Устанавливаем загрузку с установочного образа
+
+# VBoxManage modifyvm MicroXP --boot1 dvd
+Далее, запускаем машину и указываем ей параметры vnc:
+
+# VBoxHeadless -s MicroXP -n -m 5900 -o password
+Поключаемся любым vnc-клиентом (например, RealVNC или UltraVNC) и ставим ОС.
+
+Затем нужно поставить guest additions в виртуалку, без них vnc сервер иногда глючит:
+
+# VBoxManage storageattach MicroXP --storagectl "IDE Controller" --port 1 --device 0 --type dvddrive --medium /usr/local/lib/virtualbox/additions/VBoxGuestAdditions_3.2.4.iso
+После этого, виртуальная машина готова к использованию.
+
+Правда, несмотря на установленные guest additions, заставить работать курсор мыши мне не удалось.
+
+————————–
+
+Мои дополнения/заметки
+
+Вышеописанным способом мне удалось установить две виртуальные машины с OS:
+
+FreeBSD 8.1 – в кач-ве сервера
+Windows XP – в кач-ве клиента
+Запускать с vnc нужно тогда когда необходим доступ к консоли сервера, т.е. получается как удаленная KVM.
+Если нужно просто запустить уже готовую и настроенную виртуальную машину, то пользуем:
+
+# VBoxManage startvm MicroXP --type headless
+Останавливаем виртуальную машину  через acpi:
+
+# VBoxManage controlvm MicroXP acpipowerbutton
+или более жестко:
+
+# VBoxManage controlvm MicroXP poweroff
+Выставляем hdd как загрузчик, послее того как установили OS:
+
+# VBoxManage modifyvm MicroXP --boot1 disk
+Отцепить установочный диск:
+
+ 
+
+# VBoxManage storageattach MicroXP --storagectl "IDE Controller" --port 1 --device 0 --medium none
+Просмотр всех запущенных машин:
+
+# VBoxManage list runningvms
+Просмотр всех зарегистрированных машин:
+
+# VBoxManage list vms
+Просмотр информации о виртуальной машине:
+
+# VBoxManage showvminfo MicroXP
+Backup
+
+Бекап виртуальных машин можно сделать через команду export, перед выполнением команды export необходимо выключить виртуалку или поставить сделать сохранение состояния:
+
+Выключение:
+
+# VBoxManage controlvm MicroXP poweroff
+Сохранение состояния:
+# VBoxManage controlvm MicroXP savestate
+После чего можно выполнить export:
+
+# VBoxManage export MicroXP -o /usr/WinXP.ovf
+Внимание: после выполнения команды на выключение или команды на сохранения состояния виртуальную машину необходимо запускать снова, не забудьте об этом.
+
+Недавно я заморочился над темой автоматического резервного копирование виртуальных машин Virtualbox, чтобы они сами ежедневно бекапились. Почитал в Инете каждый «во что горазд» делает. Кто то через export, кто то через ﻿clonehd, а кто то через ﻿snapshot.
+
+Поразмыслив я для себя все же остановился на варианте с export. Для выполнения задачи резервного копирования виртуальных машин Virtualbox я накатал скрипт на PERL, который запихнул в /etc/crontab OS FreeBSD.
+
+Кому интересно, то вот исходник скрипта для backup`а всех запущенных виртуальных машин: http://subnets.ru/files/﻿﻿virtualbox_backup.pl.txt
+
+Что делает скрипт автоматического backup`а для virtualbox машин:
+
+получает листинг всех запущенных виртуальных машин, которые и будут подвергаться бекапу
+создает директорию для backup`а: /some/path/backup/год/месяц/день/имя_виртуальной_машины
+создает в backup дире файл readme.txt куда помещает вывод команды showvminfo по бекапируемой виртуалке
+выполняет savestate ﻿виртуальной машины
+выполняет export виртуальной машины
+выполняет запуск виртуальной машины
+после завершения бекапирования всех запущенных машин, скрипт выполняет удаление папки с бекапом месячной давности
+Import
+
+Импорт виртуальных машин:
+Может понадобиться или при восстановлении из backup`а или просто при переносе на другой физический сервер.
+По умолчанию каталог для хранения виртуальных машин является home каталогом юзера под котором вы вошли в систему, чтобы изменить местоположение выполним:
+
+# mkdir -p /usr/vbox/machines
+# mkdir /usr/vbox/hdd
+# VBoxManage setproperty machinefolder /usr/vbox/machines
+# VBoxManage setproperty hdfolder /usr/vbox/hdd
+Теперь можно импортить:
+
+#VBoxManage import /usr/WinXP.ovf
+Отныне все виртуалки будут «жить» в каталоге /usr/vbox.
+
+Добавить ещё сетевуху можно командой:
+
+# VBoxManage modifyvm MicroXP --nic2 bridged --bridgeadapter2 vlan4 --cableconnected2 on
+Этим мы добавили вторую сетевую карту, забриджевали её с vlan4 на реальном сервере.
+Все последущие карты добавляются/изменяются/удаляются так же с указанием –nicX, где X это номер карты
+
+Махнуть MAC-адрес на втором адаптере можно командой:
+
+# VBoxManage modifyvm MicroXP --macaddress2 auto
+MAC-адрес будет выбран автоматически, либо можно самому задать мак:
+
+# VBoxManage modifyvm MicroXP --macaddress2 444444444444
+Удалить любую сетевуху из виртуалки можно по её номеру, мы удалим вторую, которую создали выше:
+
+# VBoxManage modifyvm MicroXP --nic2 none
+Проблем или отличий в работе виртуальной машины и реальной я не заметил. Все работает как надо.
+
+Виртуальные машины помогут вам либо решить задачу с нехваткой реальных серверов под какую либо задачу, либо отличный способ для того чтобы создать тестовый стенд для тестирования чего либо.
+
+Например мы собирали тестовый стенд из 3-х виртуалок и гоняли на них BGP с использованием Quagga.
+==== ext4 + ssd ====
+
+https://sites.google.com/site/lightrush/random-1/howtoconfigureext4toenabletrimforssdsonubuntu
+
+ext4, потому что поддерживает команду TRIM (опция монтирования discard).
+
+At present, ext4 is the only fully-supported file system that supports discard. To enable discard commands on a device, use the mount option discard. For example, to mount /dev/sda2 to /mnt with discard enabled, run:
+mount -t ext4 -o discard /dev/sda2 /mnt
+By default, ext4 does not issue the discard command. This is mostly to avoid problems on devices which may not properly implement the discard command. The Linux swap code will issue discard commands to discard-enabled devices, and there is no option to control this behavior.
+
+(с) RHEL 6 Storage Guide
+==== индикатор ====
+
+http://askubuntu.com/questions/30334/list-of-application-indicators

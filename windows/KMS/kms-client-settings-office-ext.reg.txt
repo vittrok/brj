@@ -1,0 +1,6 @@
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\OfficeSoftwareProtectionPlatform] 
+"KeyManagementServiceName"="ololoev.djigurda.ru"
+"KeyManagementServicePort"="1666"
+

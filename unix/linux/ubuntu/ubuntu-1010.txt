@@ -1,0 +1,456 @@
+====== Ubuntu Desktop 10.10 ======
+
+http://www.opennet.ru/tips/2477_wine_1c_windows_fin.shtml
+
+Установка и настройка
+
+1. Добавляем новый репозиторий: 
+$sudo add-apt-repository ppa:doctormo/ppa
+2. Обновляем список пакетов и устанавливаем приложение gdocs-mount-gtk
+$ $sudo apt-get update
+sudo apt-get install gdocs-mount-gtk
+3. После установки, запускаем приложение 'Приложения'->'Стандартные'->'Google Docs Connection'
+4. Вводим логин и пароль от вашего Google аккаунта и жмем 'ОК'.
+5. Теперь у вас должно открыться окно наутилуса с подключенной папкой, в которой вы найдете ваши документы, расположенные в Google Docs. С ними вы можете проделывать все тоже, что и с обычными файлами. Кстати, сам подключенный диск может появиться не сразу, а где-то в течении минуты
+
+apt:startupmanager
+
+ Liberation Fonts
+ 
+ apt:ttf-mscorefonts-installer
+ 
+Step 4. Copy all the needed fonts in the .fonts  folder.
+If you come from windows, copy the desired fonts from C:\Windows\Fonts
+
+Step 5. If you want to use the fonts immediately, you'll need to refresh the font information cache files:
+
+sudo fc-cache -f -v
+
+Some applications will need to be restarted for the fonts to show up.
+
+ 
+
+Please note: to make fonts available to all users, copy the fonts to /usr/share/fonts instead of ~/.fonts.
+
+sudo fc-cache -f -v
+
+gconftool-2 --set /apps/metacity/global_keybindings/panel_main_menu --type string "Super_L"
+
+<code bash>
+sudo add-apt-repository ppa:artfwo/ppa
+sudo apt-get update
+sudo apt-get install indicator-cpufreq
+</code>
+
+==== DockBarX ====
+
+<code bash>
+$ sudo add-apt-repository ppa:dockbar-main/ppa
+$ sudo apt-get update && sudo apt-get install dockbarx
+</code>
+
+http://gtg.fritalk.com/
+
+http://projecthamster.wordpress.com/
+
+===== Оформление =====
+
+<code bash>
+wget https://downloads.sourceforge.net/project/macbuntu/macbuntu-10.10/v2.3/Macbuntu-10.10.tar.gz -O /tmp/Macbuntu-10.10.tar.gz
+tar xzvf /tmp/Macbuntu-10.10.tar.gz -C /tmp
+cd /tmp/Macbuntu-10.10/
+./install.sh
+</code>
+
+==== plymouth-theme ====
+
+<code bash>
+sudo add-apt-repository ppa:webupd8team/themes && sudo apt-get update
+sudo apt-get install buuf-icon-theme
+</code>
+
+
+<code bash>
+sudo add-apt-repository ppa:shnatsel/plymouth
+sudo apt-get update && sudo apt-get install plymouth-theme-smooth-greeting
+</code>
+
+sudo add-apt-repository ppa:conky-companions/ppa
+sudo apt-get update && sudo apt-get install conkyexaile
+
+http://gnome-look.org/content/show.php/Conky+Meet+Faenza?content=133086
+
+http://blitz-bomb.deviantart.com/art/7Like-Gnomenu-187266258
+===== Музыка =====
+
+python-mutagen
+
+
+find . -iname '*.mp3' -print0 | xargs -0 mid3iconv -eCP1251 --remove-v1
+
+EasyTag
+
+не забываем про MusicBrainz Picard (тоже есть в репозиториях) apt:picard
+
+mp3diags
+
+<code python>
+#!/usr/bin/env python
+
+import os, sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+from mutagen.mp3 import MP3
+
+for fn in os.listdir('.'):
+    if fn.lower().endswith('.mp3'):
+        print fn
+        f = MP3(fn)
+        try:
+            uslt = f["USLT::'rus'"]
+        except:
+            continue
+        s = unicode(''.join([chr(ord( c)) for c in uslt.text]),'cp1251')
+        print s
+        uslt.text = s.encode('utf-8')
+        uslt.encoding = 3
+        f.save()
+</code>
+
+====== Софт для работы ======
+
+==== linux kernel ====
+
+Удаляем старые ядра
+
+<code bash>
+sudo apt-get remove $(dpkg -l|egrep '^ii  linux-(im|he)'|awk '{print $2}'|grep -v `uname -r`) 
+</code>
+
+Для ATI
+<code bash>
+sudo apt-add-repository ppa:ubuntu-x-swat/x-updates
+sudo apt-get update
+sudo apt-get install fglrx
+</code>
+
+Для Nvidia
+<code bash>
+sudo apt-add-repository ppa:ubuntu-x-swat/x-updates
+sudo apt-get update
+sudo apt-get install nvidia-current nvidia-current-modaliases nvidia-settings
+</code>
+==== virtualbox ====
+
+<code bash>
+sudo apt-get update
+sudo apt-get install build-essential linux-headers-$(uname -r)
+sudo apt-get install virtualbox-ose-guest-x11
+</code>
+
+==== кодыки ====
+
+<code bash>
+sudo add-apt-repository ppa:ferramroberto/vlc
+sudo apt-get update
+sudo apt-get install ubuntu-restricted-extras
+sudo apt-get install ffmpeg
+sudo apt-get install vlc vlc-plugin-pulse
+sudo apt-get install libavcodec-extra-52
+</code>
+
+==== intel-driver ====
+
+<code bash>
+sudo lspci | grep VGA
+sudo add-apt-repository ppa:glasen/intel-driver
+sudo apt-get update
+sudo apt-get install libdrm-dev
+sudo apt-get install xserver-xorg-video-intel
+</code>
+
+==== Y PPA ====
+
+<code bash>
+sudo add-apt-repository ppa:webupd8team/y-ppa-manager
+sudo apt-get update
+sudo apt-get install y-ppa-manager
+</code>
+==== Translate-me ====
+
+<code bash>
+sudo add-apt-repository ppa:atareao/atareao
+sudo apt-get update
+sudo apt-get install translate-me
+</code>
+
+==== active directory ====
+
+Самый простой способ ввода Linux в домен Windows. После установки, программа доступна (для GNOME) в меню Система -> Администрирование, под именем Active Directory membership.
+
+<code bash>
+sudo aptitude install likewise-open5-gui
+</code>
+==== Midnight Commander ====
+
+<code bash>
+sudo add-apt-repository ppa:nilarimogard/webupd8
+sudo apt-get update
+sudo apt-get install mc
+</code>
+
+<code bash>
+export TERM=xterm-256color
+mkdir -p ~/.mc/skins
+cd ~/.mc/skins
+wget "http://dl.dropbox.com/u/4663634/mc-xoria256-skin/xoria256.ini"
+mc -S xoria256
+mcedit ~/.mc/ini
+Найдите внутри строку вида «skin=default» и замените на «skin=xoria256»
+</code>
+
+Update: 12 января 2011 года скин Xoria256 был добавлен в master ветку git репозитория, так что если вы только что установили mc из git, у вас уже есть этот скин, больше ничего делать не нужно.
+==== CloudSN ====
+
+
+<code bash>
+sudo add-apt-repository ppa:chuchiperriman/cloudsn
+sudo aptitude update
+sudo aptitude install cloudsn
+</code>
+
+Тех, кто хочет иметь уведомления о новой почте, сообщениях микроблогов и Google Reader-а в удобном виде на рабочем столе прошу обратить внимание на CloudSN — мультипротокольную систему уведомлений с возможностью интеграции в Ubuntu Messaging Menu -Ю http://chuchiperriman.github.com/cloud-services-notifications/
+
+Программка может отображать уведомления, используя Убунтовский NotifyOSD. Можно установить максимально разрешенное количество уведомлений для каждого сервиса, чтоб не позволять сервису «флудить».
+
+CloudSN может так же работать как апплет в области уведомлений:
+
+CloudSN, как и все остальное «кульное» в жизни, имеет свой PPA с поддержкой версий Karmic и Lucid. Рекомендуемый и самый простой способ установки:
+
+$ sudo add-apt-repository ppa:chuchiperriman/cloudsn
+$ sudo apt-get update && sudo apt-get install cloudsn
+
+Включение интеграции в Messaging Menu
+
+По умолчанию CloudSN работает как обычный апплет GNOME. Для получения интеграции в Messaging Menu необходимо проделать следующее: —
+Правый клик по иконке CloudSN в области уведомлений
+Выбираем 'Preferences'
+В возникшем окне аккаунтов идем в Edit > Preferences
+На вкладке 'General' выбираем 'Indicate status with: Indicator Applet'.
+
+==== LibreOffice ====
+
+<code bash>
+sudo apt-get purge openoffice*.*
+sudo add-apt-repository ppa:libreoffice/ppa
+sudo apt-get update
+sudo apt-get install libreoffice
+sudo apt-get install libreoffice-gnome
+</code>
+
+==== banshee ====
+
+My favourite music player, Banshee, didn’t recognize my Android phone ‘out of the box’, despite other Ubuntu apps such as Shotwell and Nautilus, doing so. If you’re in the same position you’ll want to try this crazy-simple solution that pals Banshee and your handset up in no-time:
+
+  - Exit Banshee fully and make sure your phone is mounted.
+  - Open Nautilus and head to the ‘root’ of your phones SD Card (i.e. the first level)
+  - Create a blank file named ‘.is_audio_player’ (sans apostrophes)
+
+==== indicator-cpufreq ====
+
+<code bash>
+sudo add-apt-repository ppa:artfwo/ppa
+sudo apt-get update
+sudo apt-get install indicator-cpufreq
+</code>
+
+
+
+==== chrome ====
+
+<code bash>
+sudo add-apt-repository ppa:chromium-daily/stable
+sudo apt-get update
+sudo apt-get install chromium-browser
+</code>
+
+==== vmfs =====
+
+<code bash>
+sudo apt-get install -t vmfs-tools
+</code>
+
+==== flux ====
+
+Krasnoyarsk: 56.0012512, 92.8855896
+
+<code bash>
+sudo add-apt-repository ppa:kilian/f.lux
+sudo apt-get update
+sudo apt-get install fluxgui
+</code>
+
+==== weather ====
+
+<code bash>
+sudo add-apt-repository ppa:weather-indicator-team/ppa
+sudo apt-get update
+sudo apt-get install indicator-weather
+</code>
+
+==== skype ====
+
+Чтобы добавить skype в Ubuntu messaging menu необходимо:
+
+<code bash>
+sudo aptitude install skype
+sudo gedit /usr/share/applications/skype.desktop
+Добавить строку StartupNotify=true
+sudo gedit /usr/share/indicators/messages/applications/skype
+Добавить строку /usr/share/applications/skype.desktop
+</code>
+
+==== glippy ====
+
+<code bash>
+sudo add-apt-repository ppa:bikooo/glippy
+sudo apt-get update && sudo apt-get install glippy glippy-ubuntu-mono
+</code>
+
+==== elementary ====
+
+<code bash>
+sudo add-apt-repository ppa:am-monkeyd/nautilus-elementary-ppa
+sudo apt-get update && sudo apt-get upgrade
+</code>
+==== FreeRDP ====
+
+<code bash>
+sudo add-apt-repository ppa:llyzs/ppa
+sudo apt-get install freerdp remmina
+</code>
+
+==== clipit ====
+
+<code bash>
+sudo add-apt-repository ppa:shantzu/clipit
+sudo apt-get update
+sudo apt-get install clipit
+</code>
+
+==== gdm ====
+
+https://wiki.ubuntu.com/DesktopTeam/Specs/GdmFaceBrowser
+==== GTD ====
+
+<code bash>
+sudo apt-get install hamster-applet
+sudo apt-get install gtg
+</code>
+
+==== audiorecorder ====
+
+<code bash>
+sudo apt-add-repository ppa:osmoma/audio-recorder
+sudo apt-get update
+sudo apt-get install audio-recorder
+</code>
+==== Пароль на wifi ====
+
+Что бы при автологине не заебывал key-ring -> Система -> параметры -> сетевые соединения -> беспроводная сеть -> ваше подключение -> доступно всем пользователям -> там же "подключатся автоматически".
+
+==== блятсво с grub ====
+
+В ubuntu даже в LTS сломанная заставка. Выключаем её вообще.
+
+<code bash>
+#sudo gedit /etc/default/grub
+ищем
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"
+превращаем
+GRUB_CMDLINE_LINUX_DEFAULT=""
+потом
+#sudo update-grub
+</code>
+
+==== Haguichi ====
+
+<code bash>
+sudo add-apt-repository ppa:webupd8team/haguichi
+sudo apt-get update
+sudo apt-get install haguichi
+</code>
+
+==== Mounty ====
+
+<code bash>
+sudo add-apt-repository ppa:tldm217/tahutek.net
+sudo apt-get update
+sudo apt-get install mounty
+</code>
+==== Cairo Dock ====
+
+<code bash>
+sudo add-apt-repository ppa:cairo-dock-team/weekly
+sudo apt-get update
+sudo apt-get install cairo-dock cairo-dock-plug-ins
+sudo apt-get install bzr
+cd ~/.config/cairo-dock
+rm -r third-party
+bzr checkout --lightweight lp:cairo-dock-plug-ins-extras third-party
+</code>
+
+==== Gnome Activity Journal ====
+
+<code bash>
+sudo add-apt-repository ppa:zeitgeist/ppa
+sudo apt-get update
+sudo apt-get install gnome-activity-journal
+</code>
+
+==== XBMC ====
+
+<code bash>
+sudo add-apt-repository ppa:team-xbmc
+sudo apt-get update
+sudo apt-get -y install python-software-properties pkg-config xbmc xbmc-standalone
+</code>
+
+==== ejector ====
+
+<code bash>
+sudo add-apt-repository ppa:fredp/ppa
+sudo apt-get update
+sudo apt-get install ejecter
+</code>
+
+==== 10 часов ====
+
+[[http://habrahabr.ru/blogs/linux/115451/|тыц]] -> О том, как я заставлял Ubuntu работать 10 часов от батареи
+
+==== wine ====
+
+<code bash>
+sudo add-apt-repository ppa:ubuntu-wine/ppa
+sudo apt-get update 
+sudo apt-get install wine1.3
+</code>
+
+<code bash>
+sudo add-apt-repository ppa:nikount/orta-desktop
+sudo apt-get update
+sudo apt-get install orta-theme
+</code>
+
+<code bash>
+sudo add-apt-repository ppa:webupd8team/mintmenu
+sudo apt-get update
+sudo apt-get install mintmenu
+</code>
+
+<code bash>
+sudo add-apt-repository ppa:iaz/battery-status
+sudo apt-get update
+sudo apt-get install battery-status
+/usr/lib/battery-status/battery-status --indicator
+</code>

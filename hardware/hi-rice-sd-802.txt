@@ -1,0 +1,41 @@
+====== Hi-Rice SD-802 ======
+
+Аццко оруший китайский плеер за 750 рублей. Брал [[http://www.kreep.ru/cat/sec25/prod12530/|тут]], а картинки [[http://www.dhgate.com/20pcs-hi-rice-sd-802-mini-portable-speaker/p-ff80808131ae161e0131d1be5f76260d.html|тут]], [[http://www.aliexpress.com/store/product/New-Original-Hi-Rice-SD-802-Mini-Multimedia-Speaker-for-TF-Card-FM-Mobile-phone-LED/406365_527642802.html|тут]] и [[http://www.taobaodropshipping.com/goods.php?id=3861|тут]].
+
+==== Features ====
+
+  - Music player allows you to enjoy music anytime anywhere charm ;-)
+  - The new aluminum diaphragm micro-speaker, clear treble, bass, pure ,unique design!
+  - Connect your MP3, MP4, CD, DVD, iPod, iPhone, PSP, mobile phone, computer
+  - Lithium battery or the computer USB makes you can enjoy music anytime and anywhere - 1100 mAh
+  - Support MP3, MP4, FM приемник
+  - Фонарик :-)
+  - Мало того, работает как внешняя USB звуковуха. В win7 без драйверов (само стягивает)
+
+==== Спека ====
+
+^ Спецификация ^^
+| Модель| Hi-Rice SD-802 |
+| Кол-во каналов: | 2 |
+| Пульт ДУ | нет |
+| Материал | Металл |
+| Цвет | Серебристый |
+| Мощность сателлитов | 3 Вт Output: RMS 3W*2 THD=10% |
+| Суммарная мощность | 6 Вт Speaker:1.77 inch |
+| Частотный диапазон | 150 - 18000 Гц |
+| Line in | configure 3.5mm stereo plug |
+| Отношение сигнал/шум | 80 дБ |
+| Nominal impedance | 4ohm |
+| Magnetic resistant | 4 Ohms |
+| Регуляторы | Громкость |
+| Разъемы | USB, TF |
+| Общая мощность | до 10 Вт |
+| Power supply | li-on battery rechargeable, USB power cable |
+| Package Size | 13x12x6.5cm/5.12x 4.72x2.56in(L x W x H) |
+| Speaker dimensions | 10x6x4.5cm/3.94x2.36x1.78in (L x W x H) |
+
+==== q&a ====
+
+1) how to charge the speakers? -> answered: plug the USB into the computer and the other (5P) into the rear of the speaker the small USB jack; Remember audio switch to ON (on) will be charged.
+
+{{tag>Hi-Rice SD-802 mp3 плеер китай}}

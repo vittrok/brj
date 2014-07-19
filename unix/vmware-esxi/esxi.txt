@@ -1,0 +1,274 @@
+====== VMware: виртуальная инфраструктура ======
+
+[[http://www.microsoft.com/downloads/en/details.aspx?familyid=48359DD2-1C3D-4506-AE0A-232D0314CCF6&displaylang=en|тыц]] -> Microsoft® Hyper-V™ Server 2008 R2 -> [[http://amaksimov.wordpress.com/2010/06/23/hyper-v-server-2008-r2-clear-install-to-hp-proliant-dl-360-g5/|тыц]] -> Установка Hyper-V Server 2008 R2 на серверную платформу HP ProLiant DL 360 G5
+
+Где скачать VmWare ESXi? -> К слову, эта штука теперь называется "VMware vSphere HypervisorTM (ESXi)" и имеет версию 4.1 -> Скачивать по ссылке отсюда -> http://www.vmware.com/products/vsphere-hypervisor/overview.html
+
+А с сентября 2010 так:
+
+  - Не VMotion, а vMotion
+  - Не Storage VMotion, а Storage vMotion
+  - Не бесплатный ESXi, а vSphere Hypervisor
+  - Не коммерческий гипервизор ESX и ESXi (из состава vSphere), а Hypervisor Architectures
+
+==== COM и VMware ESXi 4 ====
+
+У многих пользователей платформы виртуализации VMware ESXi возникал вопрос о том, поддерживаются ли COM порты хоста ESXi для проброса в виртуальные машины. Это необходимо в случаях, когда нужно использовать модемы, UPS или другое оборудование хостовой платформы в гостевой ОС через интерфейс последовательного порта (Serial Port).
+
+В VMware ESXi 4 этого сделать было [[http://www.vladan.fr/esxi-4-does-not-support-serial-and-parallel-ports/|нельзя]]. А вот в VMware ESXi 4.1 - [[http://www.ntpro.nl/blog/archives/1539-vSphere-4.1-Virtual-Serial-Port-Concentrator.html|можно]] (при этом, конечно, никакой vMotion работать не будет).
+
+Кроме того, в VMware vSphere 4.1 появилось такое устройство, как Virtual Serial Port Concentrator, которое позволяет перенаправлять COM порты виртуальных машин по сети. Подробнее о [[http://www.ntpro.nl/blog/archives/1539-vSphere-4.1-Virtual-Serial-Port-Concentrator.html|нем тут]].
+
+==== softline ====
+
+  - VMware View 4 (Виртуализация рабочих столов) - http://connect.softline.ru/p40233616/
+  - Vizioncore (Расширение возможностей виртуализации) – http://connect.softline.ru/p13222313/
+  - http://www.vmware.com/technical-resources/advantages/index.html
+  - ftp://fs.softline.ru/Virtual/ 
+    - Презентации продуктов и решений VMware (vSphere 4.0, VMware View);
+    - Презентации продуктов Veeam (Backup, Reporter, Monitor, Configurator);
+    - Примеры внедрений решений VMware;
+    - Jumpstart_vSphere_RUS, Jumpstart_View_RUS  (Предложения по обучению и установке ПО VMware – скидки!!!);
+    - Подробный документ по лицензированию продуктов Microsoft.
+
+=== В чом соль? ===
+
+В следующем: 
+
+  - Консолидация серверов. Мы берем ресурсы сервера, и делим их между ВМ. Так как ВМ друг от друга независимы, и создать мы их можем много, то каждому нашему приложению мы можем выделить по отдельной ВМ, т.е. - по отдельной копии ОС. Разные ВМ друг от друга не зависят, сбой или перезагрузка в одной из них не затрагивает другие ВМ, т.е. другие приложения. Зачем это нам? Для повышения КПД нашей серверной. Мы можем решить те же задачи, но заняв меньше места в стойке, потребляя меньше электроэнергии, и требую меньше энергии на охлаждение серверной.
+  - Поддержка устаревших ОС: В ВМ могут работать разные ОС - на одном и том же сервере можно эксплуатировать и какие нибудь Linux, и новую Microsoft Windows Server 2008, и старую Microsoft Windows NT 4.0 - второй приятный бонус это поддержка устаревших ОС. За счет того, что внутри ВМ железо сэмулировано, а эмулируются достаточно давно появившиеся матери \ чипсеты \ видео и т.п., многие устаревшие ОС на них работают нормально. 
+  - Неплохие бонусы - повышение непрерывности бизнеса, лучшая управляемость -  вытекают из за эмуляции железа в ВМ, и из за инкапсуляции ВМ в файлы.
+     - Отсутствие привязки к физическим железкам. Я могу перенести ВМ на другую железку - и она заработает БЕЗО всяких проблем. Зачем мне ее переносить?       
+     - Исходную железку я хочу выкинуть \ перезагрузить из за установки патчей \ выключить на аппаратную профилактику. 
+     - Железка может сдохнуть, но для запуска работавших на ней ВМ достаточно их запустить на другой железке.
+  - Бекап и восстановление. ВМ - это файлы. Во многих ситуациях бекапить, восстанавливать ВМ, делать эталоны и из эталонов поднимать новые ВМ - намного проще и удобнее.
+
+=== Погнали ===
+
+Задача: проинсталлировать ESX(несколько) и Virtual Center.
+
+Решение: 
+
+  - Берем дистрибутивы. Проще всего, думаю, зайти на соответствующий раздел vmware.com. Попросят зарегестрироваться, сделаем. Насколько я помню, публичные домены не катят, т.е. мыло с yandex\mail.ru\gmail указывать смысла нет. После регистрации на мыло приходят письма с прямыми ссылками на скачивание. Нам нужны дистрибутивы актуальной версии VMware ESXi. 
+  - Болваним скачаный образ на CD, загружаем с него сервер.
+  - Запускается установка. Если ставим сервер удалено, а канал тонкий, может иметь смысл не нажимать enter как попросят, а сначала написать esx text - тогда менюшки будут нарисованы псевдографикой :)
+  - В самом процессе установки нет ничего сложного. 
+  - Две потенциальные грабли:
+    - Установить не на тот диск (потенциально опасно затереть что то нужное). Дабы избежать этого, лучше отключить все невостребованные на этапе установке ЛУНы от этого сервера.
+    - Выбрать не тот сетевой адаптер. Вам предложат выбрать сетевушку, через которую будет доступен управляющий интерфейс ESX. А в качестве идентификатора вам будут доступны только их PCI адреса, вида 1:2.1. Если у вас не любая сетевушка сервера смотрит в ту же сеть, что и ваш писюк, с которого будете управлять, то можно ошибиться. И по сети досупа к ESX не будет - а он нужен обязательно. Поправить это можно из командной строки.
+  - После завершения установки обращаемся браузером на IP нашего ESX сервера, с него скачиваем и устанавливаем на нашей машине VI Client. Запускаем его, уже им обращаемся на IP адрес ESX сервера. Учетная запись - root, пароль для нее мы указывали при установке. 
+  - С помощью этого клиента производятся подавляющее большинство необходимых манипуляций с ESX сервером.
+
+=== Как оно это так? ===
+
+ESX - состоит из двух основных компонентов - гипервизора и Linux. Гипервизор - это написанный программистами VMware компонент, который и "делает" виртуализацию. Его еще называют "vmkernel", ядро. Linux - это порезанный Red Hat Enterprise Linux 3. Порезанность заключается в удалении всех не нужных ESX'у компонентов. Например, нет ftp сервера. Этот линукс используется для получения локального интерфейса командной строки, и для возможности запустить в нем какие то приложения. Единственное, что на мой взгяд имеет смысл инсталлировать в этот линукс(его, кстати, называют Service Console, SC) - это агенты мониторинга железа и агенты бекапа.
+
+ESXi - состоит из тех же двух компонентов - гипервизор и линукс. Но линукс чертовски маленький, и функций локально практически никаких не позволяет. Даже официальной командной строки локальной нету. Чуть подробнее о нем тут. Зато без большого линукса весь ESXi помещается буквально в три десятка мегабайт, а не в 1.5 гигабайта, как ESX.
+
+Резюме: Таким образом, отличия в следующем - с т.зрения функционала виртуализации - пофигу, использовать ESX или ESXi. У первого будет еще и линукс - туда можем что нибудь проинсталлить, там можем поработать с привычной командной строкой. Зато с "i" версией, при прочих равных:
+
+  - Можно купить сервер, где эта флешка с ESXi уже встроена, и пропустить, таким образом, этап инсталляции.
+  - Можно записать его на флешку, и грузить сервер с этой флешки.(это, правда, официально не поддерживается)
+  - Можно даже организовать загрузку по PXE - правда, опять таки не поддерживается такая конфигурация.
+  - Локально нельзя проинсталлировать ничего. Да и особо незачем обычно бывает на ESX что то инсталлировать.
+  - И даже доступ к локальной командной строке можно получить только неофициально, но - есть удаленная командная строка, так и называющаяся - RCLI, Remote Command Line Interface. Т.е. этот пункт минусом не является.
+
+==== ESXi ====
+
+VMware [[http://www.vmware.com/ru/products/esxi/|ESXi]] является отличной технологией, что бы начать ваш проект по серверной виртуализации совершенно бесплатно. Кроме того, он легкий (всего 32 Мб), безопасный и надежный (мы видели примеры работы более 1000 дней без перезагрузок). А еще он крайне прост в установке и обслуживании. Одной из основных задач при консолидации серверов является минимизация нагрузки аппаратных составляющих самой системой виртуализации, для того, чтобы можно было отдать по-максимуму самим виртуальным серверам.
+
+[[http://rutracker.org/forum/viewtopic.php?t=364262|Вот тут]] -> взять себе это -> VMware Infrastructure v3.5 Update 3 (VMware ESX Server, VMware ESX 3i Server, VMware vCenter Server, VMware vCenter Converter, VMware Consolidated Backup)
+
+[[http://www.slideshare.net/rit2010/denis-gundarev-rooconf-denis-gundarev-virtualization-boom|Читать]] виртуализационный бум, о чем молчат вендоры
+
+=== RVTools ===
+
+RVTools is a windows .NET 2.0 application which uses the VI SDK to display information about your virtual machines and ESX hosts -> http://rvtools.deveij.com/
+
+=== удаленка ===
+
+Иногда возникает необходимость предоставить пользователю доступ к виртуальной машине, расположенной на сервере ESX/ESXi. Хотя консоль VMware Infrastructure / vSphere Client и справляется с данной задачей, но является достаточно громоздкой -> в качестве альтернативных методов выступают VNC и Remote Console -> Для включения VNC клиента, отредактируйте файл .vmx виртуальной машины, добавив туда следующие строчки
+
+<code bash>
+remotedisplay.vnc.enabled=”true”
+remotedisplay.vnc.password = “<ПАРОЛЬ>”
+remotedisplay.vnc.port=”<ПОРТ>″
+</code>
+
+В случае необходимости предоставления доступа к нескольким виртуальным машинам на одном сервере, просто поменяйте номер порта. Клиент? Ultravnc -> Недостатком данного метода является то, что VNC может подсоединяться к виртуальной машине только, когда та включена, и к тому же, недоступны различные операции с машиной - выключение, перезагрузка, монтирование ISO-образа -> В качестве альтернативного варианта вы можете воспользоваться VMware Remote Console, входящей в состав VMware Player. Просто запустите из командной строки <code bash>vmplayer -h <АДРЕС_ESX> <ПУТЬ_К_VMX></code>
+
+=== Убрать сетевые ===
+
+Как убрать "старую" сетевую карту из системы -> Актуально для виртуальной (и не только) среды -> если телодвижений не сделать -> венда  будeт ругаться на задание прежнего статического айпишника "новой" сетевушке -> set devmgr_show_nonpresent_devices=1 -> start devmgmt.msc -> View -> Show Hidden Devices -> Uninstall device -> http://support.microsoft.com/kb/269155/ru
+
+=== P2V чеклист ===
+
+Sysprep file locations and versions -> http://kb.vmware.com/selfservice/microsites/search.do?language=en_US&cmd=displayKC&externalId=1005593
+
+Windows 2000 – 32Bit -> http://download.microsoft.com/download/D/2/C/D2CBC4DA-5F0D-435F-AE2C-FE9FCB6BDA8E/sp4DeployTools.exe
+Windows 2003 – 32bit -> http://www.microsoft.com/downloads/details.aspx?FamilyID=93f20bb1-97aa-4356-8b43-9584b7e72556&displaylang=en
+Windows 2003 – 64bit -> http://www.microsoft.com/downloads/details.aspx?FamilyID=c2684c95-6864-4091-bc9a-52aec5491af7&displaylang=en
+Windows XP – 32bit -> http://www.microsoft.com/downloads/details.aspx?FamilyId=3E90DC91-AC56-4665-949B-BEDA3080E0F6&displaylang=en
+Windows XP – 64bit-> http://www.microsoft.com/downloads/details.aspx?familyid=C2684C95-6864-4091-BC9A-52AEC5491AF7&displaylang=en
+
+P2V post migration checklist
+
+For hot migration:
+
+  - Disable relevant services on the source machine
+  - When configuring the P2V, don't set the VM for autoboot upon completion
+  - Adjust hardware on the VM before first boot (remove serial ports etc)
+  - Check that VMware Tools installs correctly
+  - Adjust the HAL if needed
+  - Uninstall HP software
+  - Remove hidden NIC's
+  - Set IP - if static IP (Start -> Run -> ncpa.cpl)
+  - Check services.msc to ensure that all automatic services are running (and that you re-enabled the ones that you disabled to begin with)
+  - Shutdown the physical server (shutdown /s /t 0 from CMD)
+  - Ping -t the physical server and when it stops responding, then enable the NIC on the VM
+  - Reboot the VM
+
+=== vSwitch ===
+
+To set vSwitch in trunk mode -> Edit host netwokring via the Virtual infrastructure Client -> Click Host -> Network -> vSwitch_Properties -> Click Ports -> Portgroup -> Edit -> Click the General tab -> Set the VLAN ID to 4095 -> VLAN ID 4095 stands for Trunk mode in ESX 3.x. -> Click OK.
+
+Configuration of Windows TCP/IP -> To configure the guest operating system for VGT -> Download the e1000 NIC drivers  from the Intel website into the 32bit Windows virtual machine -> Power off the virtual machine -> Configure the virtual machine to use the e1000 virtual NIC -> Enter a new line (or replace the existing virtual NIC) in the VMX file of the virtual machine -> Ethernet[0].virtualDev = "e1000" -> Increment the number in brackets if multiple virtual NICs are needed -> Power on the virtual machine -> Configure the e1000 network connection.
+
+=== VMware Icons ===
+
+VMware icons for Powerpoint -> http://communities.vmware.com/community/viops -> http://communities.vmware.com/docs/DOC-12204
+
+=== ESXi + oem.tgz ===
+
+В целом полный атвал башки -> но можно -> http://www.vm-help.com/esx/esx3i/customize_oem_tgz.php -> берем убунту -> берем вот это все ->  {{:software:ne-windows:23.04.2010-vmware.esxi.builder.zip|}} (локальная копия, вдруг там удалят) -> брал Adds support for Realtek 8168/8111C Ethernet adapter -> this oem.tgz is based on Community Unified oem.tgz v1.1.0 -> May have performance issues -> вот сюда -> http://varazir.mine.nu/esxi/ -> скрипт взяли -> переделали -> сделали исошник -> PROFIT!
+
+Требования: наличие убунты, и широково канала в интернет, если делать на месте -> у меня за минут 20 получилось все стянуть и построить.
+
+=== FreeBSD + ESXi ===
+
+  - Virtual machine with FreBSD 8.0 release with kernel sources and a full ports collection
+  - Edited the /usr/ports/emulators/open-vm-tools-nox11 file to remove comment from the line where it is marked as broken as it leaves some files after compiling.
+  - PROFIT! :-)
+
+=== Грабли multicore ===
+
+Особенности многопроцессорных ВМ -> Грабли: ВМ с Windows XP создана с 4мя процессорами -> XP видит только 2, хотя физически в сервере 2 4-ядерных процессора -> Ничего общего презентуемые ВМ виртуальные процессоры с физическими не имеют -> Каждый vCPU является одноядерным - соотв. XP ведет себя совершенно нормально -> поскольку по условиям лицензии ограничена 2мя процессорами (сокетами) -> Лечение -> Advanced Settings для ВМ создать параметр cpuid.coresPerSocket -> присвоить ему желаемое значение -> Соотв. если для 4х процессорной ВМ cpuid.coresPerSocket = 2, то ВМ увидит 2 2-ядерных процессора.
+
+=== выпиливание клиента ===
+
+Можете вспомнить, когда вы в последний раз действительно что-то конфигурировали при установке VMware Tools, а не просто нажимали Enter несколько раз подряд, принимая все установки по умолчанию? -> Можно немного упростить установку, запустив следующую команду -> <code bash>    [root@linux-vm ~]# vmware-config-tools.pl --default</code> -> Как уже понятно из названия ключа, конфигуратор не спросит вас ничего, оставив все по умолчанию.
+
+=== Траблшутинг ===
+
+При инстале / деинстале / p2v -> vmware tools может снести две нужных dllки msvcr71.dll и msvcp71.dll, живут в %systemroot%\system32 -> доставляет.
+
+=== VMware ESXi 4.0 from HP ===
+
+Где скачать ESXi с тюнингом от HP? http://hp.com/go/esxidownload
+
+
+=== vmware + oracale ===
+
+Совершенно чудесный документ попался мне на глаза – [[http://www.vmware.com/files/pdf/Oracle_Databases_on_vSphere_Deployment_Tips.pdf|Oracle Databases]] on VMware vSphere 4 -> 
+http://www.vmware.com/solutions/partners/alliances/oracle-database.html
+
+На странице 19 содержится ценнейшая информация о политике поддержки Oracle своих БД в средах VMware. На моей памяти это первый публичный документ на данную тему. Тезисно: 
+
+  - Проблема известна Oracle Support – поддержка безоговорочно принимает подобные инциденты. Это очень важно! То есть если вы имеете проблему с Oracle версии 9i или 10g, каких большинство, то шанс попасть в эту категорию чрезвычайно велик.
+  - Проблема НЕ известна Oracle Support - поддержка вправе потребовать объяснения, что проблема не связана именно с виртуализацией. Достаточно честно.
+  - Oracle RAC - не поддерживается.
+  - Сертификация - Oracle не может сертифицировать платформу VMware, поскольку последняя лежит ниже стека сертификации Oracle. Тут точно так же как и с производителями серверов x86: Dell, HP, IBM, FSC и прочие, также не могут быть сертифицированы.
+
+=== планинг анд деплоинг чо ===
+
+http://kuparinen.org/martti/comp/vmware/esxichecklist.html -> {{:software:ne-windows:my_vmware_esxi_installation_checklist.pdf|локальная копия}}
+
+  - Enable all NICs without PXE.
+  - http://www.vm-help.com/esx40i/ESXi_enable_SSH.php
+  - Configuring NTP -> Home -> Inventory -> HOSTNAME -> Configuration -> Time Configuration -> Properties -> Options -> NTP Settings -> Add -> esxgw.mycompany.com 
+  - Configuring remote logging -> Home -> Inventory -> HOSTNAME -> Configuration -> Advanced Settings -> Syslog -> Remote ->   Syslog.Remote.Hostname = esxgw.mycompany.com -> Syslog.Remote.Port = 514
+  - Mapping VMware Tools to virtual CD-ROM
+
+=== Intel Atom D945GCLF2 ===
+
+Хотел поделиться информацией - загрузил ESX3i с флешки на интеловскую D945GCLF2 (Atom 330), итого тестовая платформа за $100 с 2Гб Памяти, 2 ядрами и хайпертридингом. Особенность была такая, что влоб, при попытке установки с компакт-диска инсталляционного стандартного, установка не пошла, не помню ньюансов, но ничего не пошло. Сделал флешку, как описано в WiKi, Всё загрузилось мгновенно. Один момент - в биосе мб надо принудительно указать эмуляцию жёстких дисков для USB. Конфигурация простая - мб, 2Гб память, SATA HDD. Мать и память, ну условно - 80$ + 25$. без винта. Да, ещё момент -> не работает интегрированная сетевая карта -> via: http://www.vm4.ru/2009/03/esxi_16.html
+
+=== Проблема при обновлении ESXi со Storage. ===
+
+При обновлении ESXi получаем радостное сообщение системы: “The VMware ESX Server does not have persistent storage” и все машины помечены как “Unknown (inaccessible)”. И предлагается создавать заново хранилище -> Делаем -> Идем в закладку Сonfiguration -> Далее Advanced Settings -> В разделе LVM, устанавливаем LVM.EnableResignature в 1 (по умолчанию 0) -> Идем в Storage Adaptesr, делаем Rescan для всех девайсов -> Открываем Storage, должны появиться наши сторэджи -> Двойным кликом открываем сторэдж, видим наши машины. Заходим в папки, даем при помощи правой кнопки мыши для файлика с расширением vmx команду “Add to Inventory” -> Задаем новое имя для виртуалки -> Параметр LVM.EnableResignature можно вернуть в 0 -> http://communities.vmware.com/thread/178977
+
+=== отладка ===
+
+Некоторые хинты траблшутинга ESXi -> Если локально нажать, то увидим:
+
+  - ALT+F1 - консоль(та, что неактивна по умолчанию).
+  - ALT+F2 - дефолтное меню.
+  - ALT+F11 - сводная инфа - версия, модель сервера, CPU, память.
+  - ALT+F12 - vmkernel.log.
+
+Консоль, доступ к которой можно получить, набрав unsupported в ALT+F1 - не поддерживаемая, как и все манипуляции в ней. В логах оседает сам факт входа в эту консоль, но не все выполняемые в ней команды. Если хочется отключить саму возможность в нее заходить, то: Идем в Configuration -> Advanced Settings-> "VMkernel" -> снять галочку VMkernel.Boot.techSupportMode -> Потом рестарт.
+
+Места на партиции с ESXi мало, поэтому логи перезатираются быстро -> Вот тут Configuration -> Advanced Settings -> Syslog -> Remote -> Тут можно указать имя\IP сервера для удаленного сбора логов -> Локальные лежат в /var/log/ и /var/log/vmware -> Configuration -> Advanced Settings -> Syslog -> Local -> [datastore]\folder 
+
+Если посмотреть на разделы диска(флешки) где установлен ESXi, то первыми будут два одинаковых раздела с одинаковым содержимым. Это - основной и резервный "bank" с ESXi. Если, например, обновление прошло неудачно, и ESXi не загружается с основного раздела, то можно загрузить его с раздела резервного, куда обновление не ставилось. Перезагрузите ESXi. Когда увидите Loading VMware Hypervisor…, нажмите Shift + R для загрузки с резервной партиции.
+
+=== Сколько ресурсов под? ===
+
+Сайт, или даже сервис, с достаточно прикольной идеей сравнения выделяемых ресурсов под ВМ с конкретной задачей и условиями, т..е. если у вас есть\планируется ВМ с, например, MS Exchange 2007, 300-500 юзеров, то под ВМ с такой нагрузкой кто то считает достаточным от 1400 до 3000 Мц ЦП, 3800 МБ ОЗУ. И рейтинг у такой конфигурации неплохой. Для грубого сайзинга вполне себе решение, особенно если проекту удастся стать массовым. На сегодня доступно 321 конфигурация. Присоединяйтесь - http://www.comparemyvm.com/
+
+=== конвертирование p2v ===
+
+Иногда хочется сделать диск целевой виртуальной машины на VMware ESX поменьше при переносе в ВМ физического сервера. Для этого у продукта VMware Converter есть опция уменьшения будущего VMDK. Так вот если при данной операции у вас возникает ошибка: conversion failed, а в логе VMware Converter написано:
+
+<code bash>
+Cannot read from source volume
+‘App’ 6520 error] [fileLevelCloningTaskImpl,267] Pcopy_CloneTree failed with err=3″
+А VMware log содержит следующее:
+fileLevelCloningTaskImpl
+</code>
+
+Объяснение ошибки VMware Converter таково - если вы уменьшаете размер виртуального диска, то Converter переходит на копирование  File level вместо Block level. То есть по-сути копирует файлы изнутри гостевой ОС. При этом, очевидно, в засраных системах может быть сильно фрагментированная файловая система, бэд-блоки, ошибки чтения и т.п. Выход может оказаться простым. Может еще помочь дефрагментация дисков физического сервера и запустите проверку на ошибки:
+
+<code bash>sfc /scannow</code>
+
+=== HP sizer ===
+
+Часто разговаривая о виртуализации мы слышим такие слова, как «экономия» и «консолидация». Они подразумевают возможность размещения на одном физическом сервере некоторого количества виртуальных машин, взамен каждой из которых — без использования виртуализации — потребовался бы отдельный сервер. Как же понять — сколько именно ресурсов будет необходимо виртуальным машинам, какой сервер нужно закупать для консолидации имеющихся задач или какую нагрузку «потянут» уже имеющиеся серверы? Для того, чтобы помочь вам ответить на эти вопросы, компания Hewlett-Packard разработала специализированный инструмент планирования под названием «HP Sizer for Microsoft Windows Server 2008 R2 Hyper-V» (также иногда он упоминается как «HP Sizer for Microsoft Hyper-V 2008 R2»).
+
+Этот инструмент может использовать как свою собственную базу с типовыми значениями загрузки серверов, имеющих заданные характеристики, так и отчёты, полученные с помощью Microsoft Assessment and Planning (MAP) Toolkit версий 3.0 или 4.0. То есть вы можете при помощи MAP собрать статистику по загрузке именно ваших серверов за определённый период, а затем загрузить результаты обследования в HP Sizer for Microsoft Windows Server 2008 R2 Hyper-V — и получить советы по выбору оборудования для консолидации.
+
+По результатам инвентаризации вы получите требования к диску и памяти — а также сможете добавить к этим значениям некоторый резерв на будущее. Далее укажите, какое количество LUN на системе хранения вы планируете использовать под виртуальные машины, требуется ли вашим виртуальным машинам загрузка с SAN и собираетесь ли бы использовать снимки (Snapshot). При этом можно отдельно задать такой важный для сервера показатель, как утилизация оборудования. Насколько интенсивно вы хотите задействовать ваш сервер? Далее — какие серверы вы предпочитаете использовать в своей инфраструктуре: лезвия (серия «BL»), полноразмерные серверы для размещения в стойках («DL») или отдельно стоящие настольные серверы («ML»)? Какой производитель процессоров вызывает у вас больше доверия?..
+
+Результатом станет чёткая рекомендация по выбору оборудования для именно вашего проекта. Причём — выданная самым популярным в корпоративном секторе России производителем серверов и дисковых хранилищ.
+
+В состав рекомендации входит детальная спецификация и вся информация, необходимая сразу для заказа оборудования. Если же вы планируете использовать уже имеющееся оборудование — то на стадии выбора серверов и хранилищ явно укажите имеющиеся в наличии модели. И тогда из полученной в результате спецификации вам станет ясно, сколько таких серверов потребуется для консолидации указанной нагрузки.
+
+http://h71019.www7.hp.com/ActiveAnswers/us/en/sizers/microsoft-hyper-v2008.html
+
+=== vmware tools ===
+
+http://packages.vmware.com/tools
+
+=== Ручной Бекап ===
+
+Создание резервных копий ВМ подручными средствами: http://vmind.ru/2009/07/29/sozdanie-rezervnyx-kopij-vm-podruchnymi-sredstvami/
+
+=== iFuse ===
+
+Originally loosely based on the vmfs code from fluidOps, this set of tools has since evolved to handle more features from VMFS, such as extents, and allows to access VMFS through the standard Linux VFS with the help of the FUSE framework.
+
+http://glandium.org/projects/vmfs-tools/
+
+=== ссылки ===
+
+  * http://ultimatewhitebox.com/
+  * http://blog.vadmin.ru - Блог посвященный виртуализации. Крайне много ценной информации.
+  * http://vm4.ru - Еще один интересный блог, в особенности его wiki - http://wiki.vm4.ru/info. Там же http://wiki.vm4.ru/uda - сервер дистанционной установки, поможет проинсталлировать Windows, Linux, ESX и загрузить сервер в LiveCD по сети, с загрузкой по PXE.
+  * http://forum.ru-board.com/topic.cgi?forum=66&bm=1&topic=0068&glp - форум на руборде по виртуализации
+  * http://vmware.com/appliances/ - Virtual Applience. Сконфигурированные ВМ, как правило выполняющие какую-то задачу, или для демо-целей. Огромный выбор!
+  * http://blog.aboutnetapp.ru/ - Очень много интересной информации о VMware.
+  * http://www.itcommunity.ru/blogs/vm4ru/default.aspx - блог, посвященный виртуализации. Огромное кол-во интересных ссылок.
+  * http://servervirtualization.blogs.techtarget.com/2008/10/29/what-to-do-when-times-are-tough/ - много бесплатных инструментов для работы и обслуживания ESX.
+  * http://skywriter.habrahabr.ru/blog/83594/ - Хитрости VMWare ESXi (по опыту работы)
+
+{{tag>fixme}}

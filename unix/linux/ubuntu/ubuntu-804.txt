@@ -1,0 +1,1416 @@
+====== Ubuntu Desktop 8.04 ======
+
+{{:ubuntu:xkcd_619_supported_features_ru-2.png|Я слышал, у многих Flash наконец работает плавно, но мы с моей Intel'овской видеокартой всё ещё надеемся, что уже разрабатывается какой-нибудь патч, который позволит нам нормально смотреть Джона Стюарта.}}
+
+{{:ubuntu:snoozer_likelinux_man.gif|}}
+
+==== Вместо эпиграфа ====
+
+Убунту - линукс для людей (c) люди
+
+Нормальные люди операционную систему ставят не по идеологическим причинам, а чтобы работать в нужных им программах (c) люди
+
+Люди - это реально тупое говно (c) кровосток
+
+==== Что внутри nx7400? ====
+
+Много интересного: 
+<code bash>sudo dd if=/dev/mem bs=64k skip=15 count=1 | strings | less</code>
+<code bash>sudo mdidecode</code>
+<code bash>sudo lspci -v</code>
+<code bash>lshw</code>
+<code bash>
+cd /var/lib/acpi-support/ ; grep . -r *-*
+
+> bios-version:68YGU Ver. F.0E
+> system-manufacturer:Hewlett-Packard
+> system-product-name:HP Compaq nx7400 (EY505ES#ACB)
+> system-version:F.0E
+</code>
+
+==== Ссылки про nx7400 ====
+
+http://home.no/slazz/nx7400/
+
+https://wiki.kubuntu.org/LaptopTestingTeam/HPnx7400
+
+http://emisca.altervista.org/nx7400/old/index.html
+
+http://emisca.altervista.org/nx7400/
+
+http://wiki.ubuntu.org.cn/index.php?title=UbuntuWiki:LaptopTestingTeam/HPnx7400_EY508ES&variant=zh-tw
+
+и про ибыэмы ишшо http://www.thinkwiki.org/wiki/ThinkWiki
+
+http://www.opennet.ru/opennews/art.shtml?num=21453
+
+====== Переустановка ubuntu ======
+
+export, того, что "стояло": <code bash>sudo dpkg --get-selections | grep '[[::space]]install' | awk '{print $1}' > installedpackages</code>
+
+import, того, что "стояло": <code bash>cat installedpackages | xargs sudo aptitude install</code>
+
+====== Первая загрузка ======
+
+<code bash>
+sudo apt-get update
+sudo apt-get upgrade
+sudo wget http://www.medibuntu.org/sources.list.d/jaunty.list --output-document=/etc/apt/sources.list.d/medibuntu.list
+sudo apt-get update
+sudo apt-get install medibuntu-keyring
+sudo apt-get update
+sudo apt-get install startupmanager
+sudo apt-get install rcconf
+sudo apt-get install mpd sonata
+sudo apt-get install libdvdcss2
+sudo apt-get install w32codec
+sudo apt-get install ubuntu-restricted-extras
+sudo apt-get install ffmpeg
+sudo apt-get install preload
+sudo apt-get install guake
+sudo apt-get install mc
+sudo apt-get install mplayer
+sudo apt-get install avahi-discover
+sudo apt-get install compizconfig-settings-manager
+sudo apt-get install simple-ccsm
+sudo apt-get install deluge
+sudo apt-get install emerald
+sudo apt-get install nfoview
+sudo apt-get install sqlite
+sudo apt-get install teeworlds
+sudo apt-get install wireshark
+sudo apt-get install etherape
+sudo apt-get install pastebinit
+sudo apt-get install pv
+sudo apt-get install xclip
+sudo apt-get install rar p7zip-full unace unzip file-roller
+sudo apt-get install fusion-icon
+sudo apt-get install libnotify-bin
+sudo apt-get install blueman bluez-compat
+sudo apt-get install dontzap
+sudo apt-get install compizconfig-settings-manager gnome-art usplash startupmanager
+sudo apt-get install aspell-ru
+sudo apt-get install wpasupplicant
+sudo apt-get install network-manager-gnome network-manager
+sudo apt-get install service-discovery-applet
+sudo apt-get install di
+sudo apt-get install discus
+sudo apt-get install durep
+sudo apt-get install pydf
+</code>
+
+==== Менеджер обновлений ====
+
+"Раскукоживаем" менеджер обновлений:
+
+<code bash>
+gconftool -s --type bool /apps/update-notifier/auto_launch false
+gconftool -s --type int /apps/update-notifier/regular_auto_launch_interval 1
+gconftool -s --type bool /apps/update-manager/show_versions true
+</code>
+
+==== Автозагрузка ====
+
+Загружать все необходимые приложения при старте сессии, то есть после логина. Идем в меню "Система -> Параметры -> Сеансы" и на первой же вкладке добавляем эти ваши самые автозагрузки:
+
+<code bash>
+fusion-icon --no-start
+emerald --replace
+guake
+pidgin
+</code>
+
+==== Меняем в гноме буквы на флашки ====
+
+Итак, чтобы заменить раскладку клавиатуры на флажки, производим следующие действия. Создаем директорию для иконок. Переходим в нее. Закачиваем флажки.
+
+<code bash>mkdir -p ~/.icons/flags
+cd ~/.icons/flags
+wget http://zeroed.ru/xlam/files/gnome/lookandfeel/flags/{ru,us}.svg
+gconftool-2 --type bool --set /desktop/gnome/peripherals/keyboard/indicator/showFlags true</code>
+
+==== Клавиатура ====
+
+Настройки клавиатуры => снять галку => [x] separate layuot for each window
+
+==== Выключаем мусорку ====
+
+alt-f2 => gconf-editor => apps => nautilus => preferences => enable_delete => тыц на неё.
+
+==== Охуенные цвета ====
+
+Эмбер - охуенные цвета для терминала guake
+
+<code bash>
+amberXTerm*foreground: #ff7f00
+amberXTerm*background: #1f0000
+greenXTerm*foreground: #00df1f
+greenXTerm*background: #001f00 
+</code>
+
+http://www.linux.org.ru/view-message.jsp?msgid=3496022
+
+==== Шрифты ====
+
+Чтобы поправить шрифты в сежеустановленной системе, запусти <code bash>sudo dpkg-reconfigure x-ttcidfont-conf</code>
+
+В Windows XP по умолчанию используется шрифт Tahoma 8 normal с разрешением 96 dpi БЕЗ СГЛАЖИВАНИЯ. Рекомендуется оригинальная версия с windows xp. Если винда параллельно не установлена, то его нужно где-то скачать. В Vista используется Segoe UI normalб размер 9.
+
+<code bash>
+$ mkdir ~/.fonts (~ означает в домашнем каталоге)
+$ cd /mount/nx7400/WINDOWS/Fonts
+$ cp *.ttf ~/.fonts
+$ sudo fc-cache -fv
+...
+fc-cache: succeeded
+</code>
+
+На этом инсталляция шрифтов завершена. 
+
+====== Менеджер пакетов ======
+
+==== aptitude ====
+
+Кошерная штука, умеет больше чем apt-get. one and one for my only(tm) [[http://algebraicthunk.net/~dburrows/projects/aptitude/doc/en/ch02s03s05.html#tableSearchTermQuickGuide|Умеет]] кучу фишек.
+
+Обновить:
+<code bash>aptitude update</code>
+
+Обновить все, шо можно, но ничего не деинсталировать
+<code bash>aptitude safe-upgrade</code>
+
+Обновить все, шо можно
+<code bash>aptitude full-upgrade</code>
+
+Уставновить / удалить пакет
+<code bash>aptitude install / uninstall <package name></code>
+
+Захолдить / Унхолдить пакет
+<code bash>aptitude hold / unhold <package name></code>
+
+Найти пакет
+<code bash>aptitude search <pattern></code>
+
+Найти все, шо на холде
+
+<code bash>aptitude search ~ahold</code>
+
+=== Шаблоны ===
+
+Ещё очень полезная возможность в aptitude - пользовательские метки для выбранных пакетов. Например, нужно поставить какой-то набор пакетов, чтобы собрать программу из сорцев, а потом нужно эти пакеты удалить. При установке помечаем выбранные пакеты какой-то своей меткой (builddeps в моём примере):
+
+<code bash>aptitude install --add-user-tag builddeps libчто-то-dev libчто-то-ещё-dev ...</code>
+
+А потом, когда эти пакеты больше не требуются, их удаляем, выбрав по той же метке:
+
+<code bash>aptitude purge '?user-tag(builddeps)'</code>
+
+Поисковый шаблон ?user-tag(метка) можно использовать совместно со всеми другими поисковыми шаблонами. Присваивать метки можно не только при установке (install), но и во многих других операциях. Как видно из примера, особенно эта возможность полезна для самостоятельной сборки пакетов и программ из исходников.
+
+=== Ещё про шаблоны ===
+
+[[http://algebraicthunk.net/~dburrows/projects/aptitude/doc/en/ch02s03.html|Полное]] собрание шаблонов. Самые полезные, на мой взгляд, шаблоны:
+
+  * ~nимя — в имени встречается текст «имя» (можно использовать регулярные выражения, например, ~n^lib отбирает только имена начинающиеся с lib)
+  * ~dтекст — в описании пакета встречается «текст» (очень полезно, если название программы неизвестно, но известно, что она должна делать)
+  * ~i — отбирает только уже установленные пакеты
+  * ~N — отбирает только новые пакеты (которых раньше не было в репозитории)
+  * ~U — отбирает пакеты, которые можно обновить
+  * ~Dтребование — отбирает пакеты, которые зависят от «требования» (можно использовать регулярные выражения)
+  * ~Rзависимый — отбирает пакеты, которые необходимы для «зависимого» (можно использовать регулярные выражения)
+
+==== apt-file ====
+
+apt-file – поиск названия deb пакета по имени файла входящего в данный пакет, т.е. поставили софт, которому для запуска необходима библиотека / файл, которая входит в состав неизвестного deb пакета. Задача: узнать что за пакет содержит данную библиотеку/файл.
+
+<code bash>
+sudo apt-get install apt-file
+sudo apt-file update
+</code>
+
+после окончания процесса можем начать искать то что нам нужено:
+
+<code bash>
+sudo apt-file search
+sudo apt-file search libxmlplanner-plugin.so
+</code>
+
+====== Игрушки ======
+
+==== moon-buggy ====
+
+Действие этой восхитительной и простой игры происходит на луне. Что поразительно, игра выполнена полностью в текстовой графике (ASCII art). 
+Доставляет полюбасу!
+
+<code bash>sudo apt-get install moon-buggy</code>
+
+==== Darwinia ====
+
+{{:ubuntu:darwinia.jpg|darwinia}}
+
+ Darwinia
+Год выпуска: 2005
+Жанр: стратегия, аркада
+Язык: русский
+
+Психоделическая эстетика в духе TRON, примитивные модели и достойные Covox звуковые эффекты чужды поколению, севшему за компьютеры в XXI столетии. Darwinia — письмо из далеких 80-х игрокам, помнящим плоских Lemmings и игры Sensible Software, знающим, что такое «democompo», и готовым часами слушать «трекерную» музыку. Типичный, так сказать, артхаус. Darwinia, симулятор виртуальной реальности, где позволено едва ли не все, сорвал именно за свою оригинальность длительные и восторженные аплодисменты прессы. Тепло восприняли его и игроки. Прекрасная игра-уникум, но насладиться в полной мере ею смогут только ярые фанаты прошлого. Для всех остальных она — безделушка на час. 
+
+http://narod.ru/disk/11941208000/darwinia.tar.gz.html
+
+==== Defcon ====
+
+{{:ubuntu:defcon.jpg|Defcon}}
+
+Год выпуска: 2007
+Жанр: стратегия
+Язык: английский
+
+Небольшой, но талантливый до неприличия коллектив Introversion Software уже снискал себе неувядающую славу в вековой истории игровой индустрии как игродельческая контора, выпускающая исключительно необычные игры. Умрёт каждый. Defcon – глобальная стратегия от разработчиков знаменитой Darwinia. Здесь нет ни графического движка, ни серьезного звукового обеспечения. Наш клиент — один только чистый геймплей, квинтэссенция отточенного до бритвенной остроты геймплея и четкого стиля всеобщей ненависти и стремления перерезать всех, кроме своих. Cимулятор «холодной» войны, симулятор страха перед всесильными правителями сверхдержав, напряжения, что не отпускало ни на минуту, ядерных грибочков, распускающихся в самом сердце невезучего государства. 
+
+http://narod.ru/disk/11940215000/defcon.tar.gz.html
+
+====== Иксы ======
+
+http://opennet.ru/opennews/art.shtml?num=21679
+====== xorg.conf ======
+
+<code bash>
+Section "ServerFlags"
+        Option "BlankTime"      "5"
+        Option "SuspendTime"    "0"
+        Option "OffTime"        "10"
+        Option "DontZap"       "False"
+EndSection
+</code>
+
+Ещё можно посмотреть сюда: https://wiki.ubuntu.com/X/Config/Resolution
+
+А ещё можно вот так:
+
+<code bash>sudo ddcprobe | grep monitorrange</code>
+
+== Заппинг ==
+
+Заебали убунтовцы с заппингом иксов. в 9.10 не работает, поэтому, можно добавить в ~/.xinitrc
+
+<code bash>setxkbmap -option terminate:ctrl_alt_bksp</code>
+
+или через hal:
+
+<code bash>
+vim /usr/share/hal/fdi/policy/10osvendor/10-x11-input.fdi
+искать <match key=”info.capabilities” contains=”input.keys”>
+добавить <merge key="input.xkb.options" type="string">terminate:ctrl_alt_bksp</merge>
+</code>
+
+===== два монитора ======
+
+Если б еще сделать как-то, чтобы команда запускалась сама при подключении/отключении монитора - было бы вообще супер. Хотя для настройки автоматического срабатывания скрипта можно попробовать запустить acpi_listen и выдернуть / вставить кабель внешнего монитора. Если событие отслеживается — сделать правило для него в /etc/acpi
+
+<code bash>xrandr -q | grep 'VGA connected' && xrandr --output LVDS --off --output VGA --auto</code>
+
+либо
+
+<code bash>xrandr -q | grep 'VGA1 connected' && xrandr --output LVDS1 --off --output VGA1 --auto || xrandr --output LVDS1 --auto --output VGA1 --off</code>
+
+если во время бута
+
+<code bash>echo 'xrandr -q | grep \'VGA connected\' && xrandr --output LVDS --off --output VGA --auto' | sudo tee /etc/X11/Xsession.d/98vgaonly && sudo chmod a+x /etc/X11/Xsession.d/98vgaonly</code>
+
+Эта команда включает один дисплей и выключает другой в зависимости от того, подключен ли внешний монитор или нет. В итоге после подключения или отключения внешнего монитора достаточно нажать кнопку, к которой привязана эта команда, и вывод адаптируется под текущую конфигурацию мониторов. 
+
+====== Тоучпад ======
+
+http://habrahabr.ru/blogs/linux/53863/
+
+https://help.ubuntu.com/community/SynapticsTouchpad
+
+http://wiki.archlinux.org/index.php/Тачпад_Synaptics
+
+<code bash>
+sudo aptitude install gsynaptics
+vim /etc/hal/fdi/policy/touchpad.fdi
+</code>
+
+<code xml>
+
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<deviceinfo version="0.2">
+<device>
+<match key="info.capabilities" contains="input.touchpad">
+ <match key="info.product" contains="Synaptics TouchPad">
+  <merge key="input.x11_driver" type="string">synaptics</merge>
+  <merge key="input.x11_options.CircularScrolling" type="string">1</merge>
+  <merge key="input.x11_options.CircScrollTrigger" type="string">8</merge>
+  <merge key="input.x11_options.SHMConfig" type="string">on</merge>
+ </match>
+</match>
+</device>
+</deviceinfo>
+
+</code>
+
+<code bash>
+sudo /etc/init.d/hal restart
+</code>
+
+В данном случае прокрутка начинается из верхнего левого угла
+
+====== билд фром соурцес ======
+
+Всем известно, что Gentoo славится своим быстродействием из за того, что абсолютно все пакеты компилируются из исходников именно “под ваш” компьютер. Любители экстрима в Ubuntu могут попробывать собрать свой Ubuntu так как это делается в Gentoo, или FreeBSD.
+
+И так, для начала устанавливаем пакет apt-build 
+
+<code bash>
+apt-get install apt-build 
+dpkg-reconfigure apt-build
+</code>
+
+Надо будет ответить на вопросы об уровне оптимизации и об архитектуре вашего процессора. Далее надо убедится, что у нас раскоментированы репы для исходников в /etc/apt/sources.list (эти строки начинаются с deb-src). 
+
+<code bash>
+apt-get update
+
+Дальше вместо apt-get используем apt-build. Ключи и опции apt-build такие же как и у apt-get:
+
+apt-build update — обновление списка репозитариев и софта в них,
+apt-build upgrade — апгрейд установленных пакетов,
+apt-build install — устанавливаем программу,
+apt-build world — а это перекомпилит всю вашу систему! Тут всё на ваш страх и риск!
+
+При первом запуске apt-build вы увидите следующее сообщение об ошибке: 
+
+    Rebuilding the world!
+    Building package list
+    Please read README.Debian first. 
+</code>
+
+Просто apt-build не знает какой софт у вас установлен. Для того чтобы побороть эту ошибку достаточно ввести команду:
+
+<code bash> dpkg –get-selections | awk ‘{if ($2 == “install”) print $1}’> /etc/apt/apt-build.list </code>
+
+Ну а дальше работаем с apt-build как с apt-get. Рекомендую вставлять ключи –yes and –force-yes для того чтобы весь процесс проходил на автомате.
+
+====== Ядро ======
+
+<note warning>"Одним движением make install любой дистрибутив превращается в слаку!"</note>
+
+Разработчики убунты сами собирают свежие ядра, дабы <del>испытывать эти ядра на этих самых хомячках</del> радовать пользователей. Пакеты лежат в виде .deb файлах, рассортированных по папкам с версиями ядер, на вот этой странице:
+
+<code>http://kernel.ubuntu.com/~kernel-ppa/mainline/</code>
+
+==== Ручная сборка и установка ====
+
+Сначала читаем [[https://help.ubuntu.com/community/Kernel/Compile|тут]].
+
+Инструменты:
+
+<code bash>
+sudo apt-get install fakeroot build-essential makedumpfile
+sudo apt-get install kernel-package
+sudo apt-get install libncurses5 libncurses5-dev
+</code>
+
+<code bash>
+wget http://kernel.org/pub/linux/kernel/v2.6/linux-2.6.30.3.tar.bz2
+
+tar jxvf там, всё дела, cd, etc...
+
+cp -vi /boot/config-`uname -r` .config
+make-kpkg clean
+make-kpkg --initrd --append-to-version=-brj-nx7400 kernel-image kernel-headers
+cd ../
+ls -1 *.deb
+</code>
+
+будет два файла, вот их и поставим:
+
+<code bash>
+sudo dpkg -i linux-headers-2.6.30.3-brj-nx7400_2.6.30.3-brj-nx7400-10.00.Custom_i386.deb
+sudo dpkg -i linux-image-2.6.30.3-brj-nx7400_2.6.30.3-brj-nx7400-10.00.Custom_i386.deb
+</code>
+
+==== Удаление старых ядер ====
+
+Всё делается в консоли.
+
+Набираем:
+
+<code bash>dpkg -l | grep linux-image</code>
+
+<code bash>sudo su -c 'apt-get remove -f linux-image-2.6.28-11-generic&&update-grub'</code>
+
+<code bash>
+тут будет скрипт по удалению ядер
+</code>
+
+==== Делаем убунту лучше ====
+
+Если вы хотите сделать Ubuntu лучше и зарепортать баг-другой, значит вам просто необходимо включить встроенную систему багрепортинга Apport и конечно-же зарегаться на Launchpad.
+
+    * Включаем [[https://wiki.ubuntu.com/Apport|Apport]]
+    * /etc/default/apport -> enabled = 1
+    * sudo force_start=1 /etc/init.d/apport restart
+    * Регистрируемся на Launcpad.
+    * Зарабатываем карму делая Ubuntu лучше :)
+
+<code bash>
+gconftool -s /apps/update-notifier/show_apport_crashes --type bool true
+sudo /etc/init.d/apport start
+</code>
+
+Делаем тестовый "креш" <code bash>sh -c 'kill -SEGV $$'</code>
+
+==== Выключаем модули ====
+
+Добавить в /etc/modprobe.d/blacklist
+
+<code bash>
+# Disable ipv6
+blacklist ipv6
+blacklist pcspkr
+</code>
+
+==== Disable USplash ====
+
+<code bash>cat /etc/usplash.conf 
+# Usplash configuration file
+xres=1280
+yres=800
+</code>
+
+Но не помогло. Разрешение экрана не то. И заставка выглядит стремно. Вернемся к old style fashion text boot и выключим usplash.
+
+<code bash>
+sudo cp /boot/grub/menu.lst /boot/grub/menu.lst.backup
+sudo vim /boot/grub/menu.lst
+</code>
+
+Удалить слово "splash", и можно "quiet", т.е.:
+
+<code>kernel          /boot/... root=... ro quiet splash</code>
+
+стало:
+
+<code>kernel          /boot/... root=... ro </code>
+
+==== Если ubuntu повисла ====
+
+Бывает такое, что система зависает. Или иксы не выходят из свопа, или некий процесс отъел всю память и обработчик клавиатуры не может получить управление, или придётся признать, что у броузера медленно подтекает крышак, ну в общем, ничего не сделать, кроме ребута. А вот как его сделать, чтобы не повредить причёску файловую систему. Прибегнем к так называемой магической ядерной кнопке, а именно сочетанию Alt-SysRq (он же PrintScreen) с разными буквами. Понадобятся нам такие, в этом порядке, с учётом, что у нас клавиатура qwerty:
+
+  * Alt-Sysrq-R переключить клавиатуру в режим XLATE (перехватить управление у иксов)
+  * Alt-Sysrq-E послать всем процессам, кроме init, решительный привет, то есть SIGTERM
+  * Alt-Sysrq-I послать всем процессам, кроме init, окончательный привет, то есть SIGKILL
+  * Alt-Sysrq-S sync. Для последователей старой школы: нажать дважды
+  * Alt-Sysrq-U перемонтировать все файловые системы в read-only
+  * Alt-Sysrq-B начать загрузку
+
+Говорят, что эту последовательность (Alt-SysRq-REISUB) можно запомнить как слово BUSIER наоборот. От себя можно добавить, что если хочется освежить в голове эту краткую мнемонику, то можно на консоли нажать Alt-SysRq-H, и будет выдана краткая справка. Для тех, кто не уверен, где у него консоль: надо нажать Ctrl-Alt-F1. Ещё есть хорошая хорошая комбинация Alt-Sysrq-F которая прибивает самый ресурсожрущий процесс. От форк-бомб к сожалению не спасает. sync надо делать 3, а не 2 раза, и дальнейшие действия лучше предпринимать, если светодиод жесткого диска виден - моргнет, а есть ещё две мнемонические фразы: “Reboot Even If System Utterly Broken” и “Raising Elephants Is So Utterly Boring..."
+
+==== udev ====
+
+<code>
+Если вдруг приспичит ночью
+Правило создать в udev
+Убедитесь поначалу,
+Что его еще там нет
+</code>
+<note warning>Правила в /etc/udev/rules.d/ переписывают правила в /lib/udev/rules.d/</note>
+
+====== HDD впоряде ======
+
+Ubuntu, используя настройки из firmware вашего жесткого диска, очень часто паркует головку диска, таким образом постоянно происходит реинициализация, и соотвествующий щелчек. А производители фирмвари - люди, сука, странные. У меня в samsung'е стояла аккустическая модель - суперквает и парковать головки - сразу. Взял конфигуратор и выключил. Проверить состояние вашего диска, и подвержен ли он этому багу, можно установив пакет smartmontools.
+
+<code bash>
+sudo smartctl -a /dev/sda | grep Load_Cycle
+sudo smartctl -o on /dev/hda  
+</code>
+
+И смотрим сколько раз у нас уже происходила реинициализация. Следом идём читать
+
+  * https://wiki.ubuntu.com/PowerManagement
+  * http://www.thinkwiki.org/wiki/Problem_with_hard_drive_clicking
+  * http://www.opennet.ru/opennews/art.shtml?num=19832
+  * https://bugs.launchpad.net/ubuntu/+source/acpi-support/+bug/59695
+
+Редактируем /etc/hdparm.conf, добавляем в него следующие строки:
+
+<code>
+/dev/sda {
+apm = 255
+spindown_time = 0
+}
+</code>
+
+Это эквивалентно выполнению следующих команд:
+
+<code bash>
+hdparm -B255 /dev/sda
+hdparm -S0 /dev/sda
+</code>
+
+Делаем /etc/brj/no-apmd.sh
+
+<code bash>
+#!/bin/sh
+
+hdparm -B254 /dev/sda
+hdparm -S0 /dev/sda
+
+exit 0
+</code>
+
+и делаем вызов скрипта в
+
+<code bash>
+/etc/acpi/battery.d/90-hdparm.sh
+/etc/apm/event.d/20hdparm
+/usr/lib/pm-utils/sleep.d/95hdparm-apm
+</code>
+
+====== Чиним сеть ======
+
+После переноса с железки на железку, смотреть /etc/udev/rules.d/70-persistent-net.rules
+
+<code bash>
+# PCI device 0x10ec:0x8168 (r8169)
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:23:54:5e:6a:e6", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
+</code>
+
+====== Чиним звук ======
+
+Читаем: https://help.ubuntu.com/community/HdaIntelSoundHowto
+
+<code bash>
+brj@nx7400:~$ lspci |grep Audio
+00:1b.0 Audio device: Intel Corporation 82801G (ICH7 Family) High Definition Audio Controller (rev 01)
+</code>
+
+<code bash>
+brj@nx7400:~$ sudo vim /etc/modprobe.d/alsa-base
+добавляем туда: options snd-hda-intel model=hp
+потом 
+brj@nx7400:~$ sudo update-modules или перезагрузка 
+</code>
+
+===== HP Sanjet 2400 / HP G2410 =====
+
+http://forum.ubuntu.ru/index.php?topic=6517.45
+
+====== PPA ======
+
+Как я ищу PPA с интересующим меня софтом
+
+<code>
+google://<packagename> <lastversion> inurl:+archive site:launchpad.net
+</code>
+
+====== .bashrc ======
+
+<code bash>
+export GREP_OPTIONS='--color=always'
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+</code>
+
+====== Красивая тема ======
+
+На вкус и цвет все фломастеры разные (ц)
+==== Крышка лаптопа ====
+
+И так, делаем следующее: откроем терминал, в нём пишем
+
+<code bash>
+sudo gedit /etc/acpi/lid.sh
+</code>
+
+В открывшемся редакторе под строкой #!/bin/bash вставляем текст:
+
+<code bash>
+grep -q closed /proc/acpi/button/lid/*/state
+if [ $? = 0 ]
+then
+mplayer /etc/acpi/close.wav;
+else
+mplayer /etc/acpi/open.wav;
+fi
+</code>
+
+Теперь можно будет скачать / записать самостоятельно / взять готовую фразу в формате wav и сохранить с именем close.wav и open.wav в директории /etc/acpi и получить озвучку данных событий :-)
+
+==== Windows 7 ====
+
+И легким движением руки Ubuntu Linux превращается в Windows 7! Альтернативные пакеты для изменения графического стиля оформления интерфейса операционных систем Windows всегда вызывали повышенный интерес у пользователей, с учетом практически незначительных отличий в диапазоне от Windows 98 до Windows XP. Такие решения как Vista Transformation Pack и Seven Transformation Pack, наверное, самые популярные. Однако в данном случае речь пойдет об альтернативе, а именно Windows 7 Tranformatin Pack для Ubuntu. 
+
+Скачать можно с сайта [[http://www.gnome-look.org/content/show.php/Win7+Transformation+Pack+for+Ubuntu?content=113909|Gnome-Look.org]]
+
+==== Тема номер раз ====
+
+http://francois.vogelweith.com/
+
+<code>
+## Themes du ZgegBlog
+deb http://ppa.launchpad.net/bisigi/ppa/ubuntu jaunty main
+deb-src http://ppa.launchpad.net/bisigi/ppa/ubuntu jaunty main
+</code>
+
+<code bash>
+sudo apt-get install zgegblog-themes
+</code>
+
+==== Тема номер два ====
+
+http://linuxologist.com/eye-candy/gnome-colors-consistence-and-elegance-for-gnome-desktops/
+
+<code>
+sudo gedit /etc/apt/sources.list.d/gnome-colors.list
+
+в него
+
+deb http://ppa.launchpad.net/gnome-colors-packagers/ppa/ubuntu jaunty main
+deb-src http://ppa.launchpad.net/gnome-colors-packagers/ppa/ubuntu jaunty main
+
+sudo apt-key adv –recv-keys –keyserver keyserver.ubuntu.com 2d79f61be8d31a30
+sudo apt-get update
+sudo apt-get install gnome-colors shiki-colors arc-colors
+</code>
+
+Идем в System -> Preferences -> Appearance и в System -> Administration -> Login Window
+
+==== Конструктор №1 ====
+
+Разумеется "бабмазен" + тема окон в стиле [[http://del.icio.us/post?url=http%3A%2F%2Fgnome-look.org%2Fcontent%2Fshow.php%2FWho+Needs+Windows+7+%3F%3Fcontent%3D105399&title=Who+Needs+Windows+7+%3F|Windows 7]]
+==== Шрифт ====
+
+Взял от висты. Называется Segoe UI 9.
+==== красим яйца ====
+
+<code bash>
+export LESS_TERMCAP_mb=$'\E[01;31m'
+export LESS_TERMCAP_md=$'\E[01;31m'
+export LESS_TERMCAP_me=$'\E[0m'
+export LESS_TERMCAP_se=$'\E[0m'
+export LESS_TERMCAP_so=$'\E[01;44;33m'
+export LESS_TERMCAP_ue=$'\E[0m'
+export LESS_TERMCAP_us=$'\E[01;32m'
+export GREP_OPTIONS='--color=always' 
+echo 'export LESSOPEN="| /usr/share/source-highlight/src-hilite-lesspipe.sh %s"' >> ~/.bashrc
+echo "export LESS=' -R '" >> ~/.bashrc
+</code>
+
+==== Курсоры ====
+
+Курсоры [[http://www.gnome-look.org/content/show.php/ComixCursors?content=32627|тут]] ComixCursors, положить домой в .icons.
+
+Особенно доставляет тема ComixCursors-Green-Huge.
+
+==== Звуки ====
+
+В KDE не плохие звуки по умолчанию. Выдернуть можно [[http://packages.ubuntu.com/hardy/all/kdebase-runtime-data/download|тут]] - то, что я выдернул kdebase-runtime-data_4.0.3-0ubuntu2_all.deb. Можно заменить IM звуки на пиджине, они куда красивее, чем фридесктовые.
+
+Фридесктоп: по умолчанию на убунте, гавно а не звуки. Идем читать [[http://www.freedesktop.org/wiki/Specifications/sound-theme-spec|спецификацию]] -> затем берем [[http://people.freedesktop.org/~mccann/dist/sound-theme-freedesktop-0.2.tar.bz2|тут]] файл -> заменяем все в /usr/share/sound/ubuntu
+
+TODO: Разобраться как самому тему сделать. Да слить куданить на дропбокс, mediafire павку звуков шобы не потерялось.
+
+==== Фоном ====
+
+Страх и ненависть в бабруйске, размер 16x10, брать [[http://brj.pp.ru/wiki/useful/fear-and-loathing-in-babrujsk|тут]]
+==== Логон скрин ====
+
+[[http://gnome-look.org/content/show.php/Wooden?content=90685|Wooden]] GDM Theme
+
+==== Залочка экранов ====
+
+Принудительно выключить экраны в X11
+
+<code bash>$ xset dpms force standby</code>
+
+Принудительно включить скринсервер
+<code bash>$ xset s activate</code>
+
+Залочить экран (попросят ввести пароль)
+<code bash>$ xlock</code>
+
+====== конки ======
+
+http://ubuntuforums.org/showthread.php?t=969521
+
+<code bash>
+sudo aptitude install conky python-statgrab ttf-liberation 
+sudo wget -q http://www.kaivalagi.com/ubuntu/ppa/m-buck-conky-jaunty.list -O /etc/apt/sources.list.d/m-buck-conky-jaunty.list
+wget -q http://www.kaivalagi.com/ubuntu/ppa/m-buck-conky-key.gpg -O- | sudo apt-key add -
+sudo apt-get update
+sudo apt-get install conkyforecast
+sudo apt-get install conkyemail
+cp /usr/share/conkyforecast/conkyForecast.config ~/.conkyForecast.config
+</code>
+
+идём регаемся сюда http://www.weather.com/services/xmloap.html
+
+идем проверяем почту, там
+
+<code>
+Your weather.com XML Partner ID & License Key:
+
+Partner ID: 1130091111
+License Key: 722607c62741111
+</code>
+
+<code bash> 
+vim ~/.conkyForecast.config
+</code>
+
+и вписываем все это дело, Потом идем сюда: http://xoap.weather.com/search/search?where=pole
+
+то, что нам нужно: loc id="RSXX0267"
+
+====== Файловые системы ======
+
+==== SambaFS ====
+
+gnome smb-fs это хорошо, но кроме гнома fuse-smbfs никто не видит. Это как минимум "стремно", значит идём и читаем:
+
+https://help.ubuntu.com/community/MountWindowsSharesPermanently
+
+https://wiki.ubuntu.com/MountWindowsSharesPermanently
+
+http://amarok.kde.org/wiki/Samba
+
+http://ubuntuforums.org/showthread.php?t=288534
+
+потом:
+
+<code bash>
+$ sudo apt-get install smbfs winbind
+$ smbtree
+</code>
+
+and add wins to /etc/nsswitch.conf
+
+<code bash>
+hosts:          files mdns4_minimal [NOTFOUND=return] **wins** dns mdns4
+</code>
+
+<code bash>
+brj@nx7400:~$ sudo apt-get install smbfs
+brj@nx7400:~$ sudo chmod 600 ~/.tv-samba 
+
+brj@nx7400:~$ sudo cat ~/.tv-samba 
+username=tv
+password=tv
+
+brj@nx7400:~$ sudo cat /etc/fstab | grep /tv
+//TV/media	/mnt/tv	cifs	credentials=/home/brj/.tv-samba,uid=brj,gid=brj,dmask=0777,fmask=0777,iocharset=utf8,codepage=unicode,unicode  0  0
+</code>
+
+==== SSHfs ====
+
+Удобно редактировать файлы сразу на сервере. sshfs позволяет смонтировать файловую систему удаленного сервера в любую (существующую) папку локальной файловой системы вашего компьютера с помощью протокола ssh. Установка -> нужно добавить вашего пользователя в группу fuse -> 
+
+<code bash>sudo apt-get install sshfs
+sudo usermod -a -G fuse brj
+</code>
+
+<code bash>sshfs brj@ololo.ru:/path/ /mnt/ololo.ru</code>
+
+Можно так же указать ключ -C, чтобы sshfs сжимала передаваемые данные.
+
+Отмонтировать файловую систему удаленного сервера можно командой:
+<code bash>fusermount -u /mnt/ololo.ru</code>
+
+Для Windows есть аналог – [[http://www.expandrive.com/windows|ExpandDrive]] (бывший SftpDrive)
+
+====== ПО для работы ======
+==== OpenOffice ====
+
+Отключить SplashScreen:
+<code bash>/etc/openoffice/sofficerc
+Logo=0</code>
+
+Открываем OpenOffice: Сервис -> Параметры -> Память -> Количество шагов -> 10 -> Использовать для OpenOffice -> 120Mb -> Памяти на объект -> 3Mb ->
+Количество объектов -> 30
+
+== OpenOffice 3.2 + 9.10 ==
+
+Собственно говоря этот способ не установка, а обновление уже установленного OpenOffice до версии 3.2 через PPA launchpad.
+
+<code bash>sudo add-apt-repository ppa:openoffice-pkgs/ppa
+sudo apt-get update && sudp apt-get upgrade</code>
+
+==== apache2 =====
+
+<code bash>
+apache2ctl -t -D DUMP_MODULES
+sudo a2enmod rewrite
+sudo ln -s /etc/apache2/mods-available/rewrite.load /etc/apache2/mods-enabled/
+в /etc/apache2/sites-available/default
+
+параметр AllowOverride None -> на AllowOverride All
+</code>
+
+какой дибил вообще отключает мод_реврайт в апачах?
+
+==== Shutter ====
+
+Shutter, что бы делать скриншоты. Показать "копипасту" обычно проще и быстрее, чем описать словами, особенно когда дело касается какой-либо графики. В целом скриншоты можно делать и по хоткеям, чисто консолью, но в этот раз GUI. Самая занятная тема в "шторке" - автоматическая выгрузка скриншотов на FTP или же на один из популярных сервисов для хранения изображений (фотохостинг), последнее реализовано с помощью плагинов.
+
+<code bash>
+deb http://ppa.launchpad.net/shutter/ppa/ubuntu jaunty main
+deb-src http://ppa.launchpad.net/shutter/ppa/ubuntu jaunty main
+</code>
+
+<code bash>
+sudo apt-get install shutter
+</code>
+==== molly-guard ====
+
+<code bash>sudo apt-get install molly-guard</code>
+
+<code sql>
+$ sudo reboot
+W: molly-guard: SSH session detected!
+Please type in hostname of the machine to reboot: ruchi
+Good thing I asked; I won’t reboot Ubuntu-test …
+W: aborting reboot due to 30-query-hostname exiting with code 1.
+</code>
+==== rdesktop ====
+
+http://blog.loftninjas.org/2007/01/22/seamless-rdp-on-ubuntu-edgy-eft-outlook/
+
+про стреамлесс рдп
+
+== сяся, бляко! ==
+
+Патченный rdesktop + RAW режим херня. В итоге сегодня /usr/share/rdesktop/keymaps/ru и /usr/share/rdesktop/keymaps/en-us меняется одинаково на следущее:
+
+<code bash>
+# generated from XKB map ru
+include common
+map 0x419
+grave 0x29
+asciitilde 0x29 shift
+asciicircum 0x07 shift
+backslash 0x2b
+bar 0x2b shift
+apostrophe 0x28
+greater 0x34 shift
+less 0x33 shift
+</code>
+
+В итоге, все кнопки работают, кроме капслока и инсерта. Работают и на 2003 и на 2008. Надо думать.
+
+==== ifuse ====
+
+[[http://matt.colyer.name/projects/iphone-linux/index.php?title=Main_Page|iFuse]] позволяет монтировать iPhone/iPod Touch через USB-кабель. Вы сможете просматривать и редактировать файлы на этих устройствах так же как и на любом другом USB-диске. Для этого не надо прошивать девайс или каким-то другим способом лишаться гарантии на него.
+
+iFuse это драйвер файловой системы FUSE, который использует библиотеку "libiphone" и стандартный протокол от Apple (AFC) для подключения устройства.
+После монтирования устройство подключается в каталог /var/root/Media, и вы можете делать всё что угодно с находящимися в нём файлами.
+
+<code sql>
+deb http://ppa.launchpad.net/jonabeck/ppa/ubuntu jaunty main
+deb-src http://ppa.launchpad.net/jonabeck/ppa/ubuntu jaunty main
+
+sudo apt-get install ifuse 
+</code>
+
+==== Grumblr ====
+
+Grumblr http://themactep.com/grumblr/
+==== Сохраняем миксер ====
+
+Миксер - это какой-то ад, в гноме. Сначала настраиваем, а потом сохраняем в память.
+
+<code bash>
+alsamixer - настроили
+
+brj@nx7400:~$ alsactl store
+alsactl: save_state:1541: Cannot open /var/lib/alsa/asound.state for writing: Permission denied
+эээ, это ещё чо за херня?
+brj@nx7400:~$ sudo alsactl store
+сохранили
+</code>
+==== mysql client ====
+
+<code bash>
+brj@nx7400:~$ cat ~/my.cnf
+[client]
+default-character-set= utf8
+pager = less -n -i -S
+prompt =(\u@\h) [\d]>
+</code>
+
+==== сканер ====
+
+<code bash>apt-get install sane-utils
+vim /etc/sane.d/saned.conf
+vim nano /etc/inetd.conf
+sane-port stream tcp nowait saned:saned /usr/sbin/saned saned
+service openbsd-inetd restart
+groupadd scanner
+usermod -aG scanner $USER
+usermod -aG scanner saned
+vim /lib/udev/rules.d/40-libsane.rules
+# Hewlett-Packard ScanJet G3110
+ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="4305", ENV{libsane_matched}="yes"
+# Hewlett-Packard ScanJet G3110
+ATTRS{idVendor}=="03f0", ATTRS{idProduct}=="4305", ENV{libsane_matched}="yes", MODE="664", GROUP="scanner"
+или sane-find-scanner
+</code>
+
+<code bash>
+sudo apt-get install sane-utils
+sudo nano /etc/sane.d/net.conf
+</code>
+
+==== f.lux ====
+
+[[http://www.stereopsis.com/flux/|f.lux]] собственно тут.
+
+<code bash>
+$ wget -c https://secure.herf.org/flux/xflux.tgz
+$ tar -xvzf xflux.tgz
+$ rm -rf xflux.tgz
+$ sudo cp xflux /usr/bin/
+$ sudo chmod 755 /usr/bin/xflux
+$ xflux -l 33.55, 44.55
+</code>
+
+Или System -> Preferences -> Sessions
+
+<code bash>
+Name : Xflux
+Command : xflux -l 33.55, 44.55 (DO NOT FORGET TO CHANGE the latitude or Zip!)
+Comment : F.lux , Better lighting For Your Computer 
+</code>
+
+==== Раскукожить звук cue > mp3 ====
+
+Есть cue файл, есть mp3. Как это дело раскукожить из cue обратно на треки, без пережатия mp3? 
+
+<code bash>
+sudo aptitude install mp3splt
+mp3splt -c 401-va_live_at_hardcore_heaven-re-con_-_squad-e_and_c~ve_at_hardcore_heaven-re-con_-_squad-e_and_chris_henry-xtc.mp3
+ls -1 *.mp3 | wc -l
+21
+</code>
+
+==== Раскукожить flac > cue ====
+
+http://www.legroom.net/software/convtoflac
+
+<code bash>
+$ sudo aptitude install shntool flac cuetools
+$ cuebreakpoints CannedWheat.cue | shnsplit -o flac CannedWheat.flac
+$ cuetag CannedWheat.cue split-track*.flac 
+</code>
+
+либо готовый скрипт http://code.google.com/p/split2flac/ - [[http://tuxedo.live.googlepages.com/split2flac.tar|split2flac]]
+
+<code bash>
+$ ./split2flac.sh CannedWheat.flac -cue CannedWheat.cue -o .
+</code>
+
+==== Раскукожить обезьянку ====
+
+http://www.legroom.net/software/convtoflac
+
+http://debian-multimedia.org/pool/main/m/monkeys-audio/monkeys-audio.php
+
+<code bash>
+$ sudo apt-get install cuetools shntoolflac
+$ cuebreakpoints sample.cue | shnsplit -o flac sample.flac
+$ cuebreakpoints sample.cue | shnsplit -o flac sample.ape
+$ shntool split -t '%n - %t' -o flac -f smaple.cue sample.ape
+$ cuetag sample.cue *.flac
+</code>
+
+==== Раскукожываем имена файлов ====
+
+Часто возникают ситуации, когда например, приносим файлы с русскими названиями, но в другой кодировке, нежели чем у вас. Конечно можно эту проблему решить опциями монтирования носителя, т.е. задать ей кодировку при монтировании. Ну а если вы в дебрях вашей файловой системы, вдруг обнаруживаете файлы с "кракозябрами", то как тогда быть?
+
+Ответ прост:
+
+<code bash>apt-get install convmv</code>
+
+Это совершенно замечательная утилитка ну просто не заменимая в этом деле вещь. Понимает массу разных кодировок и не требует временных "перевалочных" директорий. Работает прям как есть. Итак в нашей системе установлена локаль UTF8, и есть русскоязычная директория с файлом, сохраненная в кодировке ср1251 от Microsoft.
+
+Предварительное тестирование операции перекодирования:
+
+<code bash>$ convmv -f cp1251 -t utf8 -r (путь_к_файлам)</code>
+
+Запуск самой операции перекодирования названия файлов с cp1251 на utf8:
+
+<code bash>$ convmv -f cp1251 -t utf8 -r --notest (путь_к_файлам)</code>
+
+Ключи:
+<code>
+-f с какой кодировки делаем
+-t на какую кодировку делаем
+-r рекурсивно, т.е. включая все файлы и подкаталоги в этом каталоге
+-- notest значит конвертировать файлы (а не тестировать)
+</code>
+
+==== Удалить из фильма дорожку ====
+
+Имеется такая проблема, практические все фильмы содержат как минимум 2 дорожки: оригинальная озвучка и перевод на русский. А это довольно накладно, ибо имеется ограничение на объём хранимой информации. Чтобы узнать количество дорожек в целой группе фильмов нужно использовать команду:
+
+<code bash>for f in *.avi; do echo -n "$f / " ; mplayer -endpos 0 -vo null "$f" 2> /dev/null | grep "Audio stream found"|wc -l ; done</code>
+
+А избаться от ненужных дорожек можно так
+
+<code bash>for f in *.avi ;do mencoder -alang ru -ovc copy -oac copy "$f" -o "/mnt/tv/video/$f"; done</code>
+
+Важны опции:
+
+  * -ovc copy и -oac copy - просто копируют выбранные аудио и видео потоки без какой либо обработки
+  * -alang ru - выбирает русскоязычную дорожку
+
+На обработку одно файла уходит примерна минута, но после этого размер файлов уменьшится примерно на 40-60 мегабайт и отпадёт необходимость переключать дорожку в плеерах которые не умеют автоматически выбирать русскую, например этим страдает Totem.
+
+==== Конвенторы ====
+
+<code bash>sudo apt-get install ffmpeg</code>
+
+3gp to avi : <code bash>ffmpeg -i source.3gp -f avi -vcodec xvid -acodec mp3 -ar 22050 destination.avi</code>
+
+flv to 3gp : <code bash>ffmpeg -i source.flv -s 176×144 -vcodec h263 -r 25 -b 200 -ab 64 -acodec mp3 -ac 1 -ar 8000 destination.3gp</code>
+
+flv to mp4 : <code bash>ffmpeg -i source.flv -vcodec h264 -r 25 -b 200 -ab 128 -acodec mp3 -ac 2 -ar 44100 destination.mp3</code>
+
+avi to mp4 : <code bash>ffmpeg -i source.avi -f psp -r 29.97 -b 768k -ar 24000 -ab 64k -s 320×240 destination.mp4</code>
+
+mp4 to 3gp : <code bash>ffmpeg -i source.mp4 -s 176×144 -vcodec h263 -r 25 -b 12200 -ab 12200 -ac 1 -ar 8000 destination.3gp</code>
+
+avi to 3gp : <code bash>ffmpeg -i source.avi-s qcif -vcodec h263 -acodec mp3 -ac 1 -ar 8000 -r 25 -ab 32 -y destination.3gp</code>
+
+mpg to 3gp : <code bash>ffmpeg -i source.mpg -s qcif -vcodec h263 -acodec mp3 -ac 1 -ar 8000 -ab 32 -y destination.3gp</code>
+==== sendemail ====
+
+Причины использования консоли для отправки почты даже не в том, что может отсутствовать графика на компьютере, и даже не в количестве отправляемых писем. А в том, что с помощью 76 килабайтного файлика, вы можете отправить почту с существующих учетных записей, на бесплатных серверах в интернете даже если они используют TLS (например google почта).
+sendEmail - как раз та 76 килобайтная утилита, которая умеет ещё и вести логи своих действий.
+
+http://caspian.dotconf.net/menu/Software/SendEmail/
+
+Сразу приведу строку, подробнее, что в ней, ниже:
+
+<code bash>
+./sendEmail -f LOGIN@gmail.com -t ADRESAT@mail.ru -o message-charset=utf-8 -u "Это тема сообщения" \
+-o message-file=Messaga.msg -o message-format=text/html -s smtp.gmail.com \
+-o tls=yes -xu LOGIN -xp PASSWORD -l log.txt
+
+./sendEmail - находясь в папке с утилитой, достаточно её просто запустить, и она вывалит вам все опции которые умеет (см. скриншот в посте)
+-f LOGIN@gmail.com - с какого ящика отправляете почту
+-t ADRESAT@mail.ru - получатель письма
+-o - дополнительные опции, например кодировка сообщения, или же использование tls, не всегда обязательны.
+-u "Это тема сообщения" - тема. Тут стоит задержаться по подробнее, единственной загвоздкой является то, что если тему
+оставить в таком виде, у пользователей сервиса mail.ru тема будет отображаться неадекватно (такая проблема замечена 
+только за mail.ru), я отправляю тему вот в таком формате: 
+"=?koi8-r?B?/snUwcrUxSDzzc/M2M7ZyiDJIExpbnV4IHhsb3JvZmYubGl2ZWpvdQ==?=", костыль, но так как 
+пользователей mail.ru большинство, приходится прогибаться.
+-o message-file=Messaga.msg - файл сообщения, обычно нужно если сообщение отправляется в формате html, вообще можно просто -m "Текст сообщения"
+-s smtp.gmail.com - сервер отправки почты
+-xu LOGIN -xp PASSWORD - логин пароль вашей почты
+-l log.txt - куда пишем логи.
+</code>
+
+ЗЫ. не переусердствуйте, через google можно отправлять не более 800 писем в день. (палюсь, палюсь...)
+
+==== Midnight Commander ====
+
+Ну куда без него? Самое интересное - ассоциации файлов. Наверное все знают что Midnight Commander позволяет связывать определённые типы файлов с определёнными программами. Сейчас настроим Midnight Commander на использование системных связей файлов:
+
+<code bash>
+cp /etc/mc/mc.ext ~/.mc/bindings
+</code>
+
+в конце файла строки
+
+<code>
+### Default ###
+
+# Default target for anything not described above
+default/*
+        Open=
+        View=
+
+
+### EOF ###
+</code>
+
+Вот оно нам и нужно! Меняем на то, что больше нравится. Набор для gnome, kde, xfce прочее. Ещё можно прикрутить xdg-open из xdg-utils
+
+<code bash>
+Open=thunar %f
+Open=rox-filer %f
+Open=kfmclient exec %f
+Open=gnome-open %f
+</code>
+
+==== SUN:JAVA ====
+
+читать: https://help.ubuntu.com/community/JavaInstallation
+
+<note tip>хав ту инсталл жава рунтаме инвиромент (ЖЫРЭРЕ) он убунту линукс</note>
+
+<code>
+sun-java6-bin – Contains the binaries
+sun-java6-demo – Contains demos and examples
+sun-java6-doc – Contains the documentation
+sun-java6-fonts – Contains the Lucida TrueType fonts from the JRE
+sun-java6-jdk – Contains the metapackage for the JDK
+sun-java6-jre – Contains the metapackage for the JRE
+sun-java6-plugin – Contains the plug-in for Mozilla-based browsers
+sun-java6-source – Contains source files for the JDK
+</code>
+
+==== Tucan Manager ====
+
+Представлен релиз менеджера загрузок [[http://tucaneando.com/index-en.html|Tucan Manager]], предназначенного для автоматизации процесса загрузки и скачивания данных с сервисов подобных rapidshare или megaupload. Основные возможности: Написан целиком на языке Python / Встроенная система распознавания каптчи и много другова.
+
+<code>
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B5140445
+echo "deb http://ppa.launchpad.net/tucan/ppa/ubuntu `lsb_release -sc` main" | sudo tee /etc/apt/sources.list.d/tucan.list
+sudo apt-get update
+sudo apt-get install tucan
+</code>
+
+==== QMMP ====
+
+<code bash>deb http://ppa.launchpad.net/stiff.ru/ppa/ubuntu jaunty main
+deb-src http://ppa.launchpad.net/stiff.ru/ppa/ubuntu jaunty main</code>
+
+http://qmmp.ylsoftware.com/
+
+Шкурка [[http://www.winamp.com/skins/details/147153|Hand-Written v5]] - Hey Look! Winamp on paper!
+
+<code bash>wget http://xmms.org/misc/winamp_presets.gz
+gunzip -c winamp_presets.gz > ~/.qmmp/eq.auto_preset</code>
+
+==== x11vnc ====
+
+Вдали от дома хочеться домашнего компа? Погуглив немного, вспомнил про VNC. Сюрпризом оказалось то, что большинство VNC-серверов запускают для удаленных клиентов ещё один Х-сервер на :1, что мне категорически не понравилось. Но есть и серверы, которые могут работать с дефолтным :0. Пусть это будет x11vnc.
+
+Идем читаем: http://www.karlrunge.com/x11vnc/
+
+<code>x11vnc -display :0 -inetd -q -passwdfile /home/brj/.vnc/passwdfile</code>
+
+Подключение к VNC серверу выполняется в два этапа. Подключение к ssh с созданием тунеля:
+
+<code bash>remote$ ssh -C -L5900:127.0.0.1:5900 brj@home.brj.pp.ru</code>
+
+И, собственно, подключение к VNC-серверу:
+
+<code bash>remotehost$ vncviewer localhost</code>
+
+=== Клиент под винду ===
+
+RealVNC сегодня официальная версия, поддерживаемая командой AT&T Laboratories. 
+
+VNC Free Edition Viewer for Windows Stand-alone Viewer Version 4.1.3 {{:ubuntu:vnc-4_1_3-x86_win32_viewer.zip|}}
+
+==== linuxvnc ====
+
+Иногда возникает необходимость удалённо посмотреть что именно выводит какоё-то демон на одну из локальных консолей. Как вариант для решения этой задачи можно использовать утилиту linuxvnc. Большая часть параметров linuxvnc аналогична параметрам x11vnc.
+
+<code bash>
+apt-get install linuxvnc
+затем linuxvnc 
+</code>
+
+Если вдруг возникнет необходимость запустить linuxvnc сразу для всех консолей, то можно добавить следующие строки в /etc/rc.local:
+
+<code bash>
+    for i in `seq 1 7`; do
+    linuxvnc ${i} -rfbport 590${i} 2> /var/log/linuxvnc_${i}.log &
+    done
+</code>
+
+Из недостатков так же хочется отметить тот момент, что linuxvnc не поддерживает функции программируемого знакогенератора, а встроенные шрифты не содержат русских букв. Однако в конечном итоге оно и не нужно.
+
+==== ДубльГИС ====
+
+Для работы ДубльГИС 3.0 под Linux потребуется установленный Wine, версии не ниже 0.9.56. Скачайте архивы оболочки и баз данных городов с этой страницы. Распакуйте загруженные пакеты в домашнюю директорию. http://help.2gis.ru/linux/
+
+Запуск программы необходимо выполнять с параметром -nomta (./grym.exe -nomta).В случае некорректного отображения шрифтов в программе необходимо будет добавить стандартные Windows шрифты в каталог Wine: «~/wine_c/windows/fonts/».
+
+<code>deb http://packages.redsolution.ru/2gis/ lenny non-free</code>
+
+Для дебиана работает. Для убунты соответственно релиз с lenny можно попробовать заменить на hardy.
+
+==== parcellite ====
+
+Копирование в буфер и вставка из буфера в линуксе определенно доставляет. Вставится и скопироваться может любая неведомая ебанная хуйня, но не то, чт ты бы хотел скопировать и вставить. Лечить можно установкой parcellite -> и в автозагрузку.
+
+<code>sudo apt-get install parcellite</code>
+
+
+==== FireFox ====
+
+Firefox 3.5 в Ubuntu 9.04, в целом в jaunty-update уже пришёл новый firefox. Так что пользователям ubuntu 9.04 все нижеприведённые манипуляции с репозитариями можно и не производить, хотя вот насколько быстро будут приползать обновления безопасности в jaunty-updates этого пакет – вопрос.
+
+Читать: Firefox 3.5 - https://help.ubuntu.com/community/FirefoxNewVersion
+
+<code bash>
+sudo aptitude install firefox-3.5
+sudo install firefox-3.5-gnome-support</code>
+
+Если вы хотите чтобы firefox-3.5 был вашим браузером по-умолчанию, вам следует произвести соотв. настройки в вашем окружении рабочего стола. Также стоит корректно настроить ссылку x-www-browser: 
+
+<code bash>sudo update-alternatives --config x-www-browser</code>
+и ссылку xulrunner: 
+<code>sudo update-alternatives --config xulrunner</code>
+
+Ubuntu Firefox -> Font Smoothening -> Open a new window or tab and paste this into the address bar -> about:config -> Create/set gfx.use_text_smoothing_setting -> true
+
+FirefoxNotify 1.5.4 - вот тут: https://addons.mozilla.org/en-US/firefox/addon/9622
+
+about:config -> browser.download.manager.showAlertOnComplete -> false
+
+Чтобы не закрывать окно после закрытия последнего таба в about:config -> browser.tabs.closeWindowWithLastTab -> false; 
+
+==== VirtualBox ====
+
+После установки VirtualBox 3 гостевые ОС стали отображаться с прозрачным фоном -> виной тому, как оказалось, стал Compiz -> лечим такое повеление -> идём в  «CompizConfigs Settings Manager» -> ищем там «Windows Management» -> «Windows Rules» -> включаем «Windows Rules» -> открываем его настройки -> находим  «No ARGB visuals» -> далее  «Window Class» -> нажимаем «Grab» -> а потом выбираем окно VirtualBox -> После этого перезапускаем программку.
+
+https://help.ubuntu.com/community/VirtualBox/SharedFolders
+
+https://help.ubuntu.com/community/VirtualBox/USB
+
+==== Skype ====
+
+Кошерно запускать скайп так:
+
+<code bash>skype --disable-cleanlooks -style GTK</code>
+
+====== LANG ======
+
+На примере GIMP
+
+Из консоли:
+
+<code bash>
+ LANG=en gimp-2.6 %U
+</code>
+
+Кнопка запуска:
+
+LANG=en_US.UTF-8
+
+<code bash>
+ sh -c "LANG=en gimp-2.6 %U"
+</code>
+
+====== вай и фай ======
+
+
+
+<code bash>
+sudo apt-get install aircrack-ng kismet
+sudo ifconfig eth1 up 
+sudo iwconfig eth1 mode monitor essid ololo channel 6
+sudo iwconfig eth1 rate 54M 
+sudo aireplay-ng -9 eth1 
+sudo kismet 
+</code>
+
+
+====== postfix через gmail ======
+
+Если вы пользуетесь Gmail и у вас есть свой выделенный сервер, то достаточно просто заставить postfix на этом сервере отправлять почту через ваш Gmail аккаунт. Для ubuntu все, что нужно сделать, это:
+
+Файл /etc/postfix/main.cf:
+
+<code bash>
+    relayhost = smtp.gmail.com:587
+    smtp_use_tls=yes
+    smtp_sasl_auth_enable = yes
+    smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+    smtp_sasl_security_options = noanonymous
+    smtp_sasl_tls_security_options = noanonymous
+</code>
+
+Создать файл /etc/postfix/sasl_passwd с параметрами авторизации Gmail:
+
+<code>    smtp.gmail.com:587 user@gmail.com:PASSWORD</code>
+
+<code bash>
+    postmap /etc/postfix/sasl_passwd
+    chmod 640 /etc/postfix/sasl_passwd*
+    chown postfix.postfix /etc/postfix/sasl_passwd*
+    /etc/init.d/postfix restart
+</code>
+
+====== Agere Systems HDA modem ======
+
+Вообще зачем в 21ом веке модем? Но раз он имплантирован в ноут, то нужно сделать следующие нехитрые действия:
+
+<code bash> 
+sudo aptitude install module-assistant
+sudo m-a a-i sl-modem
+sudo aptitude install sl-modem-daemon
+sudo vim /etc/default/sl-modem-daemon
+</code>
+
+И привести его к виду
+
+<code>
+DONTSTART=0
+SLMODEMD_DEVICE="hw,Intel,6"
+SLMODEMD_COUNTRY=RUSSIA
+OPTS=""
+FORCESTART=0
+</code>
+
+<code bash>sudo /etc/init.d/sl-modem-daemon start | restart</code>
+
+получаем нечто вроде
+
+<code>Shutting down SmartLink Modem driver normally.
+Unloading modem driver from kernel ... none found.
+Starting SmartLink Modem driver for: hw:Intel,6.
+Creating /dev/modem symlink, pointing to: /dev/ttySL0.</code>
+
+теперь можно через него звонить.
+
+Особо пытливые могут посмотреть в него через cu
+
+<code>cu -l /dev/ttySL0
+Connected.
+atz
+OK
+ati2
+SmartLink Soft Modem, 2.9.9e-pre1
+Smart Link Ltd.
+OK
+ati3
+hw:Intel,6
+alsa modem driver
+OK
+ati4
+s00=000 s01=000 s02=043 s03=013 s04=010 s05=008 s06=002 s07=060
+s08=002 s09=006 s10=007 s11=100 s12=050 s13=001 s14=000 s15=001
+s16=001 s17=000 s18=000 s19=000 s20=000 s21=000 s22=000 s23=000
+
+OK
+ati5
+Stored Profile 0:
+OK
+ati6
+Stored Profile 1:
+OK
+ati7
+Country: RUSSIA
+OK
+</code>
+
+Все теперь через него можно звонить.
+
+====== туду ======
+
+посмотреть вот тут что это за прожки http://www.opennet.ru/opennews/art.shtml?num=22882

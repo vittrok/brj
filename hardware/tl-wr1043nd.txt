@@ -1,0 +1,244 @@
+====== Роутер TP-Link TL-WR1043ND ======
+
+==== 2014 ====
+
+  - старый ftp умер
+  - новое брать тут 
+  - ftp://ftp.dd-wrt.com/others/eko/BrainSlayer-V24-preSP2/2014/
+  - ftp://ftp.dd-wrt.com/others/eko/BrainSlayer-V24-preSP2/2014/04-18-2014-r23919/tplink_tl-wr1043nd/
+===== Прошивка =====
+
+
+Труп в руках! Симптомы-горит светодиод питания. Таким образом мы видим, перед прошивкой первым делом стирается флешка, а уж потом в оперативку грузится дамп и только потом прошивается память флеш! Любой сбой или завис и труп гарантирован, а без загрузчика как все поняли только прошивать флешку напрямую!
+
+В связи с этим - не пренебрегайте отключением всех клиентов от роутера и отключением WiFi в интерфейсе! Ведь после стирания флешки, роутер продолжает работать, прошивка вся в памяти(и старая, но не факт что вся новая) - прошивки которые называються - боот, стирают будт.
+
+Ищщу програматор, чо.
+
+With the WR1043ND router, there is a catch: the stock firmware is obtained from the OEM: http://www.tplink.com/en/support/download/?model=TL-WR1043ND OEM TP-Link firmware for the TL-WR1043ndV1 with the boot part removed to revert to the original OEM firmware: http://goo.gl/cMdOdz
+
+in case the file name of this firmware file does not contain the word "boot" in it, you can simply revert back to original firmware
+in case the file name of this firmware file does contain the word "boot" in it, you need to cut off parts of the image file before flashing it:
+An example of an image file with the word "boot" in it is wr1043nv1_en_3_9_17_up_boot(091118).bin.
+
+Cut the first 0x20200 (that is 131,584 = 257*512) Bytes from original firmware:
+
+dd if=orig.bin of=tplink.bin skip=257 bs=512
+You should transfer the firmeware image to the /tmp folder and revert back to original firmware:
+
+mtd -r write tplink.bin linux
+Or depending on your mtd you may have to
+
+mtd -r write tplink.bin firmware
+This has been confirmed by supertom64
+
+http://wiki.openwrt.org/toh/tp-link/tl-wr1043nd
+===== Былое =====
+
+
+<note tip>Куплен в 2011 году, в 2013 году он все ещё работает.</note>
+
+  - Сразу требуется совместимось моделей с прошивками DD-WRT / OpenWRT. 
+  - Возможности родных прошивок мной не рассматривались вообще. 
+  - Зачем выбирать цвет обоев в новой квартире, если впереди — всесокурушающий ремонт?
+  - Строг. Красив. Манаджыца через web. Гигабит и 3х3 MIMO (она же 3T3R, 3Tx3Rx). 
+  - [[http://vilianov.com/persons/tp-link-router-jason-xu/|TP-LINK]] -> Настоящие китайские роутеры!
+==== Железо ====
+
+<note tip>В 2013 году выглядит скромно. Не AC. А просто N MIMO. Напомню покупалось в 2010.</note>
+
+<code bash>
+Chipset AR9001AP-3NG (*)
+Architecture: MIPS
+Vendor: Atheros
+Bootloader: U Boot (**)
+System-On-Chip: AR9132 ( AP83 )
+CPU Speed: 400 Mhz
+Flash-Chip: ST 25P64V6P
+Flash size: 8 MiB
+RAM: 32 MiB
+Wireless: Atheros AR9103 802.11n
+Ethernet: Gigabit switch Realtek RTL8366
+USB: Yes 1 x 2.0
+Serial: Yes (**)
+JTAG: Yes (**)
+</code>
+
+Слегка прокоментирую приведенные «спеки»: 
+
+  - Роутер разработан на предпоследнем наборе чипов фирмы Atheros -> http://www.atheros.com/
+  - AR9001AP-3NG  - это набор следующих чипов AR8316 + AR9132+ AR9103.
+  - AR8316 – гигабитнай свитч
+  - AR9132 - wireless network processing unit
+  - Короче это главный процессор роутера, отвечает за MAC адреса, гигабитную сеть с помощью вышеупомянутого контроллера
+  - Ещё отвечает за беспроводную часть роутера
+  - И фирменную технологию SST обеспечивающий «непревзойдённую пропускную Способность TCP/IP и зону покрытия роутера»
+  - AR9103 – одночастотный контроллер радиочасти Wi-Fi N 3x3 MIMO
+  - Конкретно в нашем подопытном немного нарушили целостность платформы Atheros
+  - Вместо рекомендованного гигабитного свитча AR8316 поставили Realtech RTL8366. 
+  - Для конечного пользователя это сути дела не меняет
+  - как была сеть гигабитной так и осталась. 
+  - Для разработчиков альтернативных прошивок, в частности OpenWRT, это скорее даже плюс
+  - Драйвера под Realtech нашлись сразу. 
+  - Кроме того мне сильно кажется что это удешевило железную часть системы
+  - А если не видно разницы... -> в общем с этим моментом всё ясно.
+
+  - Кроме того по «железу» буква D в названии TP-Link TL-1043ND – указывает на то что антенны у девайса съёмные. 
+  - Это однозначно хорошо т.к. не мешает нам заменить штатные на что то сильно покруче.
+
+==== Что делает роутер? ====
+
+  - Стоит и не жужжыт :-)
+  - Зарядка для [[hardware:hi-rice-sd-802|]]
+  - Залочен на N only network.
+  - Раздаёт у меня дома эти ваши интернеты на все устройства (nat + upnp)
+  - Кеширующий DNS сервер + DHCPD
+
+==== Помни об этом ====
+
+<note warning>На L2 мультикаст всегда вырождается в броадкаст, а т.к. в этом чипе нет IGMP snooping, да плюс по умолчанию WiFi работает как бридж, оно и умирает</note>
+
+==== Качество сигнала wi-fi ====
+
+<note important>Отдельно [[hardware:homed-wifi|]]</note>
+
+===== DD-WRT =====
+
+DD-WRT — это сторонняя разработка прошивки (микропрограммы) под лицензией GPL для множества ieee802.11a/b/g/h/n беспроводных маршрутизаторах, реализованных на чипах Broadcom и Atheros.
+
+  - http://www.dd-wrt.com/
+  - Скачиваем прошивку отсюда же -> http://dd-wrt.com/site/support/router-database
+  - Имя файла будет factory-to-ddwrt. 
+  - После скачивания заходим в web интерфейс на страницу Firmware update
+  - Обновляемся, используя скачанный файл.
+
+  - После окончания процесса для любого роутера стоит подождать несколько минут
+  - После чего необходимо запустить telnet и присоединиться к роутеру со свежей прошивкой (oбычно 192.168.1.1). 
+  - В командной строке вводим логин root и пароль admin. 
+  - Далее вводим команду для очистки памяти роутера – <code bash>mtd -r erase nvram</code>
+  - затем reboot для перезагрузки. 
+
+  - Все, прошивка завершена, можно заходить в web-интерфейс. 
+  - При первом запуске вас попросят ввести новое имя пользователя и пароль. 
+  - Запомните, при дальнейшем подключении к роутеру через telnet, какое бы имя пользователя вы не вводили, правильным будет root. 
+  - Пароль, правда, необходимо использовать новый.
+
+  - Не спешите играться с новой прошивкой и настраивать ее. 
+  - Сперва необходимо обновиться до последней версии, ведь версия, скачанная с сайта, является стабильной, но далеко не самой функциональной. 
+  - Перезапустите ваш браузер и снова зайдите на страницу конфигурации роутера
+  - Введите новый логин и пароль, а потом зайдите в настройки – Administration –> Firmware Upgrade.
+
+  - 2013 -> ftp://dd-wrt.com/others/eko/BrainSlayer-V24-preSP2/2013/
+  - 2012 -> ftp://dd-wrt.com/others/eko/BrainSlayer-V24-preSP2/2012/
+  - 2011 -> ftp://dd-wrt.com/others/eko/BrainSlayer-V24-preSP2/2011/
+
+==== После перепрошивки ====
+
+Заработал с первой попытки, опять же, что в наше время — уже достоинство. Все работает и настраивается через веб интерфейс. Скучно.
+
+====== Архив ======
+
+<note tip>Условия на 2010 год: Итак исходные условия: нужен роутер домашнего назначения с достаточной мощностью чтобы потянуть минимум 25Мбит интернет канала при длительной интенсивной загрузке + гигабитная сеть. 
+</note>
+
+Итого для тех кому надо одновременно гигабит, WiFi N MIMO, USB – культовый ранее ASUS, сегодня предложить ничего не может. Точнее может предложить RT-N16, но это другая история. И поверьте тоже не радостная для компании ASUS. Начинается эта грустная история с цены в 5700 рублей на Красноярске... 
+Что касается <del>легендарной модели</del> [[hardware:router-asus-wl500gp|]] так это не работало "искаропки", но и потребовало от не самых глупых людей почти полгода ебли вприсядку. Мной на замену был выбран TP-Link. 
+Всего за 3500 рублей на Красноярске.
+
+==== WR741ND ====
+
+WR741ND очень интересен тем что представляет просто великолекпную можно сказать беспрецедентную функциональность за смешные деньги. Судите сами - Wi-Fi N 150Mbits, да на антеннах съекономили но N стандарт он таки поддерживает, из коробки на штатной прошивке сразу (!) поддерживает IPTV, Dual Access PPTP, PPPOE. L2TP. 
+
+Приходится признать что дешевое китайское устройство оставляет позади всех конкурентов абсолютно всех по критерию универсальность, функциональность/стоимость! У дорогих и навороченных NetGear, например, до сих пор проблемы с неработающими туннелями, DualAccess и IPTV при том что аналогичная модель стоит на 70% дороже!
+
+==== Торренты ====
+
+<code bash>
+Router Model: TP-Link TL-WR1043ND
+Firmware Version: DD-WRT v24-sp2 (11/21/10) std — build 15778
+Time: 05:36:10 up 1 day, 17:34, load average: 0.00, 0.00, 0.00
+DHT: 330 nodes
+Download: 13MB/s
+Upload: 18Mb/s
+Active IP Connections: 1963
+</code>
+
+Про настройку utorrent [[isp:torrents|]]
+==== TL-WN781ND ====
+
+Это должна быть PCI-E карта, т.к. сейчас PCI-E слоты встречаются чаще, чем PCI, в частности, можно использовать дополнительные интерфейсы для видеокарт. Ну а если есть желание сэкономить и не сильно потерять в качестве, то к вашим услугами продукция от TP-Link. Новинка осени 2010 года. Она значительно дешевле конкурентов, она имеет пониженную теоретическую пропускную способность с 300 до 150 Мбит/с, одну, а не три антенны.
+
+<code bash>
+Тип: Wi-Fi адаптер 
+Поддерживаемые протоколы и стандарты: 802.11n/g/b 
+Частотный диапазон	: 2,4-2,4835 ГГц 
+Интерфейс: PCI-Express 
+Тип антенны: Съемная, коннектор RP-SMA 
+Скорость передачи данных: до 150 Мбит/с 
+Безопасность передачи данных: 64/128/152-битный WEP WPA/WPA2, WPA-PSK/WPA2-PSK (TKIP/AES) с функцией QSS 
+Поддержка ОС: Windows 7/XP/Vista/2000 32/64 bit 
+Габариты карты: 120,8 x 78,5 x 21,5 мм 
+Цена: 520 р. 
+</code>
+
+Итоги: Итак, максимальную скорость которую нам удалось получить, это - 14,1 Мбайт/с или 112 Мбит/с. Очень неплохой результат. Что касается D-Link DWA-556, то с ним скорость больше, но совсем не намного, а не в 2 раза, что должно быть по теории. В общем, это не стоит того, чтобы платить в 3 раза больше.
+
+==== TL-WN821N ====
+
+USB Wi-Fi карта TP-Link TL-WN821N -> Wi-Fi, который всегда с тобой  -> Итак, почему мы остановили свой выбор именно на этой модели. Беспроводной оборудование от TP-Link получило большую популярность в России как добротное, беспроблемное (на фоне конкурентов) и при этом стоящая малые деньги. Это не наши придумки - достаточно почитать отзывы с форумов и, в частности, на Яндекс.Маркет. 
+
+<code bash>
+Характеристики TP-Link TL-WN821N 
+Тип: Wi-Fi адаптер 
+Поддерживаемые протоколы и стандарты: 802.11n/g/b 
+Частотный диапазон	: 2,4-2,4835 ГГц 
+Интерфейс подключения: USB 2.0 
+Скорость передачи данных: до 150 Мбит/с 
+Поддержка MIMO: есть 
+Безопасность передачи данных: 64/128/152-битный WEP, WPA, WPA2, 802.1x 
+Модуляция: OFDM/CCK/16-QAM/64-QAM 
+Требования к условиям окружающей среды	
+Рабочая температура: 0.C~40.C (32~104F) 
+Температура хранения : -40.C~70.C (-40~158F) 
+Относительная влажность: 10% ~ 90% неконденсирующаяся 
+Влажность среды хранения: 5%~95% неконденсирующаяся 
+Поддержка ОС: Windows 7/XP/Vista/2000 32/64 bit 
+Мощность передатчика: 20 dBM 
+Габариты: 93,5 x 26 x 11 мм 
+Цена: 650 р. 
+</code>
+
+Итоги: TP-Link TL-WN821N - компактный, легкий, дешевый беспроводной адаптер. Один из хитов рынка.
+==== Ссылки ====
+
+  - http://www.3dnews.ru/communication/TP-LINK-TL-WR1043ND-Review/print
+  - http://www.overclockers.ru/lab/print/39329/Obzor_routerov_ASUS_RT-N13U_i_TP-Link_TL-WR1043ND.html
+  - http://market.yandex.ru/model.xml?modelid=6120422&hid=723087&text=TL-WR1043ND&srnum=14
+  - http://forum.tp-link.su/viewtopic.php?f=5&t=29
+  - http://versuz.livejournal.com/16155.html
+  - http://www.overclockers.ru/lab/print/39487/Alternativnye_proshivki_na_sovremennyh_routerah.html
+  - http://www.overclockers.ru/lab/print/39329/Obzor_routerov_ASUS_RT-N13U_i_TP-Link_TL-WR1043ND_obnovleno.html
+  - http://people.overclockers.ru/irkutsk/record46
+  - http://people.overclockers.ru/irkutsk/record47
+  - http://www.overclockers.ru/lab/print/39329/Obzor_routerov_ASUS_RT-N13U_i_TP-Link_TL-WR1043ND_obnovleno.html
+  - http://www.overclockers.ru/lab/print/39487/Alternativnye_proshivki_na_sovremennyh_routerah.html
+  - http://habrahabr.ru/blogs/DIY/98812
+
+==== Стартап скрипт ====
+
+<code bash>
+
+echo 50 > /proc/sys/net/netfilter/nf_conntrack_generic_timeout
+echo 5 > /proc/sys/net/netfilter/nf_conntrack_tcp_timeout_close
+echo 120 > /proc/sys/net/netfilter/nf_conntrack_tcp_timeout_close_wait
+echo 1200 > /proc/sys/net/netfilter/nf_conntrack_tcp_timeout_established
+echo 120 > /proc/sys/net/netfilter/nf_conntrack_tcp_timeout_fin_wait
+echo 60 > /proc/sys/net/netfilter/nf_conntrack_tcp_timeout_time_wait
+echo 2 > /proc/sys/net/ipv4/tcp_orphan_retries
+echo 1 > /proc/sys/net/ipv4/tcp_syncookies
+</code>
+
+
+
+
+{{tag>fixme tp-link tplink 1043nd прошивка dd-wrt ddwrt скачать}}

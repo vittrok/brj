@@ -1,0 +1,7 @@
+====== uTorrent убрать рекламу ======
+
+Установили, мигает как новогодняя елка.
+
+ctrl-p и выключить -> gui.show_plus_upsell -> offers.sponsored_torrent_offer_enabled -> и все по слову offer
+
+{{tag>utorrent отключить рекламу}}
